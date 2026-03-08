@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AC</title>
+    <link rel="icon" href="螢幕擷取畫面 2026-01-05 125529.png" sizes="48x48" type="image/png">
+    <style>
+        body {
+            background-color: rgb(20, 20, 20); 
+            margin: 0;
+            font-family: "Microsoft JhengHei", sans-serif;
+            padding-top: 60px;
+        }
+        header {
+            color: rgb(0, 131, 131);
+            padding: 20px;
+            text-align: center;
+        }
+        header img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+        header p {
+            font-size: 1.2rem;
+            margin: 10px 0;
+            color: #ccc;
+        }
+        main {
+            padding: 40px 0;
+            text-align: center;
+            margin: 10px 0;
+        }
+        .scroll-container {
+            display: flex;             
+            overflow-x: auto;         
+            gap: 20px;               
+            padding: 20px 40px;       
+            scroll-snap-type: x mandatory; 
+            -webkit-overflow-scrolling: touch;
+            &::-webkit-scrollbar {
+                height: 8px;
+            }
+            &::-webkit-scrollbar-track {
+                background: #333;
+                border-radius: 4px;
+            }
+            &::-webkit-scrollbar-thumb {
+                background: aquamarine;
+                border-radius: 4px;
+            }
+        }
+        .content-box {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+            flex: 0 0 220px;          
+            scroll-snap-align: center;
+            background-color: rgba(255, 255, 255, 0.1); 
+            border: 1px solid rgba(127, 255, 212, 0.3); 
+            border-radius: 15px;       
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s ease, background-color 0.3s;
+        }
+        .content-box:hover {
+            transform: translateY(-5px); 
+            background-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 5px 15px rgba(127, 255, 212, 0.2);
+        }
+        .img-wrap {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .img-wrap img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain; 
+        }
+        .content-box h3 {
+            margin: 0 0 10px 0;
+            color: aquamarine;
+            font-size: 1.5rem;
+            text-transform: uppercase; 
+        }
+        .content-box p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #ddd;
+            line-height: 1.4;
+        }
+        main img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 70px;
+        }
+        .navbar {
+            position: fixed;
+            top: 0;  
+            left: 0;
+            width: 100%;     
+            height: 60px;    
+            background-color: #333; 
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2); 
+            z-index: 1000;   
+            box-sizing: border-box; 
+        }
+        .logo {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-right: auto; 
+        }
+        .logo img {
+            height: 40px;
+            width: auto;
+        }
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            align-items: center;
+        }
+        .nav-menu li {
+            margin-left: 20px;
+        }
+        .nav-menu a {
+            text-decoration: none;
+            color: #ccc;
+            font-size: 1rem;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        .nav-menu a:hover {
+            color: white;
+            background-color: rgba(255,255,255,0.1);
+        }
+        .gdb-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            padding: 8px 15px; 
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+        }
+        .gdb-btn:hover {
+            background-color: #0056b3;
+            transform: scale(1.05); 
+        }
+        #gdbFloatWindow {
+            display: none;
+            position: fixed;
+            top: 100px;
+            right: 50px;
+            width: 600px;  
+            height: 500px; 
+            background: #1e1e1e;
+            border: 1px solid #444;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 2000; 
+            flex-direction: column;
+            overflow: hidden;
+            resize: both;      
+            overflow: hidden;  
+            min-width: 320px;  
+            min-height: 250px;
+            max-width: 95vw; 
+            max-height: 95vh;
+        }
+        .window-header {
+            height: 40px;
+            background: #333;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 10px;
+            cursor: move;
+            border-bottom: 1px solid #444;
+            user-select: none; 
+            flex-shrink: 0;
+        }
+        .window-title {
+            color: #ddd;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        .close-btn {
+            color: #bbb;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .close-btn:hover { color: #ff4d4d; }
+        .window-content {
+            flex: 1; 
+            background: #000;
+            position: relative;
+            height: calc(100% - 40px);
+        }
+        iframe { width: 100%; height: 100%; border: none; }
+        .is-dragging iframe {
+            pointer-events: none; 
+        }
+        header p {
+            font-size: 1.2rem;
+            margin: 10px 0;
+            color: #ccc;
+        }
+        header > img { 
+            max-width: 20%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+        <div class="logo"><img src="AClogo-removebg-preview.png"></div>
+        <ul class="nav-menu">
+            <li><a href="index.html" class="nav-link">首頁</a></li>
+            <li><a href="guide.html" class="nav-link">網站導覽</a></li>
+            <li><a href="about.html" class="nav-link">關於我們</a></li>
+            <li><a href="others.html" class="nav-link">其他</a></li>
+            <li>
+                <button class="gdb-btn" onclick="toggleGdbWindow()">
+                    GDB
+                </button>
+            </li>
+        </ul>
+    </nav>
+        <img src="AClogo-removebg-preview.png" style="max-width: 300px;">
+        <div style="height: 50px;"></div>
+        <p style="font-size:2rem"><i>A free and safe website</i></p>
+        <p style="text-align:center;font-size:2rem"><i>helps you learn coding in all ranges!</i></p>
+        <div style="height: 50px;"></div>
+    </header>
+    <main>
+        <div style="height: 50px;"></div>
+        <p style="font-size:2rem;text-align:center;color:crimson">What is coding?</p>
+        <div style="display: flex; justify-content: center;">
+            <img src="梗圖.png" alt="meme">
+        </div>
+        <p style="font-size:2rem;text-align:center;color:aquamarine"><I>一門與電腦溝通的「藝術」。</I></p>
+        <div style="height: 50px;"></div>
+        <p style="font-size:2rem;text-align:center;color:crimson">Why coding?</p>
+        <p style="font-size:2rem;text-align:center;color:aquamarine"><I>「在數位的世界裡，寫程式是唯一能讓你扮演『上帝』的方法。未來只有兩種人：告訴電腦做什麼的人，以及被電腦告訴該做什麼的人。別只當個玩家，當個創造者。花一小時寫程式，省下未來一千小時的重複工作。用指尖，改變世界。」</I></p>
+        <div style="display: flex; justify-content: center;">
+            <img src="黃仁勳.png" alt="Huang">
+        </div>
+        <p style="font-size:2rem;text-align:center;color:rgb(189, 170, 0)"><I><B>"Run, don't walk. Either you are running for food, or running from being food."</B></I></p>
+        <div style="height: 100px;"></div>
+        <center><p style="color:#ddd;font-size:2rem"><B><I>What are some simple and basic programming languages?</I></B></p></center>
+        <div style="height: 50px;"></div>
+        <div class="scroll-container">
+            <a href="cpp.html" class="content-box">
+                <div class="img-wrap"><img src="c++logo.png" alt="C++"></div>
+                <h3>C++</h3>
+                <p>C的延伸語言，效能極高，是UE的核心語言，也常用於競賽程式。</p>
+            </a>
+            <a href="python.html" class="content-box">
+                <div class="img-wrap"><img src="python_vertical_logo_icon_168039.webp" alt="Python"></div>
+                <h3>Python</h3>
+                <p>最簡易的語言，常用於計算或生成AI。</p>
+            </a>
+            <a href="js.html" class="content-box">
+                <div class="img-wrap"><img src="imgbin_a00831a712bb4f59eba35cb2c4c7a737.png" alt="JS"></div>
+                <h3>JavaScript</h3>
+                <p>常用於網頁互動與視覺化計算並輔助HTML。</p>
+            </a>
+            <a href="java.html" class="content-box">
+                <div class="img-wrap"><img src="Java_logo.png" alt="Java"></div>
+                <h3>Java</h3>
+                <p>跨平台物件導向語言，常用於大型企業後端系統與androidApp開發。</p>
+            </a>
+            <a href="html.html" class="content-box">
+                <div class="img-wrap"><img src="htmllogo-removebg-preview.png" alt="HTML"></div>
+                <h3>HTML</h3>
+                <p>最常見的網頁結構語言。</p>
+            </a>
+            <a href="css.html" class="content-box">
+                <div class="img-wrap"><img src="csslogo-removebg-preview.png" alt="CSS"></div>
+                <h3>CSS</h3>
+                <p>負責網頁的樣式與排版，常用於輔助HTML。</p>
+            </a>
+            <a href="cs.html" class="content-box">
+                <div class="img-wrap"><img src="Logo_C_sharp.svg-removebg-preview.png" alt="C#"></div>
+                <h3>C#</h3>
+                <p>微軟開發，語法優雅，是Unity遊戲引擎的主要開發語言。</p>
+            </a>
+            <a href="c.html" class="content-box">
+                <div class="img-wrap"><img src="C_Logo-removebg-preview.png" alt="C"></div>
+                <h3>C</h3>
+                <p>最早的高級語言，效能極高。</p>
+            </a>
+            <a href="linux.html" class="content-box">
+                <div class="img-wrap"><img src="linuxlogo.png" alt="linux"></div>
+                <h3>linux</h3>
+                <p>部署程式、競賽環境設定，都離不開linux終端機操作。</p>
+            </a>
+            <a href="sql.html" class="content-box">
+                <div class="img-wrap"><img src="SQLlogo.png" alt="SQL"></div>
+                <h3>SQL</h3>
+                <p>無論是寫網頁、寫 APP還是做AI，資料庫都是避不開的。</p>
+            </a>
+        </div>
+        <div style="height: 50px;"></div>
+        <center><p style="color:#ddd;font-size:2rem"><B><I>What can you do with those languages?</I></B></p></center>
+        <div style="height: 50px;"></div>
+        <div class="scroll-container">
+            <a href="competition.html" class="content-box">
+                <div class="img-wrap"><img src="competition.png" alt="Competition"></div>
+                <h3>Competition</h3>
+                <p>C++、Python常作為APCS、TOI等競賽的語言；競賽導向的學習常偏向對基礎邏輯和解題心法的訓練。</p>
+            </a>
+            <a href="ai.html" class="content-box">
+                <div class="img-wrap"><img src="AI.png" alt="AI"></div>
+                <h3>AI</h3>
+                <p>AI最常使用Python編寫，AI導向的學習會偏向大部分觀念和技巧的了解。</p>
+            </a>
+            <a href="website.html" class="content-box">
+                <div class="img-wrap"><img src="website.png" alt="Website"></div>
+                <h3>Website</h3>
+                <p>HTML、CSS、JS都是製作網站的語言，本網站也是用此三語言製作。</p>
+            </a>
+            <a href="b.html" class="content-box">
+                <div class="img-wrap"><img src="b.png" alt="Beckend"></div>
+                <h3>Backend</h3>
+                <p>後端結構大都以Java和linux為主，方便企業與私人做跨平台連結。</p>
+            </a>
+            <a href="system.html" class="content-box">
+                <div class="img-wrap"><img src="system.png" alt="System"></div>
+                <h3>System</h3>
+                <p>系統通常使用C語言和SQL，這是因為C語言最早出現且效能極高；而SQL負責資料庫貯存。</p>
+            </a>
+            <a href="game.html" class="content-box">
+                <div class="img-wrap"><img src="game.png" alt="Game"></div>
+                <h3>Game</h3>
+                <p>C++、C#是目前Unity、UE等遊戲引擎的主流語言，比起程式方塊具有更高的自有度。</p>
+            </a>
+            <a href="wc&d.html" class="content-box">
+                <div class="img-wrap"><img src="螢幕擷取畫面_2026-01-11_112317-removebg-preview.png" alt="Web_crawler_&_Debug"></div>
+                <h3>Web_crawler_&_Debug</h3>
+                <p>網路爬蟲(web crawler)是幫你自動上網、自動複製貼上資料；Debug(偵錯)是指把程式中語法邏輯錯誤的地方揪出。</p>
+            </a>
+            <div style="height: 50px;"></div>
+        </div>
+    </main>
+    <footer>
+        <h1>
+            <p style="text-align: center;color:#ddd;font-size:2rem"><I>"Wish you always AC(all corrected) in coding with us!"</I></p>
+            <div style="display: flex; align-items: center;">
+                <img src="logo.png" alt="描述" style="width: 200px; margin-right: 20px;">
+                <p style="color:#ddd">協作者：臺北市私立再興高級中學程式設計社<br>　　　　第五屆社長：林宜霆<br>　　　　社員：殷宏宇</p>
+            </div>
+        </h1>
+        <h2>
+            <p style="text-align: center;color:#ddd;font-size:2rem"><I> CONTACT US </I></p>
+            <div style="display: flex; align-items: center;">
+                <img src="fb.png" alt="FB_QRCode" style="width: 200px; margin-right: 20px;background-color:#ccc">
+                <img src="ig.png" alt="IG_QRCode" style="width: 200px; margin-right: 20px;background-color:#ccc">
+                <img src="網站.png" alt="Website_QRCode" style="width: 200px; margin-right: 20px;background-color:#ccc">
+                <a href="https://www.instagram.com/thcca_5th/?next=%2Fp%2FDJbHqzKRbLd%2F">@thcca_5th</a>
+            </div>
+        </h2>
+    </footer>
+    <div id="gdbFloatWindow">
+        <div class="window-header" id="dragHandle">
+            <span class="window-title">GDB</span>
+            <span class="close-btn" onclick="toggleGdbWindow()">&times;</span>
+        </div>
+        <div class="window-content">
+            <iframe 
+                id="gdbFrame"
+                data-src="https://www.onlinegdb.com/"
+                src="https://www.onlinegdb.com/"
+                sandbox="allow-forms allow-scripts allow-same-origin allow-popups">
+            </iframe>
+        </div>
+    </div>
+    <script>
+        const floatWindow = document.getElementById('gdbFloatWindow');
+        const iframe = document.getElementById('gdbFrame');
+        const dragHandle = document.getElementById('dragHandle');
+        function toggleGdbWindow() {
+            if (floatWindow.style.display === 'flex') {
+                floatWindow.style.display = 'none';
+            } else {
+                floatWindow.style.display = 'flex';
+                if (iframe.getAttribute('src') === "") {
+                    iframe.setAttribute('src', iframe.getAttribute('data-src'));
+                }
+            }
+        }
+        let isDragging = false;
+        let startX, startY, initialLeft, initialTop;
+        dragHandle.addEventListener('mousedown', function(e) {
+            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            const rect = floatWindow.getBoundingClientRect();
+            initialLeft = rect.left;
+            initialTop = rect.top;
+            floatWindow.classList.add('is-dragging');
+        });
+        document.addEventListener('mousemove', function(e) {
+            if (isDragging) {
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+                floatWindow.style.left = `${initialLeft + dx}px`;
+                floatWindow.style.top = `${initialTop + dy}px`;
+                floatWindow.style.right = 'auto'; 
+            }
+        });
+        document.addEventListener('mouseup', function() {
+            isDragging = false;
+            floatWindow.classList.remove('is-dragging');
+        });
+    </script>
+</body>
+</html>

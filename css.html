@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AC_CSS</title>
+    <link rel="icon" href="images/螢幕擷取畫面 2026-01-05 125529.png" sizes="48x48" type="image/png">
+    <style>
+        body {
+            background-color: rgb(20, 20, 20);
+            color: white;
+            font-family: "Microsoft JhengHei", sans-serif;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            text-decoration: none;
+            color: aquamarine;
+            border: 1px solid aquamarine;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        .back-button:hover {
+            background-color: aquamarine;
+            color: black;
+        }
+        .content {
+            max-width: 800px;
+            text-align: center;
+            margin-top: 50px;
+        }
+        h1 { color: aquamarine; font-size: 3rem; margin-bottom: 10px; }
+        p { font-size: 1.2rem; line-height: 1.6; color: #ddd; }
+        .big-logo {
+            width: 150px;
+            height: 150px;
+            object-fit: contain;
+            margin-bottom: 20px;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        .sidebar {
+            width: 200px;
+            height: 100vh;
+            position: fixed; 
+            top: 0;
+            left: 0;
+            background-color: #faa11cd0;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            overflow-y: auto;
+        }
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+        .sidebar li {
+            margin-bottom: 15px;
+        }
+        .sidebar a {
+            text-decoration: none;
+            color: #333;
+            display: block;
+            padding: 8px 12px;
+            border-left: 4px solid transparent; 
+            transition: all 0.3s;
+        }
+        .sidebar a:hover {
+            background-color: #faa11cd0;
+        }
+        .sidebar a.active {
+            color: #007bff;    
+            font-weight: bold;
+            border-left: 4px solid #007bff;
+            background-color: #faa11cd0;
+        }
+        .content {
+            margin-left: 240px;
+            padding: 40px;
+            max-width: 800px;
+        }
+        section {
+            min-height: 80vh; 
+            padding-top: 20px;
+            border-bottom: 1px solid #faa11cd0;
+        }
+        h2 {
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-button">← 回首頁</a>
+    <nav class="sidebar">
+        <div style="height: 30px;"></div>
+        <h3>章節目錄</h3>
+        <ul>
+            <li><a href="#section1" class="nav-link">1. 引入與選取</a></li>
+            <li><a href="#section2" class="nav-link">2. 盒模型</a></li>
+            <li><a href="#section3" class="nav-link">3. 定位與顯示</a></li>
+            <li><a href="#section4" class="nav-link">4. 排版系統</a></li>
+            <li><a href="#section5" class="nav-link">5. 響應式與動畫</a></li>
+        </ul>
+    </nav>
+    <header>
+        <div class="content">
+        <img src="csslogo-removebg-preview.png" class="big-logo">
+        <h1>CSS</h1>
+        <hr style="border-color: #333; margin: 20px 0;">
+        <div style="height: 50px;"></div>
+        <center>
+            <p style="color:#ddd;font-size:2rem"><B><I>Try Code Here!</I></B></p>
+        </center>
+        <div style="height: 30px;"></div>
+        <div style="max-width: 90%; margin: 0 auto; box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);">
+            <iframe 
+                src="https://www.onlinegdb.com/" 
+                width="100%" 
+                height="600px" 
+                frameborder="0" 
+                style="border-radius: 10px; border: 1px solid #333;"
+                allowfullscreen>
+            </iframe>
+        </div>
+        <div style="height: 30px;"></div>
+        <main class="content">
+            <section id="section1">
+                <h2>1. 引入與選取</h2>
+                <p>這裡是產品簡介的內容。請向下滾動查看側邊欄的變化。</p>
+                <p>（為了演示效果，這裡填充一些空白高度...）</p>
+            </section>
+            <section id="section2">
+                <h2>2. 盒模型</h2>
+                <p>這裡是規格說明的詳細資料。</p>
+            </section>
+            <section id="section3">
+                <h2>3. 定位與顯示</h2>
+                <p>這裡是使用教學的步驟。</p>
+            </section>
+            <section id="section4">
+                <h2>4. 排版系統</h2>
+                <p>這裡列出 FAQ。</p>
+            </section>
+            <section id="section5">
+                <h2>5. 響應式與動畫</h2>
+                <p>這裡有聯絡表單或資訊。</p>
+            </section>
+        </main>
+    <script>
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('section');
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= (sectionTop - 100)) {
+                    current = section.getAttribute('id');
+                }
+            });
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').includes(current)) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+    </header>
+</body>
+</html>

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AC_CPP</title>
+    <link rel="icon" href="螢幕擷取畫面 2026-01-05 125529.png" sizes="48x48" type="image/png">
+    <style>
+        body {
+            background-color: rgb(20, 20, 20);
+            color: white;
+            font-family: "Microsoft JhengHei", sans-serif;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            text-decoration: none;
+            color: aquamarine;
+            border: 1px solid aquamarine;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        .back-button:hover {
+            background-color: aquamarine;
+            color: black;
+        }
+        .content {
+            max-width: 800px;
+            text-align: center;
+            margin-top: 50px;
+        }
+        h1 { color: aquamarine; font-size: 3rem; margin-bottom: 10px; }
+        p { font-size: 1.2rem; line-height: 1.6; color: #ddd; }
+        .big-logo {
+            width: 150px;
+            height: 150px;
+            object-fit: contain;
+            margin-bottom: 20px;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        .sidebar {
+            width: 200px;
+            height: 100vh;
+            position: fixed; 
+            top: 0;
+            left: 0;
+            background-color: #faa11cd0;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            overflow-y: auto;
+        }
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+        .sidebar li {
+            margin-bottom: 15px;
+        }
+        .sidebar a {
+            text-decoration: none;
+            color: #333;
+            display: block;
+            padding: 8px 12px;
+            border-left: 4px solid transparent; 
+            transition: all 0.3s;
+        }
+        .sidebar a:hover {
+            background-color: #faa11cd0;
+        }
+        .sidebar a.active {
+            color: #007bff;    
+            font-weight: bold;
+            border-left: 4px solid #007bff;
+            background-color: #faa11cd0;
+        }
+        .content {
+            margin-left: 240px;
+            padding: 40px;
+            max-width: 800px;
+        }
+        section {
+            min-height: 80vh; 
+            padding-top: 20px;
+            border-bottom: 1px solid #faa11cd0;
+        }
+        h2 {
+            margin-top: 0;
+        }
+        .download-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .navbar {
+            position: fixed;
+            top: 0;  
+            left: 0;
+            width: 100%;     
+            height: 60px;    
+            background-color: #333; 
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2); 
+            z-index: 1000;   
+            box-sizing: border-box; 
+        }
+        .logo {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-right: auto; 
+        }
+        .logo img {
+            height: 40px;
+            width: auto;
+        }
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            align-items: center;
+        }
+        .nav-menu li {
+            margin-left: 20px;
+        }
+        .nav-menu a {
+            text-decoration: none;
+            color: #ccc;
+            font-size: 1rem;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        .nav-menu a:hover {
+            color: white;
+            background-color: rgba(255,255,255,0.1);
+        }
+        .gdb-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            padding: 8px 15px; 
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+        }
+        .gdb-btn:hover {
+            background-color: #0056b3;
+            transform: scale(1.05); 
+        }
+        #gdbFloatWindow {
+            display: none;
+            position: fixed;
+            top: 100px;
+            right: 50px;
+            width: 600px;  
+            height: 500px; 
+            background: #1e1e1e;
+            border: 1px solid #444;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 2000; 
+            flex-direction: column;
+            overflow: hidden;
+            resize: both;      
+            overflow: hidden;  
+            min-width: 320px;  
+            min-height: 250px;
+            max-width: 95vw; 
+            max-height: 95vh;
+        }
+        .window-header {
+            height: 40px;
+            background: #333;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 10px;
+            cursor: move;
+            border-bottom: 1px solid #444;
+            user-select: none; 
+            flex-shrink: 0;
+        }
+        .window-title {
+            color: #ddd;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        .close-btn {
+            color: #bbb;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .close-btn:hover { color: #ff4d4d; }
+        .window-content {
+            flex: 1; 
+            background: #000;
+            position: relative;
+            height: calc(100% - 40px);
+        }
+        iframe { width: 100%; height: 100%; border: none; }
+        .is-dragging iframe {
+            pointer-events: none; 
+        }
+        header p {
+            font-size: 1.2rem;
+            margin: 10px 0;
+            color: #ccc;
+        }
+        header > img { 
+            max-width: 20%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+<head>
+    <ul class="nav-menu">
+            <li>
+                <button class="gdb-btn" onclick="toggleGdbWindow()">
+                    GDB
+                </button>
+            </li>
+        </ul>
+</head>
+<body>
+    <a href="index.html" class="back-button">← 回首頁</a>
+    <nav class="sidebar">
+        <div style="height: 30px;"></div>
+        <h3>章節目錄</h3>
+        <ul>
+            <li><a href="#section1" class="nav-link">1. 開頭檔、輸入輸出、算術運算</a></li>
+            <li><a href="#section2" class="nav-link">2. 變數與資料型態、陣列</a></li>
+            <li><a href="#section3" class="nav-link">3. 條件判斷、迴圈</a></li>
+            <li><a href="#section4" class="nav-link">4. 函式</a></li>
+            <li><a href="#section5" class="nav-link">5. 類別與物件、繼承、資料儲存、例外處理</a></li>
+        </ul>
+    </nav>
+    <header>
+        <div class="content">
+        <img src="c++logo.png" class="big-logo">
+        <h1>C++</h1>
+        <button class="gdb-btn" onclick="toggleGdbWindow()">
+            GDB
+        </button>
+        <hr style="border-color: #333; margin: 20px 0;">
+        <div style="height: 50px;"></div>
+        <div style="height: 30px;"></div>
+        <main class="content">
+            <section id="section1">
+                <h2>1. 開頭檔、輸入輸出、算術運算</h2>
+                <p>C++是在貝爾實驗室開發，用來讓C語言具物件導向，因此C語言<span style="color:#fa6dff">編譯器</span>大都可以<span style="color:#ffee00fa">編譯</span>C++<br></p>
+                <p>在開頭的開頭，要先說明的是<span style="color:#fa6dff">「開頭檔」</span>，這是將已建立的<span style="color:#fa6dff">函式庫</span><span style="color:#ffee00fa">導入</span><span style="color:#fa6dff">環境</span>，最基礎的是<span style="color:#ffae00">#include</span><span style="color:#00eeff">&ltiostream&gt</span>；其他像是<span style="color:#09ff00">vector</span>等特殊<span style="color:#fa6dff">函式</span>就需要<span style="color:#ffee00fa">導入</span>，這邊提供一個<span style="color:#ffee00fa">導入</span>所有<span style="color:#fa6dff">函式</span>的<span style="color:#fa6dff">函式庫</span>：<span style="color:#ffae00">#include</span><span style="color:#00eeff">&ltbits/stdc++.h&gt</span>，可以避免忘記<span style="color:#ffee00fa">導入</span>要用的<span style="color:#fa6dff">函式</span>，缺點是運行時間會變長；最後是int main，這是主程式，你的整個程式架構就是以此為骨架。</p>
+                <p>再來是「<span style="color:#ffae00">using namespace</span> std;」，它的功用是引入<span style="color:#fa6dff">「命名空間」</span>，這樣就不必在每一行程式前加上std::，std是空間名稱，而<span style="color:#fa6dff">「命名空間」</span>是要區分不同<span style="color:#fa6dff">函式庫</span>中名稱相同的<span style="color:#fa6dff">函式</span>，有點像是一個班級，std::是班牌，而<span style="color:#ffae00">using namespace</span>是教室，一群人在教室外需要班牌區分班級，但在班級內就知道這夥人是同一班、哪一班的</p>
+                <p>接著來聊聊<span style="color:#ffee00fa">「輸入輸出」</span>，C++中<span style="color:#ffee00fa">輸入</span>是cin，<span style="color:#ffee00fa">輸出</span>是cout(有人唸「信」、「騷」，但我個人都唸「西印」、「西澳」)，打法是cin>>、cout&lt&lt</p>
+                <p>本節終段就以<span style="color:#fa6dff">「運算子」</span>收尾，<span style="color:#fa6dff">運算子</span>可分為<span style="color:#fa6dff">「指定運算子」</span>、<span style="color:#fa6dff">「算術運算子」</span>、<span style="color:#fa6dff">「關係運算子」</span>、<span style="color:#fa6dff">「邏輯運算子」</span>(雖然都是拿來算數的就是了ㄎㄎ)</p>
+                <p><span style="color:#fa6dff">指定運算子</span>目前只需要知道<span style="color:#ffae00">=</span>，可以把一個<span style="color:#fa6dff">變數</span><span style="color:#ffee00fa">指定</span>(例：a<span style="color:#ffae00">=</span>10;)</p>
+                <p>而<span style="color:#fa6dff">算術運算子</span>包含加減乘除，依序為+、-、*、/，這邊提點神奇的東東「%」(唸mod，不要再那邊啪啪啪了)，它可以用來取餘數、「++」加1、「--」減1；另外，C++是有先乘除後加減的觀念的，所以要先做的部分要用括號包住</p>
+                <p><span style="color:#fa6dff">關係運算子</span>，顧名思義就是判斷關係，有<span style="color:#ffae00">大於</span>、<span style="color:#ffae00">小於</span>、<span style="color:#ffae00">等於</span>、<span style="color:#ffae00">大於等於</span>、<span style="color:#ffae00">小於等於</span>、<span style="color:#ffae00">不等於</span>，依序為<span style="color:#ffae00">&gt</span>、<span style="color:#ffae00">&lt</span>、<span style="color:#ffae00">=</span>、<span style="color:#ffae00">&gt=</span>、<span style="color:#ffae00">&lt=</span>、<span style="color:#ffae00">!=</span></p>
+                <p>最後是<span style="color:#fa6dff">邏輯運算子</span>，有「且」、「或」、「否」，分別為「&&」、「||」、「!」</p>            
+            </section>
+            <section id="section2">
+                <h2>2. 變數與資料型態、陣列</h2>
+                <p>敬請期待</p>
+            </section>
+            <section id="section3">
+                <h2>3. 條件判斷、迴圈</h2>
+                <p>敬請期待</p>
+            </section>
+            <section id="section4">
+                <h2>4. 函式</h2>
+                <p>敬請期待</p>
+            </section>
+            <section id="section5">
+                <h2>5. 類別與物件、繼承、資料儲存、例外處理</h2>
+                <p>敬請期待</p>
+            </section>
+        </main>
+        <div style="height: 60px;"></div>
+        <p>最後這裡提供一個用GoogleAI(Gemini)NotebookLM製作的教學綱要簡報簡報，下載起來，方便需要時做迅速的統整和複習~</p>
+        <a href="C  _基礎與實踐藍圖.pdf" download class="download-btn">立即下載檔案</a>
+    <script>
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('section');
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= (sectionTop - 100)) {
+                    current = section.getAttribute('id');
+                }
+            });
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').includes(current)) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+    </header>
+    <div id="gdbFloatWindow">
+        <div class="window-header" id="dragHandle">
+            <span class="window-title">GDB</span>
+            <span class="close-btn" onclick="toggleGdbWindow()">&times;</span>
+        </div>
+        <div class="window-content">
+            <iframe 
+                id="gdbFrame"
+                data-src="https://www.onlinegdb.com/"
+                src="https://www.onlinegdb.com/"
+                sandbox="allow-forms allow-scripts allow-same-origin allow-popups">
+            </iframe>
+        </div>
+    </div>
+    <script>
+        const floatWindow = document.getElementById('gdbFloatWindow');
+        const iframe = document.getElementById('gdbFrame');
+        const dragHandle = document.getElementById('dragHandle');
+        function toggleGdbWindow() {
+            if (floatWindow.style.display === 'flex') {
+                floatWindow.style.display = 'none';
+            } else {
+                floatWindow.style.display = 'flex';
+                if (iframe.getAttribute('src') === "") {
+                    iframe.setAttribute('src', iframe.getAttribute('data-src'));
+                }
+            }
+        }
+        let isDragging = false;
+        let startX, startY, initialLeft, initialTop;
+        dragHandle.addEventListener('mousedown', function(e) {
+            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            const rect = floatWindow.getBoundingClientRect();
+            initialLeft = rect.left;
+            initialTop = rect.top;
+            floatWindow.classList.add('is-dragging');
+        });
+        document.addEventListener('mousemove', function(e) {
+            if (isDragging) {
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+                floatWindow.style.left = `${initialLeft + dx}px`;
+                floatWindow.style.top = `${initialTop + dy}px`;
+                floatWindow.style.right = 'auto'; 
+            }
+        });
+        document.addEventListener('mouseup', function() {
+            isDragging = false;
+            floatWindow.classList.remove('is-dragging');
+        });
+    </script>
+</body>
+</html>
