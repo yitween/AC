@@ -135,25 +135,41 @@
         <main class="content">
             <section id="section1">
                 <h2>1. 類別結構與基礎</h2>
-                <p>這裡是產品簡介的內容。請向下滾動查看側邊欄的變化。</p>
-                <p>（為了演示效果，這裡填充一些空白高度...）</p>
-            </section>
+                <p>Java是一個強型別、物件導向的程式語言，由Sun Microsystems（現Oracle）開發，最大特色是「<span style="color:#ffee00fa">Write Once, Run Anywhere</span>」——Java程式先編譯成<span style="color:#fa6dff">「位元組碼（Bytecode）」</span>，再由<span style="color:#ffae00">JVM（Java Virtual Machine）</span>執行，所以可以跨平台運作。Android開發、企業後端系統大量使用Java。</p>
+                <p>Java程式的每個檔案都必須有一個同名的<span style="color:#ffae00">public class</span>，例如檔案叫Main.java，裡面就要有 <span style="color:#ffae00">public class</span> <span style="color:#00eeff">Main</span> {...}。程式進入點是固定語法：<span style="color:#ffae00">public static void main</span>(<span style="color:#ffae00">String</span>[] args) {...}，一個字都不能差。</p>
+                <p>Java的<span style="color:#ffee00fa">輸出</span>用<span style="color:#ffae00">System.out.println()</span>（自動換行）或<span style="color:#ffae00">System.out.print()</span>（不換行），<span style="color:#ffee00fa">輸入</span>要先建立<span style="color:#ffae00">Scanner</span>物件：<span style="color:#ffae00">Scanner</span> <span style="color:#00eeff">sc</span> = <span style="color:#ffae00">new Scanner</span>(<span style="color:#ffae00">System.in</span>);，然後用 sc.<span style="color:#ffae00">nextInt()</span>讀整數、sc.<span style="color:#ffae00">nextLine()</span>讀字串。</p>
+                <p>Java的字串用<span style="color:#ffae00">String</span>型態（注意大寫S），字串串接用<span style="color:#ffae00">+</span>；現代Java（15+）支援文字區塊，也可以用<span style="color:#ffae00">String.format()</span>格式化，例如：<span style="color:#ffae00">String.format</span>(<span style="color:#00eeff">"我叫%s，今年%d歲"</span>, name, age)，格式符和C的printf相同。</p>
+                <p>Java的<span style="color:#fa6dff">「運算子」</span>和C/C++完全相同，加減乘除、%取餘數、比較運算子、邏輯運算子（&&、||、!）都一樣，沒什麼需要特別說明的，直接套用過來用就行！每行敘述結尾要加<span style="color:#ffee00fa">分號（;）</span>。</p>
+</section>
             <section id="section2">
                 <h2>2. 變數與資料</h2>
-                <p>這裡是規格說明的詳細資料。</p>
-            </section>
+                <p>Java是<span style="color:#ffae00">強型別語言</span>，所有變數宣告時都必須指定型態。<span style="color:#fa6dff">「基本型態（Primitive Types）」</span>有八種：<span style="color:#ffae00">int</span>（整數）、<span style="color:#ffae00">long</span>（大整數）、<span style="color:#ffae00">short</span>（小整數）、<span style="color:#ffae00">byte</span>（更小的整數）、<span style="color:#ffae00">float</span>（單精浮點，後面加f）、<span style="color:#ffae00">double</span>（雙精浮點）、<span style="color:#ffae00">char</span>（字元，用單引號）、<span style="color:#ffae00">boolean</span>（true/false）。</p>
+                <p>和C#類似，Java也有<span style="color:#fa6dff">「包裝類別（Wrapper Classes）」</span>，讓基本型態變成物件，例如<span style="color:#ffae00">int</span>對應<span style="color:#ffae00">Integer</span>、<span style="color:#ffae00">double</span>對應<span style="color:#ffae00">Double</span>，在需要物件的場合（如放進集合）就要用包裝類別。Java會自動在基本型態和包裝類別之間轉換，叫做<span style="color:#ffee00fa">自動裝箱/拆箱（Auto-boxing）</span>。</p>
+                <p>Java的<span style="color:#fa6dff">「陣列」</span>宣告語法和C#相同：<span style="color:#ffae00">int</span>[] arr = <span style="color:#ffae00">new int</span>[5];，或直接初始化：<span style="color:#ffae00">int</span>[] arr = {1, 2, 3, 4, 5};，索引從0開始，用<span style="color:#ffae00">.length</span>取得長度（注意不是方法，不用加括號）。</p>
+                <p>更靈活的集合用<span style="color:#ffae00">ArrayList</span>，需要<span style="color:#ffee00fa">引入</span><span style="color:#00eeff">java.util.ArrayList</span>。宣告：<span style="color:#ffae00">ArrayList</span>&lt;<span style="color:#ffae00">Integer</span>&gt; list = <span style="color:#ffae00">new ArrayList</span>&lt;&gt;();（注意要用包裝類別），常用方法：<span style="color:#ffae00">.add()</span>新增、<span style="color:#ffae00">.get(i)</span>取值、<span style="color:#ffae00">.set(i, x)</span>修改、<span style="color:#ffae00">.remove(i)</span>刪除、<span style="color:#ffae00">.size()</span>大小。</p>
+</section>
             <section id="section3">
                 <h2>3. 流程控制</h2>
-                <p>這裡是使用教學的步驟。</p>
-            </section>
+                <p>Java的<span style="color:#fa6dff">「流程控制」</span>語法和C/C++幾乎完全相同，學過一個就等於學過另一個，這邊快速過一遍。<span style="color:#ffae00">if...else if...else</span>條件判斷、<span style="color:#ffae00">switch</span>多分支（記得加<span style="color:#ffae00">break</span>），Java的switch從Java 14起支援更現代的箭頭語法：<span style="color:#ffae00">case</span> 1 <span style="color:#ffae00">-&gt;</span> ...，不需要break。</p>
+                <p>迴圈有<span style="color:#ffae00">for</span>、<span style="color:#ffae00">while</span>、<span style="color:#ffae00">do...while</span>，語法和C完全一樣。遍歷陣列或集合可以用<span style="color:#fa6dff">「增強型for迴圈（Enhanced for）」</span>，也叫for-each：<span style="color:#ffae00">for</span>(<span style="color:#ffae00">int</span> item : arr){...}，和C#的foreach語法類似，不需要管索引，簡潔易讀。</p>
+                <p><span style="color:#ffae00">break</span>跳出迴圈、<span style="color:#ffae00">continue</span>跳過這一輪，用法和C/C++相同。Java還有<span style="color:#fa6dff">「帶標籤的break（Labeled break）」</span>，可以跳出指定的外層迴圈，語法是在迴圈前加標籤：<span style="color:#ffae00">outer: for</span>(...){<span style="color:#ffae00">for</span>(...){<span style="color:#ffae00">break outer</span>;}}，在多層巢狀迴圈中很有用。</p>
+                <p>Java的<span style="color:#ffae00">String</span>比較要用<span style="color:#ffae00">.equals()</span>而不是<span style="color:#ffae00">==</span>，這是Java初學者最常犯的錯誤！因為==比較的是物件的記憶體位址，而.equals()才是比較字串內容。例如：<span style="color:#ffae00">if</span>(name.<span style="color:#ffae00">equals</span>(<span style="color:#00eeff">"小明"</span>)){...}。</p>
+</section>
             <section id="section4">
                 <h2>4. 方法</h2>
-                <p>這裡列出 FAQ。</p>
-            </section>
+                <p>Java把函式叫做<span style="color:#fa6dff">「方法（Method）」</span>，所有方法都必須在class內宣告。完整語法是：「<span style="color:#ffae00">存取修飾詞</span> [static] <span style="color:#ffae00">回傳型態</span> <span style="color:#00eeff">方法名稱</span>（<span style="color:#fa6dff">參數型態 參數名稱</span>）{... <span style="color:#ffae00">return</span> 值;}」。在main裡呼叫的方法一樣要加<span style="color:#ffae00">static</span>。</p>
+                <p><span style="color:#fa6dff">「存取修飾詞」</span>有四種：<span style="color:#ffae00">public</span>（任何地方可存取）、<span style="color:#ffae00">private</span>（同class內）、<span style="color:#ffae00">protected</span>（同package和子類別）、無修飾詞（同package，叫package-private）。封裝原則建議屬性設<span style="color:#ffae00">private</span>，再提供<span style="color:#ffae00">public</span>的getter/setter方法來存取。</p>
+                <p>Java支援<span style="color:#fa6dff">「方法多載（Overloading）」</span>，同名方法有不同參數型態或數量。Java是<span style="color:#ffee00fa">傳值</span>的語言，但傳物件時傳的是<span style="color:#ffee00fa">參考的副本</span>，所以在方法內修改物件的屬性會影響原物件，但重新指定整個物件（如 obj = new Object()）不會影響原來的參考。</p>
+                <p>Java也支援<span style="color:#fa6dff">「遞迴」</span>，語法和其他語言相同，記得要有終止條件。Java 8之後加入了<span style="color:#fa6dff">「Lambda運算式」</span>，語法是 (參數) <span style="color:#ffae00">-&gt;</span> 運算式，例如：<span style="color:#ffae00">Comparator</span>&lt;<span style="color:#ffae00">Integer</span>&gt; cmp = (a, b) <span style="color:#ffae00">-&gt;</span> a - b;，常搭配Stream API做集合操作，是現代Java開發的重要特性。</p>
+</section>
             <section id="section5">
                 <h2>5. 物件導向核心</h2>
-                <p>這裡有聯絡表單或資訊。</p>
-            </section>
+                <p>Java是<span style="color:#fa6dff">「純物件導向語言」</span>（除了基本型態），OOP的四大特性：<span style="color:#ffae00">封裝</span>（把資料和方法包在class內，隱藏實作細節）、<span style="color:#ffae00">繼承</span>（子類別繼承父類別）、<span style="color:#ffae00">多型</span>（同名方法在不同類別有不同行為）、<span style="color:#ffae00">抽象</span>（用介面或抽象類別定義規範），Java把這四個都實作得非常完整。</p>
+                <p>繼承語法：<span style="color:#ffae00">class</span> <span style="color:#00eeff">Dog</span> <span style="color:#ffae00">extends</span> <span style="color:#00eeff">Animal</span> {...}，Java只支援<span style="color:#ffee00fa">單一繼承</span>（只能extends一個父類別）。子類別用<span style="color:#ffae00">super()</span>呼叫父類別建構子，用<span style="color:#ffae00">@Override</span>覆寫父類別方法（加這個標註有助於編譯器幫你抓錯）。</p>
+                <p>多重繼承的需求靠<span style="color:#fa6dff">「介面（Interface）」</span>解決，介面用<span style="color:#ffae00">interface</span>宣告，class用<span style="color:#ffae00">implements</span>實作，且可以實作多個介面，例如：<span style="color:#ffae00">class</span> <span style="color:#00eeff">Robot</span> <span style="color:#ffae00">implements</span> <span style="color:#00eeff">Workable</span>, <span style="color:#00eeff">Chargeable</span> {...}。<span style="color:#fa6dff">「抽象類別（Abstract class）」</span>用<span style="color:#ffae00">abstract</span>修飾，可以有未實作的方法，介於一般class和interface之間。</p>
+                <p>Java的<span style="color:#fa6dff">「例外處理」</span>用<span style="color:#ffae00">try...catch...finally</span>，語法和C#相同。Java的例外分兩類：<span style="color:#ffae00">checked exception</span>（編譯器強制要處理，例如IOException）和<span style="color:#ffae00">unchecked exception</span>（執行時才發現，例如NullPointerException）。方法若可能拋出checked exception，要在宣告加<span style="color:#ffae00">throws</span>，例如：<span style="color:#ffae00">void</span> readFile() <span style="color:#ffae00">throws</span> <span style="color:#ffae00">IOException</span> {...}。</p>
+                <p>恭喜完成Java基礎！Java雖然語法較為嚴謹囉嗦，但這種嚴格正是大型專案的保障。下一步可以深入學習Java的泛型、Stream API、多執行緒，或是往Spring Boot框架發展，做後端服務開發——Java在企業級應用的地位無可撼動！</p>
+</section>
         </main>
     <script>
         const navLinks = document.querySelectorAll('.nav-link');

@@ -120,25 +120,43 @@
         <main class="content">
             <section id="section1">
                 <h2>1. 基本操作</h2>
-                <p>這裡是產品簡介的內容。請向下滾動查看側邊欄的變化。</p>
-                <p>（為了演示效果，這裡填充一些空白高度...）</p>
-            </section>
+                <p>Linux是目前最廣泛使用的伺服器作業系統，幾乎所有雲端服務、網頁伺服器都跑在Linux上。學Linux主要是透過<span style="color:#fa6dff">「終端機（Terminal）」</span>下指令操作，雖然一開始看起來很嚇人，但掌握基本指令後效率遠超圖形介面。</p>
+                <p>最基本的導航指令：<span style="color:#ffae00">pwd</span>（Print Working Directory）顯示目前所在的路徑；<span style="color:#ffae00">ls</span>列出當前目錄的檔案，加<span style="color:#ffae00">-l</span>顯示詳細資訊（權限、大小、時間），加<span style="color:#ffae00">-a</span>顯示隱藏檔（以.開頭的檔案）；<span style="color:#ffae00">cd</span>切換目錄，<span style="color:#ffae00">cd ..</span>回上一層，<span style="color:#ffae00">cd ~</span>回家目錄，<span style="color:#ffae00">cd /</span>到根目錄。</p>
+                <p>Linux的路徑有兩種：<span style="color:#fa6dff">「絕對路徑」</span>從根目錄<span style="color:#ffae00">/</span>開始，例如 /home/user/documents；<span style="color:#fa6dff">「相對路徑」</span>從目前位置出發，例如 ./documents 或 ../other。<span style="color:#ffae00">.</span>代表目前目錄，<span style="color:#ffae00">..</span>代表上一層目錄，<span style="color:#ffae00">~</span>代表家目錄。</p>
+                <p>幾個超實用的操作技巧：<span style="color:#ffee00fa">Tab鍵</span>自動補全指令和路徑，是效率神器；<span style="color:#ffee00fa">↑↓方向鍵</span>可以瀏覽歷史指令；<span style="color:#ffae00">history</span>顯示所有歷史指令；<span style="color:#ffae00">clear</span>清空畫面；<span style="color:#ffae00">Ctrl+C</span>強制中斷正在執行的程式；<span style="color:#ffae00">Ctrl+Z</span>暫停程式放到背景。</p>
+                <p>想知道某個指令怎麼用，有兩個方法：<span style="color:#ffae00">man 指令名</span>（Manual）顯示完整說明書，按Q離開；或是<span style="color:#ffae00">指令名 --help</span>顯示簡短說明。剛開始學Linux遇到不確定的指令，查man和help是最正確的做法！</p>
+</section>
             <section id="section2">
                 <h2>2. 檔案管理</h2>
-                <p>這裡是規格說明的詳細資料。</p>
-            </section>
+                <p>Linux的<span style="color:#fa6dff">「檔案管理」</span>全靠指令完成，掌握這幾個就能應付大多數情況。<span style="color:#ffae00">mkdir 目錄名</span>建立新目錄（Make Directory），加<span style="color:#ffae00">-p</span>可一次建立多層目錄，例如：<span style="color:#ffae00">mkdir -p</span> a/b/c；<span style="color:#ffae00">rmdir 目錄名</span>刪除空目錄。</p>
+                <p><span style="color:#ffae00">touch 檔名</span>建立空白檔案（或更新檔案的時間戳記）；<span style="color:#ffae00">cp 來源 目的</span>複製檔案，加<span style="color:#ffae00">-r</span>可複製整個目錄；<span style="color:#ffae00">mv 來源 目的</span>移動或重新命名檔案（在同目錄下移動就等於重新命名）；<span style="color:#ffae00">rm 檔名</span>刪除檔案，加<span style="color:#ffae00">-r</span>刪除目錄，加<span style="color:#ffae00">-f</span>強制刪除不詢問。</p>
+                <p>⚠️ 要特別注意：Linux<span style="color:#ffee00fa">沒有資源回收桶</span>，rm刪掉的檔案幾乎無法恢復！尤其是<span style="color:#ffae00">rm -rf /</span>（刪除根目錄所有東西）這種指令絕對不要執行，是毀滅性的操作。刪除前最好先用ls確認路徑正確。</p>
+                <p>搜尋檔案用<span style="color:#ffae00">find 路徑 -name "檔名"</span>，支援萬用字元，例如：<span style="color:#ffae00">find</span> /home <span style="color:#ffae00">-name</span> "*.txt" 找所有txt檔；搜尋檔案內容用<span style="color:#ffae00">grep "關鍵字" 檔名</span>，加<span style="color:#ffae00">-r</span>可遞迴搜尋整個目錄，加<span style="color:#ffae00">-i</span>忽略大小寫，這個指令在找log檔裡的錯誤訊息時超好用！</p>
+                <p>想知道磁碟使用情況，<span style="color:#ffae00">df -h</span>顯示各分區的使用率（-h是human-readable，用KB/MB/GB顯示）；<span style="color:#ffae00">du -sh 目錄</span>顯示某目錄的總大小；<span style="color:#ffae00">ls -lh</span>查看各檔案大小。</p>
+</section>
             <section id="section3">
                 <h2>3. 查看與編輯</h2>
-                <p>這裡是使用教學的步驟。</p>
-            </section>
+                <p>查看檔案內容有幾種方式：<span style="color:#ffae00">cat 檔名</span>直接把全部內容印出來（適合短檔案）；<span style="color:#ffae00">less 檔名</span>分頁顯示（上下鍵翻頁、Q離開），適合大檔案；<span style="color:#ffae00">head -n 10 檔名</span>顯示前10行；<span style="color:#ffae00">tail -n 10 檔名</span>顯示後10行，加<span style="color:#ffae00">-f</span>可即時追蹤新增的內容（監控log檔超常用！）。</p>
+                <p>Linux最常見的終端機文字編輯器是<span style="color:#ffae00">vim</span>和<span style="color:#ffae00">nano</span>。<span style="color:#ffae00">nano</span>比較適合初學者，操作提示都顯示在畫面下方，<span style="color:#ffae00">Ctrl+O</span>儲存，<span style="color:#ffae00">Ctrl+X</span>離開。<span style="color:#ffae00">vim</span>功能強大但學習曲線陡峭，有<span style="color:#fa6dff">「模式」</span>的概念：一般模式（預設）、插入模式（按<span style="color:#ffae00">i</span>進入、<span style="color:#ffae00">Esc</span>退出）、命令模式（在一般模式按<span style="color:#ffae00">:</span>進入），儲存用<span style="color:#ffae00">:w</span>，離開用<span style="color:#ffae00">:q</span>，強制離開用<span style="color:#ffae00">:q!</span>。</p>
+                <p>Linux的<span style="color:#fa6dff">「管道（Pipe）｜」</span>是把一個指令的輸出當作另一個指令的輸入，例如：<span style="color:#ffae00">ls -l | grep ".txt"</span>，先列出所有檔案，再用grep過濾只顯示txt檔，這個概念可以把簡單指令組合成強大的功能。</p>
+                <p>還有<span style="color:#fa6dff">「重定向（Redirect）」</span>：<span style="color:#ffae00">&gt;</span>把輸出寫入檔案（覆蓋），<span style="color:#ffae00">&gt;&gt;</span>附加到檔案尾端，例如：<span style="color:#ffae00">echo "Hello" &gt;&gt; log.txt</span>；<span style="color:#ffae00">&lt;</span>把檔案內容作為輸入。這讓你可以把指令結果存成檔案，或把檔案內容餵給指令處理。</p>
+</section>
             <section id="section4">
                 <h2>4. 權限與使用者</h2>
-                <p>這裡列出 FAQ。</p>
-            </section>
+                <p>Linux是多使用者系統，每個檔案都有<span style="color:#fa6dff">「擁有者」</span>和<span style="color:#fa6dff">「權限」</span>設定。用<span style="color:#ffae00">ls -l</span>可以看到類似 -rwxr-xr-- 的權限字串，分三組，每組三個字元（r=讀、w=寫、x=執行），分別代表<span style="color:#ffee00fa">擁有者、群組、其他人</span>的權限。</p>
+                <p>更改權限用<span style="color:#ffae00">chmod</span>，有兩種寫法：符號法（<span style="color:#ffae00">chmod u+x 檔名</span>，給擁有者加執行權）；數字法（每個權限對應數字：r=4、w=2、x=1，相加後三位數字，例如755代表rwxr-xr-x），常見的<span style="color:#ffae00">chmod 755</span>給腳本執行權、<span style="color:#ffae00">chmod 644</span>讓檔案可讀但不可執行。</p>
+                <p>更改擁有者用<span style="color:#ffae00">chown 使用者:群組 檔名</span>，例如：<span style="color:#ffae00">chown</span> alice:staff file.txt。查看目前登入的使用者用<span style="color:#ffae00">whoami</span>；查看所有使用者用<span style="color:#ffae00">cat /etc/passwd</span>；切換使用者用<span style="color:#ffae00">su 使用者名</span>。</p>
+                <p>Linux的<span style="color:#fa6dff">「sudo」</span>是超級指令，讓一般使用者暫時以管理員（root）身份執行某個指令，例如：<span style="color:#ffae00">sudo apt install nginx</span>，需要輸入自己的密碼確認。<span style="color:#ffae00">sudo su</span>可以切換到root，但要非常謹慎，root可以刪除任何東西！能力越大，責任越大。</p>
+                <p>套件管理是Linux日常維護的重要技能，Debian/Ubuntu系列用<span style="color:#ffae00">apt</span>：<span style="color:#ffae00">sudo apt update</span>更新套件清單、<span style="color:#ffae00">sudo apt install 套件名</span>安裝、<span style="color:#ffae00">sudo apt remove 套件名</span>移除；CentOS/RHEL系列用<span style="color:#ffae00">yum</span>或<span style="color:#ffae00">dnf</span>，語法類似。</p>
+</section>
             <section id="section5">
                 <h2>5. 進階管理</h2>
-                <p>這裡有聯絡表單或資訊。</p>
-            </section>
+                <p>Linux的<span style="color:#fa6dff">「行程管理」</span>讓你知道系統上在跑什麼程式。<span style="color:#ffae00">ps aux</span>列出所有行程（PID、使用者、CPU/記憶體佔用等）；<span style="color:#ffae00">top</span>即時顯示系統資源使用狀況（按Q離開），更好用的替代品是<span style="color:#ffae00">htop</span>（要另外安裝，介面更友善）；<span style="color:#ffae00">kill PID</span>終止指定行程，<span style="color:#ffae00">kill -9 PID</span>強制終止。</p>
+                <p><span style="color:#fa6dff">「背景執行」</span>：在指令後加<span style="color:#ffae00">&amp;</span>讓程式在背景執行，例如：<span style="color:#ffae00">python server.py &amp;</span>；<span style="color:#ffae00">jobs</span>查看背景工作；<span style="color:#ffae00">fg</span>把背景工作拉回前景；更穩定的長時間背景執行用<span style="color:#ffae00">nohup</span>或<span style="color:#ffae00">screen</span>，即使關閉終端機程式也會繼續跑。</p>
+                <p>網路相關指令：<span style="color:#ffae00">ping 主機名</span>測試網路連通性；<span style="color:#ffae00">curl URL</span>取得網頁內容（常用來測試API）；<span style="color:#ffae00">wget URL</span>下載檔案；<span style="color:#ffae00">ssh 使用者@主機</span>遠端登入另一台Linux機器；<span style="color:#ffae00">scp 來源 目的</span>安全地複製檔案到遠端主機（Secure Copy）。</p>
+                <p><span style="color:#fa6dff">「Shell Script」</span>是把一連串指令寫成腳本檔自動執行，副檔名通常是<span style="color:#ffae00">.sh</span>，第一行固定是<span style="color:#ffae00">#!/bin/bash</span>（Shebang，告訴系統用哪個Shell執行），存檔後用<span style="color:#ffae00">chmod +x script.sh</span>給執行權，再<span style="color:#ffae00">./script.sh</span>執行。Shell Script可以做迴圈、判斷、排程，是Linux自動化的核心工具。</p>
+                <p>最後，<span style="color:#ffae00">crontab -e</span>可以設定<span style="color:#fa6dff">「排程任務（Cron Job）」</span>，讓某個指令在固定時間自動執行，格式是「分 時 日 月 週 指令」，例如：0 2 * * * /home/backup.sh 代表每天凌晨2點執行備份腳本，是伺服器自動化維運的必學技能！</p>
+</section>
         </main>
     <script>
         const navLinks = document.querySelectorAll('.nav-link');

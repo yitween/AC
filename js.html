@@ -135,25 +135,40 @@
         <main class="content">
             <section id="section1">
                 <h2>1. 輸出與運算</h2>
-                <p>這裡是產品簡介的內容。請向下滾動查看側邊欄的變化。</p>
-                <p>（為了演示效果，這裡填充一些空白高度...）</p>
-            </section>
+                <p>JavaScript（JS）是唯一能在<span style="color:#fa6dff">「瀏覽器」</span>內原生執行的程式語言，幾乎所有網頁的互動效果都是JS做的。搭配Node.js也可以跑在伺服器端，是全端開發的必學語言。JS是<span style="color:#ffae00">動態型別語言</span>，不需要宣告型態。</p>
+                <p>JS的<span style="color:#ffee00fa">輸出</span>有幾種方式：<span style="color:#ffae00">console.log()</span>在瀏覽器的開發者工具Console顯示（最常用）；<span style="color:#ffae00">alert()</span>跳出對話框；<span style="color:#ffae00">document.write()</span>直接寫入網頁（實務上很少用）。開啟Chrome開發者工具用F12，Console分頁就能測試JS。</p>
+                <p>JS的<span style="color:#fa6dff">「運算子」</span>和其他語言大致相同，但有個特別重要的：<span style="color:#ffae00">==</span>（寬鬆相等，會自動轉型）和<span style="color:#ffae00">===</span>（嚴格相等，型態也要一樣）。例如：<span style="color:#00eeff">"5" == 5</span> 是true，但 <span style="color:#00eeff">"5" === 5</span> 是false。<span style="color:#ffee00fa">強烈建議永遠用===</span>，==的自動轉型很容易造成難找的bug！</p>
+                <p>JS也有<span style="color:#ffae00">**</span>（次方）、<span style="color:#ffae00">%</span>（取餘數）、<span style="color:#ffae00">++</span>/<span style="color:#ffae00">--</span>（加減1）。字串可以用<span style="color:#ffae00">+</span>串接，例如：<span style="color:#00eeff">"Hello" + " " + "World"</span>；更推薦用<span style="color:#fa6dff">「模板字串（Template Literal）」</span>，用反引號（`）包住，<span style="color:#ffae00">${}</span>嵌入變數，例如：<span style="color:#ffae00">`我叫${name}，今年${age}歲`</span>，和Python的f-string概念相同。</p>
+</section>
             <section id="section2">
                 <h2>2. 變數與物件</h2>
-                <p>這裡是規格說明的詳細資料。</p>
-            </section>
+                <p>JS宣告變數有三種關鍵字：<span style="color:#ffae00">var</span>（舊式，有作用域問題，現在不建議用）、<span style="color:#ffae00">let</span>（現代寫法，可重新賦值）、<span style="color:#ffae00">const</span>（常數，宣告後不可重新賦值）。現代JS建議<span style="color:#ffee00fa">預設用const，需要改變時才用let，不要用var</span>。</p>
+                <p>JS的<span style="color:#fa6dff">「陣列（Array）」</span>和Python的list類似，混放型態、動態大小，用方括號宣告：<span style="color:#ffae00">const</span> fruits = [<span style="color:#00eeff">'apple', 'banana'</span>]。常用方法：<span style="color:#ffae00">.push(x)</span>加到尾端、<span style="color:#ffae00">.pop()</span>移除最後、<span style="color:#ffae00">.shift()</span>移除第一個、<span style="color:#ffae00">.unshift(x)</span>加到最前、<span style="color:#ffae00">.splice()</span>插入或移除、<span style="color:#ffae00">.slice()</span>切片、<span style="color:#ffae00">.length</span>長度。</p>
+                <p>JS最核心的資料結構是<span style="color:#fa6dff">「物件（Object）」</span>，用大括號宣告鍵值對：<span style="color:#ffae00">const</span> student = {<span style="color:#00eeff">name: '小明', age: 18</span>}，存取用<span style="color:#ffae00">student.name</span>或<span style="color:#ffae00">student['name']</span>。物件可以包含函式（這時叫<span style="color:#ffae00">方法</span>），是JS最重要的概念之一，幾乎所有JS程式都在操作物件。</p>
+                <p>JS有個獨特的概念：<span style="color:#fa6dff">「解構賦值（Destructuring）」</span>，可以快速從物件或陣列取出值：<span style="color:#ffae00">const</span> {name, age} = student; 就等於分別宣告name和age；<span style="color:#ffae00">const</span> [first, second] = fruits;。還有<span style="color:#fa6dff">「展開運算子（Spread Operator）」</span><span style="color:#ffae00">...</span>，可以展開陣列或物件，例如合併：<span style="color:#ffae00">const</span> merged = {...obj1, ...obj2};。</p>
+</section>
             <section id="section3">
                 <h2>3. 流程控制</h2>
-                <p>這裡是使用教學的步驟。</p>
-            </section>
+                <p>JS的<span style="color:#fa6dff">「條件判斷」</span>和C/C++語法相同：<span style="color:#ffae00">if...else if...else</span>，條件式記得用<span style="color:#ffae00">===</span>而不是==。三元運算子：條件 <span style="color:#ffae00">?</span> 成立值 <span style="color:#ffae00">:</span> 不成立值，例如：<span style="color:#ffae00">const</span> label = score &gt;= 60 <span style="color:#ffae00">?</span> <span style="color:#00eeff">"通過"</span> <span style="color:#ffae00">:</span> <span style="color:#00eeff">"不通過"</span>;。</p>
+                <p>JS的<span style="color:#ffae00">switch</span>語法和C相同，一樣要記得加<span style="color:#ffae00">break</span>。特別介紹<span style="color:#fa6dff">「短路求值（Short-circuit）」</span>，JS的&&和||除了邏輯判斷，還常用來做條件賦值：<span style="color:#ffae00">const</span> name = user && user.name;（user存在才取name，否則是undefined）；<span style="color:#ffae00">const</span> val = input || <span style="color:#00eeff">"預設值"</span>;（input為假值時用預設值）。</p>
+                <p>迴圈方面，<span style="color:#ffae00">for</span>、<span style="color:#ffae00">while</span>、<span style="color:#ffae00">do...while</span>語法和C相同。遍歷陣列最常用<span style="color:#ffae00">forEach()</span>：fruits.<span style="color:#ffae00">forEach</span>(fruit =&gt; <span style="color:#ffae00">console.log</span>(fruit));，或<span style="color:#ffae00">for...of</span>迴圈：<span style="color:#ffae00">for</span>(<span style="color:#ffae00">const</span> fruit <span style="color:#ffae00">of</span> fruits){...}；遍歷物件的鍵用<span style="color:#ffae00">for...in</span>：<span style="color:#ffae00">for</span>(<span style="color:#ffae00">const</span> key <span style="color:#ffae00">in</span> obj){...}。</p>
+                <p>陣列的函式式操作是現代JS的主流寫法：<span style="color:#ffae00">.map()</span>對每個元素做轉換並回傳新陣列；<span style="color:#ffae00">.filter()</span>篩選符合條件的元素；<span style="color:#ffae00">.reduce()</span>把所有元素累積成一個值；<span style="color:#ffae00">.find()</span>找第一個符合的元素。例如：<span style="color:#ffae00">const</span> doubled = numbers.<span style="color:#ffae00">map</span>(n =&gt; n * 2)，超簡潔！</p>
+</section>
             <section id="section4">
                 <h2>4. 函式</h2>
-                <p>這裡列出 FAQ。</p>
-            </section>
+                <p>JS的函式有三種寫法：<span style="color:#ffae00">function 宣告</span>（可以在宣告前呼叫，有「提升」效果）、<span style="color:#ffae00">function 表達式</span>（賦值給變數）、<span style="color:#fa6dff">「箭頭函式（Arrow Function）」</span>（最現代的寫法，語法是 <span style="color:#ffae00">(參數) =&gt; 回傳值</span>）。例如：<span style="color:#ffae00">const</span> add = (a, b) <span style="color:#ffae00">=&gt;</span> a + b;，如果函式體超過一行，要加大括號和return。</p>
+                <p>JS函式是<span style="color:#fa6dff">「第一公民（First-class）」</span>，可以把函式當參數傳入另一個函式（叫<span style="color:#ffae00">Callback函式</span>），也可以從函式回傳函式，這是JS函式式編程的基礎。例如：<span style="color:#ffae00">setTimeout</span>(() =&gt; <span style="color:#ffae00">console.log</span>(<span style="color:#00eeff">"3秒後"</span>), 3000);，這個箭頭函式就是callback。</p>
+                <p>JS的<span style="color:#fa6dff">「作用域（Scope）」</span>規則要注意：let和const有<span style="color:#ffee00fa">區塊作用域</span>（大括號內有效），var有函式作用域（整個函式內有效）。<span style="color:#fa6dff">「閉包（Closure）」</span>是JS的重要概念，內層函式可以存取外層函式的變數，即使外層函式已經執行完畢，這讓JS可以做到很多強大的設計模式。</p>
+                <p>現代JS（ES6+）的<span style="color:#fa6dff">「模組系統」</span>讓程式碼可以分檔案管理：用<span style="color:#ffae00">export</span>匯出函式或變數，用<span style="color:#ffae00">import</span>引入，例如：<span style="color:#ffae00">import</span> {add} <span style="color:#ffae00">from</span> <span style="color:#00eeff">'./math.js'</span>;。這是現代前端框架（React、Vue）的基礎，學會模組化思考非常重要。</p>
+</section>
             <section id="section5">
                 <h2>5. 網頁互動與非同步</h2>
-                <p>這裡有聯絡表單或資訊。</p>
-            </section>
+                <p>JS最核心的功能是操作<span style="color:#fa6dff">「DOM（Document Object Model）」</span>，把HTML元素轉換成JS物件來操控。常用方法：<span style="color:#ffae00">document.querySelector()</span>（用CSS選擇器選一個元素）、<span style="color:#ffae00">document.querySelectorAll()</span>（選所有符合的元素）、修改內容用<span style="color:#ffae00">.textContent</span>或<span style="color:#ffae00">.innerHTML</span>、修改樣式用<span style="color:#ffae00">.style.屬性</span>。</p>
+                <p><span style="color:#fa6dff">「事件監聽（Event Listener）」</span>讓你對使用者的操作做反應：<span style="color:#ffae00">element.addEventListener</span>(<span style="color:#00eeff">'click'</span>, () =&gt; {...})，常見事件有click（點擊）、input（輸入）、submit（表單送出）、keydown（按鍵）、mouseover（滑鼠移過）。這是讓網頁「活起來」的關鍵！</p>
+                <p>JS的<span style="color:#fa6dff">「非同步（Async）」</span>是一大特色，因為JS是單執行緒，為了不阻塞畫面，耗時的操作（API請求、計時器）會非同步執行。舊式寫法用<span style="color:#ffae00">Callback</span>，容易形成「Callback Hell」；現代用<span style="color:#ffae00">Promise</span>，或更優雅的<span style="color:#ffae00">async/await</span>語法。</p>
+                <p><span style="color:#ffae00">async/await</span>讓非同步程式碼看起來像同步：在函式前加<span style="color:#ffae00">async</span>，耗時操作前加<span style="color:#ffae00">await</span>，例如：<span style="color:#ffae00">const</span> data = <span style="color:#ffae00">await</span> <span style="color:#ffae00">fetch</span>(<span style="color:#00eeff">'https://api.example.com'</span>)，搭配<span style="color:#ffae00">try/catch</span>處理錯誤，是目前最推薦的非同步寫法。</p>
+                <p>恭喜完成JavaScript基礎！JS是前端開發的核心，下一步可以學React或Vue等框架，或是Node.js做後端，甚至用Electron做桌面應用程式——JS的應用場景廣到嚇人，繼續加油！🚀</p>
+</section>
         </main>
     <script>
         const navLinks = document.querySelectorAll('.nav-link');

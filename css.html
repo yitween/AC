@@ -135,25 +135,40 @@
         <main class="content">
             <section id="section1">
                 <h2>1. 引入與選取</h2>
-                <p>這裡是產品簡介的內容。請向下滾動查看側邊欄的變化。</p>
-                <p>（為了演示效果，這裡填充一些空白高度...）</p>
-            </section>
+                <p>CSS（Cascading Style Sheets）負責網頁的<span style="color:#ffee00fa">外觀與樣式</span>，包含顏色、字型、版面排列等，和HTML的分工是「HTML定義內容，CSS定義外觀」。引入CSS有三種方式：<span style="color:#ffae00">外部樣式表</span>（最推薦，用&lt;link rel="stylesheet" href="style.css"&gt;引入獨立的.css檔）、<span style="color:#ffae00">內部樣式</span>（在HTML的&lt;head&gt;裡用&lt;style&gt;標籤）、<span style="color:#ffae00">行內樣式</span>（直接在HTML標籤加style屬性，不推薦，難以維護）。</p>
+                <p>CSS的語法是：<span style="color:#ffae00">選取器</span> { <span style="color:#fa6dff">屬性</span>: <span style="color:#00eeff">值</span>; }。<span style="color:#fa6dff">「選取器（Selector）」</span>決定要套用樣式的對象，基本選取器有：<span style="color:#ffae00">元素選取器</span>（直接寫標籤名，例如p）、<span style="color:#ffae00">類別選取器</span>（.class名，一個元素可以有多個class，用空格分開）、<span style="color:#ffae00">ID選取器</span>（#id名，一頁只能有一個相同的id）。</p>
+                <p>進階選取器：<span style="color:#ffae00">後代選取器</span>（A B，選A內所有B）、<span style="color:#ffae00">子代選取器</span>（A &gt; B，只選A的直接子元素B）、<span style="color:#ffae00">相鄰兄弟</span>（A + B）、<span style="color:#ffae00">群組選取器</span>（A, B，同時選A和B）。<span style="color:#fa6dff">「偽類（Pseudo-class）」</span>讓你選特定狀態：<span style="color:#ffae00">:hover</span>（滑鼠移過）、<span style="color:#ffae00">:active</span>（點擊時）、<span style="color:#ffae00">:focus</span>（聚焦時）、<span style="color:#ffae00">:nth-child(n)</span>（第n個子元素）。</p>
+                <p>CSS有<span style="color:#fa6dff">「優先權（Specificity）」</span>規則，決定多個樣式衝突時誰優先：ID選取器 &gt; 類別選取器 &gt; 元素選取器；後面的樣式覆蓋前面的（層疊性）；<span style="color:#ffae00">!important</span>強制最高優先權（但盡量少用，會讓樣式難以維護）。</p>
+</section>
             <section id="section2">
                 <h2>2. 盒模型</h2>
-                <p>這裡是規格說明的詳細資料。</p>
-            </section>
+                <p>CSS的<span style="color:#fa6dff">「盒模型（Box Model）」</span>是CSS最核心的概念，每個HTML元素都是一個矩形盒子，由內到外分四層：<span style="color:#ffae00">content</span>（內容，你的文字或圖片）、<span style="color:#ffae00">padding</span>（內距，內容和邊框之間的空間）、<span style="color:#ffae00">border</span>（邊框）、<span style="color:#ffae00">margin</span>（外距，和其他元素之間的空間）。</p>
+                <p>設定padding和margin都可以用一到四個值：一個值（四邊相同）、兩個值（上下 左右）、三個值（上 左右 下）、四個值（上 右 下 左，順時針）。也可以個別指定：<span style="color:#ffae00">padding-top</span>、<span style="color:#ffae00">margin-left</span>等。border的設定：<span style="color:#ffae00">border: 2px solid red</span>（厚度 樣式 顏色）。</p>
+                <p>重要！CSS預設的<span style="color:#ffae00">box-sizing</span>是<span style="color:#ffae00">content-box</span>，設定width只算content的寬度，加上padding和border後實際佔用的寬度會更大，讓排版很難預測。建議在CSS開頭加：<span style="color:#ffae00">*, *::before, *::after { box-sizing: border-box; }</span>，這樣width就包含padding和border，直觀得多！</p>
+                <p>顏色的設定方式有：關鍵字（<span style="color:#ffae00">red</span>、<span style="color:#ffae00">aquamarine</span>）；十六進制（<span style="color:#ffae00">#ff0000</span>，縮寫<span style="color:#ffae00">#f00</span>）；RGB（<span style="color:#ffae00">rgb(255, 0, 0)</span>）；RGBA（<span style="color:#ffae00">rgba(255, 0, 0, 0.5)</span>，第四個值是透明度0-1）；HSL（<span style="color:#ffae00">hsl(色相, 飽和度%, 亮度%)</span>）。字型大小常用px（像素）、rem（相對於根元素字型大小，推薦）、em（相對於父元素字型大小）。</p>
+</section>
             <section id="section3">
                 <h2>3. 定位與顯示</h2>
-                <p>這裡是使用教學的步驟。</p>
-            </section>
+                <p>CSS的<span style="color:#ffae00">display</span>屬性控制元素的顯示模式：<span style="color:#ffae00">block</span>（區塊，獨占一行）、<span style="color:#ffae00">inline</span>（行內，不能設寬高）、<span style="color:#ffae00">inline-block</span>（行內但可設寬高）、<span style="color:#ffae00">none</span>（隱藏，不佔空間）、<span style="color:#ffae00">flex</span>和<span style="color:#ffae00">grid</span>（後面會詳說）。<span style="color:#ffae00">visibility: hidden</span>也是隱藏，但還是佔著空間，和display: none不同。</p>
+                <p>CSS的<span style="color:#fa6dff">「定位（Position）」</span>控制元素怎麼放：<span style="color:#ffae00">static</span>（預設，按照文件流排列）；<span style="color:#ffae00">relative</span>（相對定位，相對自己原本位置偏移，其他元素不受影響）；<span style="color:#ffae00">absolute</span>（絕對定位，相對於最近的非static父元素定位，脫離文件流）；<span style="color:#ffae00">fixed</span>（固定在視窗，捲動頁面也不動）；<span style="color:#ffae00">sticky</span>（滾到指定位置後固定住，常用來做固定navbar）。</p>
+                <p>定位後用<span style="color:#ffae00">top</span>、<span style="color:#ffae00">right</span>、<span style="color:#ffae00">bottom</span>、<span style="color:#ffae00">left</span>設定偏移量。<span style="color:#ffae00">z-index</span>控制元素的堆疊順序，數字越大越在上面，只對非static定位的元素有效。</p>
+                <p>讓元素完全置中是CSS的經典難題，現代最簡單的方式：對父元素設 <span style="color:#ffae00">display: flex; justify-content: center; align-items: center;</span>，子元素就會水平垂直置中，這個技巧幾乎每個CSS開發者都會用到！</p>
+</section>
             <section id="section4">
                 <h2>4. 排版系統</h2>
-                <p>這裡列出 FAQ。</p>
-            </section>
+                <p><span style="color:#fa6dff">「Flexbox（彈性盒子）」</span>是目前最常用的一維排版系統，在父元素設<span style="color:#ffae00">display: flex</span>後，子元素就會自動沿主軸排列。關鍵屬性：<span style="color:#ffae00">flex-direction</span>設定主軸方向（row水平、column垂直）；<span style="color:#ffae00">justify-content</span>控制主軸對齊（flex-start、center、space-between、space-around）；<span style="color:#ffae00">align-items</span>控制交叉軸對齊（stretch、center、flex-start）。</p>
+                <p>子元素也有Flexbox屬性：<span style="color:#ffae00">flex: 1</span>讓元素平均分配剩餘空間；<span style="color:#ffae00">flex-shrink: 0</span>防止元素被壓縮；<span style="color:#ffae00">align-self</span>覆蓋父元素的align-items，單獨設定這個子元素的對齊方式；<span style="color:#ffae00">order</span>改變元素的排列順序（預設都是0）。</p>
+                <p><span style="color:#fa6dff">「Grid（網格）」</span>是二維排版系統，可以同時控制行和列，適合整頁的版面配置。在父元素設<span style="color:#ffae00">display: grid</span>，然後用<span style="color:#ffae00">grid-template-columns</span>定義欄的寬度，例如：<span style="color:#ffae00">grid-template-columns: 1fr 1fr 1fr</span>（三欄均分，fr是fraction的縮寫）；<span style="color:#ffae00">gap</span>設定格子間的間距；子元素用<span style="color:#ffae00">grid-column</span>和<span style="color:#ffae00">grid-row</span>指定佔哪些格子。</p>
+                <p>Flexbox適合一維（導覽列、卡片列表），Grid適合二維（整頁layout），實務上常兩者混用——Grid做外層大版面，Flexbox做內部元件排列。這兩個系統是現代CSS排版的核心，一定要熟練！</p>
+</section>
             <section id="section5">
                 <h2>5. 響應式與動畫</h2>
-                <p>這裡有聯絡表單或資訊。</p>
-            </section>
+                <p><span style="color:#fa6dff">「響應式設計（Responsive Design）」</span>讓網頁在不同螢幕尺寸（手機、平板、桌機）都能良好顯示。核心工具是<span style="color:#ffae00">Media Query</span>，根據螢幕寬度套用不同樣式：<span style="color:#ffae00">@media</span> (max-width: 768px) { ... } 表示螢幕寬度在768px以下時套用這裡面的樣式，可以在手機上把多欄變成單欄、調整字型大小等。</p>
+                <p>響應式設計的最佳實踐是<span style="color:#ffee00fa">Mobile First</span>：先寫手機版樣式，再用<span style="color:#ffae00">min-width</span>的Media Query逐步擴展到大螢幕，這樣程式碼更精簡。常見斷點（Breakpoints）：小手機&lt;480px、手機&lt;768px、平板&lt;1024px、桌機以上。字型大小建議用<span style="color:#ffae00">rem</span>，讓使用者可以透過瀏覽器設定調整基礎字型大小。</p>
+                <p>CSS的<span style="color:#fa6dff">「過渡（Transition）」</span>讓樣式的改變有動畫效果：<span style="color:#ffae00">transition: all 0.3s ease</span>，表示所有屬性在0.3秒內平滑過渡，常用在hover效果。可以指定特定屬性：<span style="color:#ffae00">transition: background-color 0.3s, transform 0.5s</span>，也可以指定緩動函式（ease、linear、ease-in-out）。</p>
+                <p><span style="color:#fa6dff">「動畫（Animation）」</span>比transition更強大，用<span style="color:#ffae00">@keyframes</span>定義關鍵影格，再用<span style="color:#ffae00">animation</span>屬性套用：<span style="color:#ffae00">@keyframes</span> fadeIn { from { opacity: 0; } to { opacity: 1; } } 定義淡入效果，元素加上 <span style="color:#ffae00">animation: fadeIn 1s ease</span> 即可。<span style="color:#ffae00">transform</span>屬性可以做位移（translate）、旋轉（rotate）、縮放（scale）等幾何變換，搭配transition和animation可以做出各種精緻效果。</p>
+                <p>恭喜完成CSS基礎！CSS是越用越有感的技術，建議多複製喜歡的網站設計來拆解模仿，打開瀏覽器開發者工具直接改樣式看效果，是進步最快的方式。CSS好，網頁就好看，加油！🎨</p>
+</section>
         </main>
     <script>
         const navLinks = document.querySelectorAll('.nav-link');

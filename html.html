@@ -135,25 +135,40 @@
         <main class="content">
             <section id="section1">
                 <h2>1. 文件結構</h2>
-                <p>這裡是產品簡介的內容。請向下滾動查看側邊欄的變化。</p>
-                <p>（為了演示效果，這裡填充一些空白高度...）</p>
-            </section>
+                <p>HTML（HyperText Markup Language）是網頁的骨架，它不是程式語言，而是<span style="color:#fa6dff">「標記語言」</span>，用<span style="color:#ffae00">標籤（Tag）</span>來描述網頁的結構和內容。瀏覽器讀取HTML後，依照標籤把內容呈現在畫面上。</p>
+                <p>一個完整的HTML文件結構長這樣：最頂端是<span style="color:#ffae00">&lt;!DOCTYPE html&gt;</span>，告訴瀏覽器這是HTML5文件；接著是<span style="color:#ffae00">&lt;html lang="zh-TW"&gt;</span>，包住整份文件，lang屬性設定語言；裡面分兩大區塊：<span style="color:#ffae00">&lt;head&gt;</span>放文件的設定和meta資訊（不在畫面顯示），以及<span style="color:#ffae00">&lt;body&gt;</span>放實際顯示在頁面上的內容。</p>
+                <p><span style="color:#ffae00">&lt;head&gt;</span>裡常見的標籤：<span style="color:#ffae00">&lt;meta charset="UTF-8"&gt;</span>設定字元編碼（不加可能亂碼）；<span style="color:#ffae00">&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</span>讓網頁在手機上正常縮放；<span style="color:#ffae00">&lt;title&gt;</span>設定瀏覽器分頁的標題；<span style="color:#ffae00">&lt;link&gt;</span>引入CSS；<span style="color:#ffae00">&lt;script&gt;</span>引入JavaScript。</p>
+                <p>HTML標籤分<span style="color:#ffee00fa">雙標籤</span>（有開頭和結尾，例如&lt;p&gt;...&lt;/p&gt;）和<span style="color:#ffee00fa">單標籤（自閉合）</span>（不需要結尾，例如&lt;br&gt;、&lt;img&gt;、&lt;input&gt;）。標籤可以有<span style="color:#fa6dff">「屬性（Attribute）」</span>提供額外資訊，格式是 屬性名="屬性值"，例如：<span style="color:#ffae00">&lt;a</span> href="https://example.com"<span style="color:#ffae00">&gt;</span>點我<span style="color:#ffae00">&lt;/a&gt;</span>。</p>
+</section>
             <section id="section2">
                 <h2>2. 文字元素</h2>
-                <p>這裡是規格說明的詳細資料。</p>
-            </section>
+                <p>HTML有豐富的<span style="color:#fa6dff">「文字相關標籤」</span>。標題用<span style="color:#ffae00">&lt;h1&gt;</span>到<span style="color:#ffae00">&lt;h6&gt;</span>，h1最大最重要（一頁通常只有一個h1），h6最小；段落用<span style="color:#ffae00">&lt;p&gt;</span>；換行用<span style="color:#ffae00">&lt;br&gt;</span>（在p內直接換行，不是另起一段）；水平分隔線用<span style="color:#ffae00">&lt;hr&gt;</span>。</p>
+                <p>文字強調標籤：<span style="color:#ffae00">&lt;strong&gt;</span>語義上的重要（瀏覽器預設顯示為粗體）；<span style="color:#ffae00">&lt;em&gt;</span>語義上的強調（預設顯示為斜體）；<span style="color:#ffae00">&lt;b&gt;</span>視覺上的粗體；<span style="color:#ffae00">&lt;i&gt;</span>視覺上的斜體；<span style="color:#ffae00">&lt;u&gt;</span>底線；<span style="color:#ffae00">&lt;del&gt;</span>刪除線；<span style="color:#ffae00">&lt;mark&gt;</span>螢光筆效果；<span style="color:#ffae00">&lt;sup&gt;</span>/<span style="color:#ffae00">&lt;sub&gt;</span>上下標。</p>
+                <p>超連結用<span style="color:#ffae00">&lt;a href="網址"&gt;</span>，加上<span style="color:#ffae00">target="_blank"</span>讓連結在新分頁開啟；連結到頁內錨點時href寫#id名，例如：<span style="color:#ffae00">&lt;a href="#section1"&gt;</span>。清單有兩種：<span style="color:#ffae00">&lt;ul&gt;</span>（無序清單，項目符號）和<span style="color:#ffae00">&lt;ol&gt;</span>（有序清單，數字），清單項目都用<span style="color:#ffae00">&lt;li&gt;</span>包住。</p>
+                <p>顯示程式碼用<span style="color:#ffae00">&lt;code&gt;</span>（行內）或<span style="color:#ffae00">&lt;pre&gt;&lt;code&gt;</span>（保留空白換行的程式碼區塊）；引用文字用<span style="color:#ffae00">&lt;blockquote&gt;</span>；定義說明用<span style="color:#ffae00">&lt;dl&gt;</span>（定義清單）、<span style="color:#ffae00">&lt;dt&gt;</span>（術語）、<span style="color:#ffae00">&lt;dd&gt;</span>（說明）。HTML標籤的選擇應該根據<span style="color:#ffee00fa">語義（Semantics）</span>而非外觀，外觀交給CSS負責。</p>
+</section>
             <section id="section3">
                 <h2>3. 媒體與表格</h2>
-                <p>這裡是使用教學的步驟。</p>
-            </section>
+                <p>圖片用<span style="color:#ffae00">&lt;img&gt;</span>標籤，重要屬性：<span style="color:#ffae00">src</span>指定圖片路徑；<span style="color:#ffae00">alt</span>提供替代文字（圖片載入失敗時顯示，對無障礙設計很重要，一定要填）；<span style="color:#ffae00">width</span>/<span style="color:#ffae00">height</span>設定尺寸（通常交給CSS控制）。例如：<span style="color:#ffae00">&lt;img</span> src="photo.jpg" alt="風景照"<span style="color:#ffae00">&gt;</span>。</p>
+                <p>影片用<span style="color:#ffae00">&lt;video&gt;</span>，音訊用<span style="color:#ffae00">&lt;audio&gt;</span>，加<span style="color:#ffae00">controls</span>屬性顯示播放控制列，例如：<span style="color:#ffae00">&lt;video</span> src="movie.mp4" controls<span style="color:#ffae00">&gt;&lt;/video&gt;</span>。內嵌其他網頁或服務（YouTube、地圖）用<span style="color:#ffae00">&lt;iframe&gt;</span>，設定src為目標網址，width和height控制大小。</p>
+                <p><span style="color:#fa6dff">「表格（Table）」</span>用來呈現結構化資料，基本結構：<span style="color:#ffae00">&lt;table&gt;</span>包住整個表格；<span style="color:#ffae00">&lt;tr&gt;</span>（Table Row）定義一列；<span style="color:#ffae00">&lt;th&gt;</span>（Table Header）定義表頭欄（預設粗體、置中）；<span style="color:#ffae00">&lt;td&gt;</span>（Table Data）定義資料欄。</p>
+                <p>表格合併欄位用<span style="color:#ffae00">colspan</span>（跨欄）和<span style="color:#ffae00">rowspan</span>（跨列）屬性，例如：<span style="color:#ffae00">&lt;td colspan="2"&gt;</span>合併兩欄。語義化分組用<span style="color:#ffae00">&lt;thead&gt;</span>（表頭區域）、<span style="color:#ffae00">&lt;tbody&gt;</span>（表身區域）、<span style="color:#ffae00">&lt;tfoot&gt;</span>（表尾區域），讓表格結構更清晰，也有助於CSS樣式設定。</p>
+</section>
             <section id="section4">
                 <h2>4. 表單互動</h2>
-                <p>這裡列出 FAQ。</p>
-            </section>
+                <p><span style="color:#fa6dff">「表單（Form）」</span>是讓使用者輸入資料的主要方式，用<span style="color:#ffae00">&lt;form&gt;</span>標籤包住，重要屬性：<span style="color:#ffae00">action</span>指定資料送往的URL，<span style="color:#ffae00">method</span>設定HTTP方法（<span style="color:#ffae00">GET</span>：資料放在URL，<span style="color:#ffae00">POST</span>：資料放在請求體，通常用POST送敏感資料）。</p>
+                <p>最核心的是<span style="color:#ffae00">&lt;input&gt;</span>，用<span style="color:#ffae00">type</span>屬性決定類型：<span style="color:#ffae00">text</span>（文字輸入）、<span style="color:#ffae00">password</span>（密碼，顯示為點點）、<span style="color:#ffae00">email</span>（email格式驗證）、<span style="color:#ffae00">number</span>（數字）、<span style="color:#ffae00">checkbox</span>（勾選框）、<span style="color:#ffae00">radio</span>（單選鈕，同組的name要相同）、<span style="color:#ffae00">file</span>（上傳檔案）、<span style="color:#ffae00">date</span>（日期選擇器）、<span style="color:#ffae00">submit</span>（送出按鈕）。</p>
+                <p>其他重要表單元素：<span style="color:#ffae00">&lt;textarea&gt;</span>多行文字輸入（用rows和cols控制大小）；<span style="color:#ffae00">&lt;select&gt;</span>下拉選單，搭配<span style="color:#ffae00">&lt;option&gt;</span>定義選項；<span style="color:#ffae00">&lt;button type="submit"&gt;</span>送出按鈕；<span style="color:#ffae00">&lt;label for="id"&gt;</span>為input加上說明文字，點label也能聚焦到對應的input，是無障礙設計的重要元素。</p>
+                <p>表單驗證屬性：<span style="color:#ffae00">required</span>設定必填；<span style="color:#ffae00">placeholder</span>顯示提示文字；<span style="color:#ffae00">minlength</span>/<span style="color:#ffae00">maxlength</span>限制字元數；<span style="color:#ffae00">min</span>/<span style="color:#ffae00">max</span>限制數字範圍；<span style="color:#ffae00">pattern</span>用正則表達式驗證格式。HTML5的原生驗證雖然不夠強大，但可以做基本的防呆，實務上通常還會搭配JavaScript做更完整的驗證。</p>
+</section>
             <section id="section5">
                 <h2>5. 區塊與語意</h2>
-                <p>這裡有聯絡表單或資訊。</p>
-            </section>
+                <p>HTML元素的顯示模式分<span style="color:#ffae00">block（區塊）</span>和<span style="color:#ffae00">inline（行內）</span>兩種。Block元素會獨占一整行，前後自動換行，例如&lt;div&gt;、&lt;p&gt;、&lt;h1&gt;等；inline元素只佔自身的寬度，和其他inline元素並排，例如&lt;span&gt;、&lt;a&gt;、&lt;strong&gt;等。這個概念對CSS排版很重要！</p>
+                <p><span style="color:#ffae00">&lt;div&gt;</span>和<span style="color:#ffae00">&lt;span&gt;</span>是兩個「無語義」的通用容器，div是block、span是inline，常用來包住一段內容後用CSS設定樣式或讓JavaScript操作。雖然可以全部用div包，但現代HTML5提倡使用有意義的<span style="color:#fa6dff">「語意標籤（Semantic Tags）」</span>。</p>
+                <p>HTML5的語意標籤讓結構更清晰，也有助於SEO和無障礙設計：<span style="color:#ffae00">&lt;header&gt;</span>（頁首或區塊標題）、<span style="color:#ffae00">&lt;nav&gt;</span>（導覽列）、<span style="color:#ffae00">&lt;main&gt;</span>（頁面主要內容，一頁只有一個）、<span style="color:#ffae00">&lt;article&gt;</span>（獨立的完整文章）、<span style="color:#ffae00">&lt;section&gt;</span>（主題分區）、<span style="color:#ffae00">&lt;aside&gt;</span>（側邊欄或補充資訊）、<span style="color:#ffae00">&lt;footer&gt;</span>（頁尾）。</p>
+                <p>HTML的<span style="color:#fa6dff">「meta標籤」</span>提供網頁的描述資訊給搜尋引擎和社群平台：<span style="color:#ffae00">&lt;meta name="description" content="..."&gt;</span>設定搜尋結果的描述；Open Graph標籤（og:title、og:image）控制分享到Facebook/LINE等社群時的預覽卡片顯示。</p>
+                <p>恭喜學完HTML基礎！HTML只是網頁的骨架，要讓網頁好看需要CSS，要讓網頁有互動需要JavaScript，三者合在一起就是前端開發的核心。建議馬上動手寫一個簡單的個人介紹頁面，把這章學到的標籤全部用上一遍，是最快的學習方式！</p>
+</section>
         </main>
     <script>
         const navLinks = document.querySelectorAll('.nav-link');
