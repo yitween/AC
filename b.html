@@ -104,11 +104,11 @@
         <div style="height: 30px;"></div>
         <h3>章節目錄</h3>
         <ul>
-            <li><a href="#section1" class="nav-link">1. 產品簡介</a></li>
-            <li><a href="#section2" class="nav-link">2. 規格說明</a></li>
-            <li><a href="#section3" class="nav-link">3. 使用教學</a></li>
-            <li><a href="#section4" class="nav-link">4. 常見問題</a></li>
-            <li><a href="#section5" class="nav-link">5. 聯絡我們</a></li>
+            <li><a href="#section1" class="nav-link">1. 後端是什麼</a></li>
+            <li><a href="#section2" class="nav-link">2. 資料庫設計與 SQL</a></li>
+            <li><a href="#section3" class="nav-link">3. 後端框架：Flask 與 Node.js</a></li>
+            <li><a href="#section4" class="nav-link">4. 伺服器部署與維運</a></li>
+            <li><a href="#section5" class="nav-link">5. 實作專案：RESTful API 後端</a></li>
         </ul>
     </nav>
     <header>
@@ -134,26 +134,45 @@
         <div style="height: 50px;"></div>
         <main class="content">
             <section id="section1">
-                <h2>1. 產品簡介</h2>
-                <p>這裡是產品簡介的內容。請向下滾動查看側邊欄的變化。</p>
-                <p>（為了演示效果，這裡填充一些空白高度...）</p>
-            </section>
+                <h2>1. 後端是什麼</h2>
+                <p><span style="color:#fa6dff">「後端（Backend）」</span>是使用者看不見的部分——伺服器、資料庫、API——負責處理業務邏輯、儲存資料、和前端溝通。前端負責「呈現」，後端負責「運算和儲存」，兩者透過<span style="color:#ffae00">HTTP API</span>溝通，這就是現代Web應用的基本架構。</p>
+                <p><span style="color:#fa6dff">「API（Application Programming Interface）」</span>是前後端的橋樑，最常見的是<span style="color:#ffae00">REST API</span>：用不同的HTTP方法對應不同操作——<span style="color:#ffae00">GET</span>（查詢）、<span style="color:#ffae00">POST</span>（新增）、<span style="color:#ffae00">PUT/PATCH</span>（修改）、<span style="color:#ffae00">DELETE</span>（刪除）；資料格式用<span style="color:#ffae00">JSON</span>傳遞；URL設計語意清楚，例如<span style="color:#00eeff">/api/users/123</span>代表id=123的使用者。</p>
+                <p>後端開發最常用的資料庫是<span style="color:#fa6dff">「關聯式資料庫（RDBMS）」</span>：<span style="color:#ffae00">MySQL</span>（最廣泛使用）、<span style="color:#ffae00">PostgreSQL</span>（功能更強，支援JSON欄位、地理資訊等）、<span style="color:#ffae00">SQLite</span>（輕量，適合小型專案和開發測試）。資料以<span style="color:#ffee00fa">表格（Table）</span>形式儲存，表格之間靠<span style="color:#ffae00">外鍵（Foreign Key）</span>關聯，用<span style="color:#ffae00">SQL</span>語言操作。</p>
+                <p>非關聯式資料庫（NoSQL）在某些場景更適合：<span style="color:#ffae00">MongoDB</span>（文件型，存JSON，schema彈性）適合資料結構多變；<span style="color:#ffae00">Redis</span>（鍵值型，記憶體儲存，超快速）適合快取（Cache）、Session儲存、排行榜；選什麼資料庫要根據專案需求決定，沒有絕對的好壞。</p>
+                <p>後端的三層架構：<span style="color:#ffae00">路由層（Router）</span>接收請求並分配到對應的處理函式；<span style="color:#ffae00">業務邏輯層（Service）</span>處理核心功能；<span style="color:#ffae00">資料存取層（Repository/DAO）</span>負責和資料庫溝通。這種分層設計讓程式碼職責清楚、容易測試和維護，是企業級後端的標準結構。</p>
+</section>
             <section id="section2">
-                <h2>2. 規格說明</h2>
-                <p>這裡是規格說明的詳細資料。</p>
-            </section>
+                <h2>2. 資料庫設計與 SQL</h2>
+                <p>好的<span style="color:#fa6dff">「資料庫設計」</span>是後端的根基。設計原則：<span style="color:#ffae00">正規化（Normalization）</span>——避免資料重複，每個資訊只存一個地方，用外鍵關聯；每張表加上<span style="color:#ffae00">id</span>作為主鍵（Primary Key），通常設為auto-increment；時間欄位加<span style="color:#ffae00">created_at</span>和<span style="color:#ffae00">updated_at</span>，追蹤資料的建立和修改時間。</p>
+                <p>資料表關係有三種：<span style="color:#ffae00">一對多（1:N）</span>——一個使用者有多篇文章（users.id ← posts.user_id）；<span style="color:#ffae00">多對多（M:N）</span>——學生和課程，需要第三張「中間表」（student_courses）；<span style="color:#ffae00">一對一（1:1）</span>——使用者和個人資料，通常可以合併成一張表，除非有效能考量才分開。</p>
+                <p>後端常用的SQL進階技巧：<span style="color:#ffae00">JOIN</span>連接多張表查詢；<span style="color:#ffae00">INDEX（索引）</span>加在常被WHERE查詢的欄位，大幅提升查詢速度（例如<span style="color:#ffae00">CREATE INDEX idx_email ON users(email);</span>）；<span style="color:#ffae00">Transaction（交易）</span>確保多個SQL操作全部成功或全部回滾，例如轉帳：扣款和入帳必須同時成功，用<span style="color:#ffae00">BEGIN; ... COMMIT;</span>或<span style="color:#ffae00">ROLLBACK;</span>。</p>
+                <p><span style="color:#fa6dff">「ORM（Object-Relational Mapping）」</span>讓你用程式語言操作資料庫，不用直接寫SQL。Python的<span style="color:#ffae00">SQLAlchemy</span>（或Django ORM）讓你用Python class代表資料表，用物件的方式新增查詢，例如：<span style="color:#ffae00">User.query.filter_by(email='a@b.com').first()</span>。ORM更安全（自動防範SQL Injection）、更好維護，是現代後端的主流做法。</p>
+                <p>SQL資安：<span style="color:#fa6dff">「SQL Injection」</span>是最常見的資安漏洞，攻擊者透過輸入惡意SQL破壞資料庫。永遠<span style="color:#ffee00fa">不要</span>用字串拼接SQL：<span style="color:#ffae00">f"SELECT * FROM users WHERE name='{user_input}'"</span>，這非常危險！要用<span style="color:#ffee00fa">參數化查詢（Parameterized Query）</span>：<span style="color:#ffae00">cursor.execute("SELECT * FROM users WHERE name=?", (user_input,))</span>，或直接用ORM。</p>
+</section>
             <section id="section3">
-                <h2>3. 使用教學</h2>
-                <p>這裡是使用教學的步驟。</p>
-            </section>
+                <h2>3. 後端框架：Flask 與 Node.js</h2>
+                <p>Python的<span style="color:#ffae00">Flask</span>是輕量後端框架，適合學習和小型專案。安裝：<span style="color:#ffae00">pip install flask</span>。最簡單的Flask應用：<span style="color:#ffae00">from flask import Flask, jsonify, request</span>；<span style="color:#ffae00">app = Flask(__name__)</span>；<span style="color:#ffae00">@app.route('/api/hello', methods=['GET'])</span>裝飾器定義路由；函式裡回傳<span style="color:#ffae00">jsonify({'message': 'Hello'})</span>；最後<span style="color:#ffae00">app.run(debug=True)</span>啟動。</p>
+                <p>Flask處理不同HTTP方法：<span style="color:#ffae00">request.args.get('key')</span>取URL參數（GET的?key=value）；<span style="color:#ffae00">request.json</span>取POST/PUT的JSON body；<span style="color:#ffae00">request.headers</span>取header（例如Authorization token）。回應狀態碼：<span style="color:#ffae00">return jsonify(data), 201</span>（創建成功）；<span style="color:#ffae00">return jsonify({'error': 'Not found'}), 404</span>。</p>
+                <p><span style="color:#fa6dff">「使用者認證（Authentication）」</span>是後端核心功能：常用<span style="color:#ffae00">JWT（JSON Web Token）</span>，使用者登入後伺服器產生一個Token，之後每次請求把Token放在Header（<span style="color:#ffae00">Authorization: Bearer &lt;token&gt;</span>），伺服器驗證Token的有效性。密碼<span style="color:#ffee00fa">絕對不能明文儲存</span>，要用<span style="color:#ffae00">bcrypt</span>做雜湊（Hash）再存到資料庫。</p>
+                <p><span style="color:#fa6dff">「中介層（Middleware）」</span>讓你在請求到達路由之前做統一處理：身份驗證（每個需要登入的路由都要檢查Token，用middleware一次處理，不用每個函式都寫）；CORS設定（允許前端跨域存取API，用<span style="color:#ffae00">flask-cors</span>套件）；請求Log記錄（每次API呼叫都記下時間、路徑、狀態碼）。</p>
+                <p>Node.js的<span style="color:#ffae00">Express</span>是JS後端的主流選擇，語法和Flask類似：<span style="color:#ffae00">app.get('/api/users', (req, res) =&gt; { res.json(users) })</span>。Node.js的異步特性讓它在高並發場景效能優異，搭配<span style="color:#ffae00">MongoDB</span>是MEAN/MERN Stack的組合，很多新創公司的技術棧。</p>
+</section>
             <section id="section4">
-                <h2>4. 常見問題</h2>
-                <p>這裡列出 FAQ。</p>
-            </section>
+                <h2>4. 伺服器部署與維運</h2>
+                <p>程式寫好了，要把它部署到<span style="color:#fa6dff">「伺服器」</span>上才能讓別人存取。常見的雲端平台：<span style="color:#ffae00">Heroku</span>（免費方案易用，適合學習）、<span style="color:#ffae00">Railway / Render</span>（現代替代方案）、<span style="color:#ffae00">AWS / GCP / Azure</span>（企業級，功能最強但複雜）、<span style="color:#ffae00">DigitalOcean</span>（便宜、開發者友善）。</p>
+                <p>生產環境的Flask不應該用內建的開發伺服器，要用<span style="color:#ffae00">Gunicorn</span>（WSGI伺服器）：<span style="color:#ffae00">pip install gunicorn</span>；啟動：<span style="color:#ffae00">gunicorn -w 4 -b 0.0.0.0:8000 app:app</span>（4個worker行程，監聽8000埠）。前面再加一個<span style="color:#ffae00">Nginx</span>反向代理，處理靜態檔案、SSL終止、負載平衡，這是業界標準的部署架構。</p>
+                <p><span style="color:#fa6dff">「Docker」</span>讓部署更標準化：把應用程式和所有依賴打包成<span style="color:#ffae00">容器（Container）</span>，「在我電腦上跑得好好的」的問題就消失了——任何有Docker的機器都能跑一樣的容器。建立<span style="color:#ffae00">Dockerfile</span>定義容器內容，<span style="color:#ffae00">docker-compose.yml</span>同時啟動後端app + 資料庫 + Redis的整組服務，是現代開發的標準工作流程。</p>
+                <p>資料庫維護：定期<span style="color:#ffae00">備份（Backup）</span>——<span style="color:#ffae00">mysqldump -u root -p mydb &gt; backup.sql</span>，配合Cron排程自動每天備份；資料量大時要做<span style="color:#ffae00">讀寫分離</span>（主庫寫、從庫讀）或<span style="color:#ffae00">分片（Sharding）</span>；用<span style="color:#ffae00">Migration工具</span>（Flask-Migrate、Alembic）管理資料庫schema版本，不要直接手動改生產資料庫！</p>
+                <p>後端監控：<span style="color:#ffae00">Sentry</span>自動捕捉程式例外錯誤並發警報；<span style="color:#ffae00">Prometheus + Grafana</span>監控API回應時間、錯誤率、資料庫查詢速度等指標；設定適當的<span style="color:#ffae00">Health Check</span>端點（<span style="color:#00eeff">/api/health</span>），讓負載平衡器知道服務是否正常。這些是進入企業後端開發必學的工具。</p>
+</section>
             <section id="section5">
-                <h2>5. 聯絡我們</h2>
-                <p>這裡有聯絡表單或資訊。</p>
-            </section>
+                <h2>5. 實作專案：RESTful API 後端</h2>
+                <p>做一個完整的<span style="color:#fa6dff">「RESTful API」</span>後端！題材：「任務管理系統」——使用者可以註冊登入、建立任務、標記完成、查詢自己的任務清單。這包含了後端最核心的CRUD和認證功能。</p>
+                <p>API設計：<span style="color:#ffae00">POST /api/auth/register</span>（註冊）、<span style="color:#ffae00">POST /api/auth/login</span>（登入，回傳JWT token）；<span style="color:#ffae00">GET /api/tasks</span>（查詢我的任務）、<span style="color:#ffae00">POST /api/tasks</span>（新增任務）、<span style="color:#ffae00">PUT /api/tasks/:id</span>（修改任務）、<span style="color:#ffae00">DELETE /api/tasks/:id</span>（刪除任務）。除了auth，其他端點都需要JWT驗證。</p>
+                <p>資料庫設計：<span style="color:#ffae00">users</span>表（id, email, password_hash, created_at）；<span style="color:#ffae00">tasks</span>表（id, user_id, title, description, is_done, due_date, created_at, updated_at），user_id是外鍵關聯users。用<span style="color:#ffae00">SQLAlchemy</span>定義Model，<span style="color:#ffae00">Flask-Migrate</span>管理migration。</p>
+                <p>用<span style="color:#ffae00">Postman</span>或<span style="color:#ffae00">Insomnia</span>測試API：可以儲存所有的測試請求、設定環境變數（把Token存起來，所有請求自動帶上）、建立自動化測試集，是後端開發的重要工具。寫完API後也可以用<span style="color:#ffae00">pytest</span>寫自動化測試，確保功能正確、之後改Code時不會壞掉。</p>
+                <p>完成後部署到<span style="color:#ffae00">Railway</span>或<span style="color:#ffae00">Render</span>（免費方案可用），讓前端夥伴能實際連線測試。把API文件用<span style="color:#ffae00">Swagger / OpenAPI</span>（Flask用<span style="color:#ffae00">flask-restx</span>自動產生）整理好，讓別人知道怎麼用你的API，這是後端工程師的專業素養！🚀</p>
+</section>
         </main>
     <script>
         const navLinks = document.querySelectorAll('.nav-link');

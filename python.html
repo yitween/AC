@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AC_PYTHON</title>
-    <link rel="icon" href="螢幕擷取畫面 2026-01-05 125529.png" sizes="48x48" type="image/png">
+    <link rel="icon" href="python_vertical_logo_icon_168039.webp" sizes="48x48" type="image/png">
     <style>
         body {
             background-color: rgb(20, 20, 20);
@@ -96,7 +96,36 @@
         h2 {
             margin-top: 0;
         }
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            align-items: center;
+        }
+        .nav-menu li {
+            margin-left: 20px;
+        }
+        .nav-menu a {
+            text-decoration: none;
+            color: #ccc;
+            font-size: 1rem;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        .nav-menu a:hover {
+            color: white;
+            background-color: rgba(255,255,255,0.1);
+        }
     </style>
+    <ul class="nav-menu">
+        <li>
+            <button class="gdb-btn" onclick="toggleGdbWindow()">
+                GDB
+            </button>
+        </li>
+    </ul>
 </head>
 <body>
     <a href="index.html" class="back-button">← 回首頁</a>
@@ -113,8 +142,11 @@
     </nav>
     <header>
         <div class="content">
-        <img src="Logo_C_sharp.svg-removebg-preview.png" class="big-logo">
-        <h1>C#</h1>
+        <img src="python_vertical_logo_icon_168309.webp" class="big-logo">
+        <h1>python</h1>
+        <button class="gdb-btn" onclick="toggleGdbWindow()">
+            GDB
+        </button>
         <hr style="border-color: #333; margin: 20px 0;">
         <div style="height: 50px;"></div>
         <center>
@@ -173,6 +205,9 @@
                 <p>最後，Python最強大的是第三方套件生態系，用<span style="color:#ffae00">pip install 套件名</span>安裝，例如：<span style="color:#00eeff">numpy</span>（科學計算）、<span style="color:#00eeff">pandas</span>（資料分析）、<span style="color:#00eeff">matplotlib</span>（繪圖）、<span style="color:#00eeff">requests</span>（HTTP請求）、<span style="color:#00eeff">flask/django</span>（網頁框架）。掌握Python基礎後，選一個你有興趣的方向深入，你會發現Python的世界無邊無際！</p>
 </section>
         </main>
+        <div style="height: 60px;"></div> 
+        <p>最後這裡提供一個用GoogleAI(Gemini)NotebookLM製作的教學綱要簡報簡報，下載起來，方便需要時做迅速的統整和複習~</p>
+        <a href="python_2026_Performance_Revolution.pdf" download class="download-btn">立即下載檔案</a>
     <script>
         const navLinks = document.querySelectorAll('.nav-link');
         const sections = document.querySelectorAll('section');
@@ -194,5 +229,58 @@
         });
     </script>
     </header>
+    <div id="gdbFloatWindow">
+        <div class="window-header" id="dragHandle">
+            <span class="window-title">GDB</span>
+            <span class="close-btn" onclick="toggleGdbWindow()">&times;</span>
+        </div>
+        <div class="window-content">
+            <iframe 
+                id="gdbFrame"
+                data-src="https://www.onlinegdb.com/"
+                src="https://www.onlinegdb.com/"
+                sandbox="allow-forms allow-scripts allow-same-origin allow-popups">
+            </iframe>
+        </div>
+    </div>
+    <script>
+        const floatWindow = document.getElementById('gdbFloatWindow');
+        const iframe = document.getElementById('gdbFrame');
+        const dragHandle = document.getElementById('dragHandle');
+        function toggleGdbWindow() {
+            if (floatWindow.style.display === 'flex') {
+                floatWindow.style.display = 'none';
+            } else {
+                floatWindow.style.display = 'flex';
+                if (iframe.getAttribute('src') === "") {
+                    iframe.setAttribute('src', iframe.getAttribute('data-src'));
+                }
+            }
+        }
+        let isDragging = false;
+        let startX, startY, initialLeft, initialTop;
+        dragHandle.addEventListener('mousedown', function(e) {
+            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            const rect = floatWindow.getBoundingClientRect();
+            initialLeft = rect.left;
+            initialTop = rect.top;
+            floatWindow.classList.add('is-dragging');
+        });
+        document.addEventListener('mousemove', function(e) {
+            if (isDragging) {
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+                floatWindow.style.left = `${initialLeft + dx}px`;
+                floatWindow.style.top = `${initialTop + dy}px`;
+                floatWindow.style.right = 'auto'; 
+            }
+        });
+        document.addEventListener('mouseup', function() {
+            isDragging = false;
+            floatWindow.classList.remove('is-dragging');
+        });
+    </script>
 </body>
 </html>

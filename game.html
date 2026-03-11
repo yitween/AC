@@ -119,26 +119,44 @@
         <div style="height: 50px;"></div>
         <main class="content">
             <section id="section1">
-                <h2>1. 產品簡介</h2>
-                <p>這裡是產品簡介的內容。請向下滾動查看側邊欄的變化。</p>
-                <p>（為了演示效果，這裡填充一些空白高度...）</p>
-            </section>
+                <h2>1. 遊戲開發概論</h2>
+                <p>遊戲開發結合了程式設計、美術、音效、設計等多個領域，是技術和藝術的融合。從語言層面看：<span style="color:#ffae00">C#配合Unity</span>是目前最主流的入門選擇（手機遊戲、獨立遊戲）；<span style="color:#ffae00">C++配合Unreal Engine</span>是業界AAA大作的標準（效能最強）；<span style="color:#ffae00">C語言</span>則常見於嵌入式遊戲、復古掌機或自製遊戲引擎的底層。</p>
+                <p><span style="color:#fa6dff">「遊戲引擎（Game Engine）」</span>提供了渲染、物理、音效、輸入等基礎功能，讓你不用從零開始。<span style="color:#ffae00">Unity</span>：免費（有條件）、跨平台（iOS/Android/PC/主機）、C#腳本、龐大的Asset Store；<span style="color:#ffae00">Unreal Engine</span>：免費（收益超標才收費）、視覺效果頂尖、Blueprint視覺化腳本+C++；<span style="color:#ffae00">Godot</span>：完全開源免費、輕量、GDScript（類Python語法）、適合2D遊戲。</p>
+                <p><span style="color:#fa6dff">「遊戲迴圈（Game Loop）」</span>是所有遊戲的核心：每一幀（Frame）不斷執行——<span style="color:#ffee00fa">處理輸入 → 更新遊戲狀態 → 渲染畫面</span>——然後重複。Unity裡對應的是<span style="color:#ffae00">Update()</span>（每幀呼叫）和<span style="color:#ffae00">FixedUpdate()</span>（固定時間間隔，用於物理計算）。<span style="color:#ffae00">Time.deltaTime</span>是兩幀之間的時間差，移動物體時要乘上它，讓速度不受幀率影響。</p>
+                <p>C++做遊戲的優勢：效能極致、完全控制記憶體、可以自己做引擎底層。用C++從零開始做遊戲的函式庫：<span style="color:#ffae00">SDL2</span>（Simple DirectMedia Layer，處理視窗、輸入、音效，輕量）；<span style="color:#ffae00">SFML</span>（更現代的替代品，物件導向介面）；<span style="color:#ffae00">raylib</span>（極簡，教學用途很棒）。C語言做遊戲常見於懷舊遊戲移植或資源極受限的環境（單晶片、復古掌機）。</p>
+                <p>遊戲數學基礎：<span style="color:#ffae00">Vector2/Vector3</span>（二維/三維向量，代表位置、方向、速度）；<span style="color:#ffae00">Mathf.Lerp()</span>（線性插值，做平滑過渡）；<span style="color:#ffae00">Quaternion</span>（四元數，代表旋轉，避免萬向鎖）；<span style="color:#ffae00">碰撞偵測（Collision Detection）</span>；這些數學概念是遊戲程式設計的核心，投資時間學習非常值得。</p>
+</section>
             <section id="section2">
-                <h2>2. 規格說明</h2>
-                <p>這裡是規格說明的詳細資料。</p>
-            </section>
+                <h2>2. Unity 與 C# 遊戲開發</h2>
+                <p>Unity的核心概念：每個遊戲物件都是一個<span style="color:#ffae00">GameObject</span>，GameObject上可以掛各種<span style="color:#ffae00">Component</span>（組件）——Transform（位置/旋轉/縮放）、Rigidbody（物理）、Collider（碰撞）、SpriteRenderer（顯示圖片）、自己寫的Script（行為）。這種<span style="color:#fa6dff">「組件化（Component）設計」</span>讓遊戲物件的功能可以靈活組合，不用複雜的繼承關係。</p>
+                <p>Unity C# Script的基本結構：繼承<span style="color:#ffae00">MonoBehaviour</span>；<span style="color:#ffae00">Start()</span>在物件創建時執行一次（初始化）；<span style="color:#ffae00">Update()</span>每幀執行（處理輸入、移動邏輯）。取得其他Component：<span style="color:#ffae00">GetComponent&lt;Rigidbody&gt;()</span>；取得其他GameObject：<span style="color:#ffae00">GameObject.Find("Player")</span>或在Inspector面板直接拖曳賦值（更推薦）。</p>
+                <p>基本遊戲機制用C#實作：移動——<span style="color:#ffae00">transform.Translate(Vector3.right * speed * Time.deltaTime)</span>；跳躍——對Rigidbody加力：<span style="color:#ffae00">rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse)</span>；射擊——用<span style="color:#ffae00">Instantiate(bulletPrefab, transform.position, Quaternion.identity)</span>實例化子彈Prefab；碰撞——<span style="color:#ffae00">OnCollisionEnter(Collision col)</span>觸發事件。</p>
+                <p><span style="color:#fa6dff">「Prefab（預製件）」</span>是Unity最重要的概念之一：把設計好的GameObject儲存成Prefab，就能重複實例化（例如大量敵人、子彈、金幣），修改Prefab的屬性會自動同步到所有實例。<span style="color:#fa6dff">「Scene（場景）」</span>是遊戲的不同關卡/畫面，用<span style="color:#ffae00">SceneManager.LoadScene("MainMenu")</span>切換場景。</p>
+                <p>遊戲管理：用<span style="color:#ffae00">Singleton模式</span>做GameManager，管理全局狀態（分數、生命值、遊戲結束判斷）；用<span style="color:#ffae00">PlayerPrefs</span>儲存簡單資料（最高分等）；<span style="color:#ffae00">UI</span>用Unity的Canvas系統——TextMeshPro顯示文字、Button監聽點擊、Slider做血條、Panel做介面。</p>
+</section>
             <section id="section3">
-                <h2>3. 使用教學</h2>
-                <p>這裡是使用教學的步驟。</p>
-            </section>
+                <h2>3. C++ 遊戲開發</h2>
+                <p>C++遊戲開發的核心優勢是<span style="color:#ffee00fa">效能</span>和<span style="color:#ffee00fa">控制力</span>，代價是更複雜的語法和手動記憶體管理。用<span style="color:#ffae00">SFML</span>（Simple and Fast Multimedia Library）做入門：<span style="color:#ffae00">sf::RenderWindow</span>建立視窗；<span style="color:#ffae00">sf::Event</span>處理輸入事件；<span style="color:#ffae00">sf::Sprite</span>+<span style="color:#ffae00">sf::Texture</span>顯示圖片；<span style="color:#ffae00">window.clear(); window.draw(sprite); window.display();</span>就是最簡單的渲染迴圈。</p>
+                <p>C++的<span style="color:#fa6dff">「遊戲迴圈」</span>用while實作：<span style="color:#ffae00">while(window.isOpen()){ processEvents(); update(dt); render(); }</span>，dt是用<span style="color:#ffae00">sf::Clock</span>計算的delta time。實體類別設計：每個遊戲物件（玩家、敵人、子彈）是一個C++ Class，包含位置（sf::Vector2f pos）、速度（velocity）、精靈（sprite）以及update()和draw()方法。用<span style="color:#ffae00">std::vector</span>存放所有敵人，用<span style="color:#ffae00">remove_if</span>清除被擊殺的敵人。</p>
+                <p>C++碰撞偵測：最簡單的矩形碰撞（AABB）——<span style="color:#ffae00">sf::FloatRect.intersects()</span>判斷兩個矩形是否相交；圓形碰撞——計算兩點距離是否小於半徑之和（<span style="color:#ffae00">std::hypot(dx, dy) &lt; r1+r2</span>）。C++的效能允許你在一幀內做更多碰撞計算，這是它相比其他語言的優勢。</p>
+                <p>記憶體管理在遊戲開發中很關鍵：頻繁new/delete子彈會造成記憶體碎片和效能問題，解法是<span style="color:#fa6dff">「物件池（Object Pool）」</span>——預先分配一批子彈物件，需要時從池中取出、用完歸還，避免動態記憶體分配。<span style="color:#ffae00">std::unique_ptr</span>和<span style="color:#ffae00">std::shared_ptr</span>（智慧指標）讓C++的記憶體管理更安全，不用手動delete。</p>
+                <p>進階：用<span style="color:#ffae00">Unreal Engine</span>的C++，所有引擎功能（物理、光照、動畫）都可以用C++控制，是大型遊戲開發的頂級選擇。學習Unreal C++需要先熟悉Unreal的資產系統（UObject、UProperty、UFUNCTION宏）和它自己的字串/容器類型（FString、TArray），上手成本比Unity高但實力天花板也更高。</p>
+</section>
             <section id="section4">
-                <h2>4. 常見問題</h2>
-                <p>這裡列出 FAQ。</p>
-            </section>
+                <h2>4. 遊戲設計與物理</h2>
+                <p><span style="color:#fa6dff">「遊戲設計（Game Design）」</span>決定遊戲好不好玩，和程式技術同樣重要。核心概念：<span style="color:#ffae00">遊戲感（Game Feel）</span>——操控的手感（輸入回饋要即時、動作要有重量感）；<span style="color:#ffae00">難度曲線</span>——循序漸進，讓玩家在挫折和成就感之間保持平衡（心流理論）；<span style="color:#ffae00">反饋迴路</span>——每個玩家行動都有清楚的反饋（視覺、音效、震動）。</p>
+                <p>讓遊戲更有手感的技巧：<span style="color:#ffae00">Coyote Time</span>（走到平台邊緣後短暫還能跳，讓操控更寬容）；<span style="color:#ffae00">Jump Buffering</span>（提前按跳躍也能在落地後立即跳）；<span style="color:#ffae00">螢幕震動（Screen Shake）</span>在爆炸時短暫震動相機（Unity：<span style="color:#ffae00">Camera.main.transform.position += Random.insideUnitSphere * intensity</span>）；<span style="color:#ffae00">慢動作（Time.timeScale = 0.3f）</span>在關鍵瞬間增加戲劇感。</p>
+                <p>遊戲物理實作：重力——每幀給y方向速度加一個向下的加速度；<span style="color:#ffae00">Rigidbody</span>（Unity/Unreal的物理組件）自動處理重力、碰撞、摩擦；但有時候「感覺比真實更重要」——馬里歐的跳躍物理就不符合真實物理，而是調整到讓跳躍感覺更爽。C++做物理引擎可以整合<span style="color:#ffae00">Box2D</span>（2D物理）或<span style="color:#ffae00">Bullet Physics</span>（3D物理）。</p>
+                <p><span style="color:#fa6dff">「AI（人工智慧）」</span>讓敵人有行為：最簡單的是狀態機（FSM）——敵人有巡邏、追蹤、攻擊等狀態，根據條件切換；<span style="color:#ffae00">NavMesh</span>（Unity）讓敵人自動尋路，不會卡在牆角；<span style="color:#ffae00">A*搜尋演算法</span>是自製尋路的標準方案；<span style="color:#ffae00">行為樹（Behavior Tree）</span>是大型遊戲AI的主流架構（Unreal內建BT系統）。</p>
+</section>
             <section id="section5">
-                <h2>5. 聯絡我們</h2>
-                <p>這裡有聯絡表單或資訊。</p>
-            </section>
+                <h2>5. 實作專案：2D平台動作遊戲</h2>
+                <p>做一個<span style="color:#fa6dff">「2D橫向捲軸平台遊戲」</span>！這個類型包含了遊戲開發最核心的技術：物理移動、碰撞偵測、動畫、敵人AI、UI、音效，完成後有完整的遊玩體驗。建議用<span style="color:#ffae00">Unity</span>（C#），效率最高；或用<span style="color:#ffae00">SFML+C++</span>挑戰硬核路線。</p>
+                <p>玩家控制（C# Unity）：左右移動讀取<span style="color:#ffae00">Input.GetAxisRaw("Horizontal")</span>（-1、0、1）；跳躍用Rigidbody2D加力；地面偵測用<span style="color:#ffae00">Physics2D.OverlapCircle</span>在腳底下打一個圓形ray，碰到地板層才允許跳躍（避免空中二段跳）；動畫用<span style="color:#ffae00">Animator</span>組件控制Idle/Run/Jump動畫狀態機。</p>
+                <p>敵人：簡單的巡邏敵人——在Patrol點A和B之間來回移動，碰到玩家就傷害；用Raycast偵測前方是否有地板，沒有就轉向（避免走到懸崖）。用<span style="color:#ffae00">事件系統（Event System）</span>讓玩家踩到敵人頭上時消滅敵人，敵人碰到玩家側面時扣血，解耦傷害邏輯和碰撞偵測。</p>
+                <p>遊戲關卡設計：用Unity的<span style="color:#ffae00">Tilemap</span>系統畫地圖（非常高效）；放置收集品（金幣）、陷阱（棘刺）、CheckPoint（存檔點）；Camera跟隨玩家（用<span style="color:#ffae00">Cinemachine</span>套件做流暢的相機跟隨，比手動更好）；UI顯示生命值、分數；死亡後從CheckPoint重生或顯示Game Over畫面。</p>
+                <p>最後加上音效（<span style="color:#ffae00">AudioSource.PlayOneShot(jumpSound)</span>）和背景音樂，打包輸出（Unity Build Settings → Windows/Mac/WebGL）。WebGL版可以直接放到<span style="color:#ffae00">itch.io</span>讓大家在瀏覽器玩你的遊戲！遊戲開發是個旅程，完成第一個完整作品的感動無可比擬，加油！🎮</p>
+</section>
         </main>
     <script>
         const navLinks = document.querySelectorAll('.nav-link');

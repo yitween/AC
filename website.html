@@ -104,11 +104,11 @@
         <div style="height: 30px;"></div>
         <h3>章節目錄</h3>
         <ul>
-            <li><a href="#section1" class="nav-link">1. 產品簡介</a></li>
-            <li><a href="#section2" class="nav-link">2. 規格說明</a></li>
-            <li><a href="#section3" class="nav-link">3. 使用教學</a></li>
-            <li><a href="#section4" class="nav-link">4. 常見問題</a></li>
-            <li><a href="#section5" class="nav-link">5. 聯絡我們</a></li>
+            <li><a href="#section1" class="nav-link">1. 網頁的三層結構</a></li>
+            <li><a href="#section2" class="nav-link">2. 響應式版面設計</a></li>
+            <li><a href="#section3" class="nav-link">3. JavaScript 互動效果</a></li>
+            <li><a href="#section4" class="nav-link">4. 網頁效能與優化</a></li>
+            <li><a href="#section5" class="nav-link">5. 實作專案：個人作品集網站</a></li>
         </ul>
     </nav>
     <header>
@@ -134,26 +134,45 @@
         <div style="height: 30px;"></div>
         <main class="content">
             <section id="section1">
-                <h2>1. 產品簡介</h2>
-                <p>這裡是產品簡介的內容。請向下滾動查看側邊欄的變化。</p>
-                <p>（為了演示效果，這裡填充一些空白高度...）</p>
-            </section>
+                <h2>1. 網頁的三層結構</h2>
+                <p>製作一個完整的網頁，需要三種技術各司其職：<span style="color:#ffae00">HTML</span>定義<span style="color:#ffee00fa">內容與結構</span>（這是什麼、放在哪裡）、<span style="color:#ffae00">CSS</span>定義<span style="color:#ffee00fa">外觀與樣式</span>（看起來怎麼樣）、<span style="color:#ffae00">JavaScript</span>定義<span style="color:#ffee00fa">行為與互動</span>（點了之後發生什麼）。三者缺一不可，好的網頁需要三者平衡配合。</p>
+                <p>一個網頁的標準檔案結構：建立一個資料夾，裡面放<span style="color:#00eeff">index.html</span>（首頁）、<span style="color:#00eeff">style.css</span>（樣式）、<span style="color:#00eeff">script.js</span>（腳本），圖片放在<span style="color:#00eeff">images/</span>子資料夾。HTML裡用<span style="color:#ffae00">&lt;link rel="stylesheet" href="style.css"&gt;</span>引入CSS，用<span style="color:#ffae00">&lt;script src="script.js" defer&gt;&lt;/script&gt;</span>引入JS（<span style="color:#ffae00">defer</span>讓JS在HTML載入完後才執行，避免找不到元素的問題）。</p>
+                <p>HTML的<span style="color:#fa6dff">「語意結構」</span>是現代網頁開發的基礎：用<span style="color:#ffae00">&lt;header&gt;</span>放Logo和導覽列、<span style="color:#ffae00">&lt;main&gt;</span>放主要內容、<span style="color:#ffae00">&lt;section&gt;</span>分區塊、<span style="color:#ffae00">&lt;article&gt;</span>放獨立文章、<span style="color:#ffae00">&lt;footer&gt;</span>放頁尾資訊。語意標籤除了讓程式碼更易讀，對SEO（搜尋引擎優化）也很有幫助。</p>
+                <p>CSS的<span style="color:#fa6dff">「變數（Custom Properties）」</span>讓你建立設計系統：在<span style="color:#ffae00">:root</span>裡定義全局變數，例如：<span style="color:#ffae00">--primary-color: #00ffcc;</span>，之後用<span style="color:#ffae00">color: var(--primary-color);</span>引用，要改主題色只需改一個地方，整站都更新，是大型專案的必備技巧。</p>
+                <p>JS的<span style="color:#fa6dff">「模組化」</span>讓程式碼可維護：把不同功能拆成不同的.js檔，用<span style="color:#ffae00">export</span>和<span style="color:#ffae00">import</span>管理。例如：utils.js放工具函式、api.js放所有API呼叫、ui.js放DOM操作——這樣找bug和修改功能時，知道要去哪個檔案，不會在幾千行的大檔裡迷路。</p>
+</section>
             <section id="section2">
-                <h2>2. 規格說明</h2>
-                <p>這裡是規格說明的詳細資料。</p>
-            </section>
+                <h2>2. 響應式版面設計</h2>
+                <p>現代網頁必須在手機、平板、桌機上都好看，這就是<span style="color:#fa6dff">「響應式設計（Responsive Web Design）」</span>。核心思路：先設計手機版（Mobile First），再用<span style="color:#ffae00">Media Query</span>逐步擴展到大螢幕，例如：<span style="color:#ffae00">@media (min-width: 768px)</span>套用平板樣式，<span style="color:#ffae00">@media (min-width: 1200px)</span>套用桌機樣式。</p>
+                <p><span style="color:#ffae00">Flexbox</span>做元件排版：導覽列、卡片清單、按鈕群組都很適合。父元素設<span style="color:#ffae00">display: flex</span>後，用<span style="color:#ffae00">flex-wrap: wrap</span>讓子元素在空間不足時自動換行，例如每張卡片設<span style="color:#ffae00">flex: 1 1 300px</span>（可縮放、可換行、最小寬300px），畫面寬時三欄並排，窄時自動變成單欄。</p>
+                <p><span style="color:#ffae00">CSS Grid</span>做整頁版面配置：<span style="color:#ffae00">grid-template-columns: 1fr 3fr</span>做側邊欄+主內容；<span style="color:#ffae00">grid-template-areas</span>可以直觀地命名各區塊，例如：<span style="color:#ffae00">"header header" "sidebar main" "footer footer"</span>，然後子元素用<span style="color:#ffae00">grid-area: header</span>指定歸屬，排版邏輯一目瞭然。在手機版用Media Query把grid改成<span style="color:#ffae00">grid-template-columns: 1fr</span>就變成單欄。</p>
+                <p>圖片響應式：<span style="color:#ffae00">img { max-width: 100%; height: auto; }</span>讓圖片隨容器縮放，不超出邊界；用<span style="color:#ffae00">&lt;picture&gt;</span>標籤搭配<span style="color:#ffae00">srcset</span>，讓瀏覽器根據螢幕選擇合適尺寸的圖片，手機不用下載桌機版的大圖，加快載入速度。</p>
+                <p>字型和間距用<span style="color:#ffae00">rem</span>為單位（相對於html的font-size，預設16px），而非px，讓使用者在瀏覽器調整字型大小時整頁等比縮放。<span style="color:#ffae00">clamp(最小值, 理想值, 最大值)</span>讓字型大小在範圍內根據視窗寬度流暢縮放，例如：<span style="color:#ffae00">font-size: clamp(1rem, 2.5vw, 2rem)</span>，這是現代CSS的優雅解法！</p>
+</section>
             <section id="section3">
-                <h2>3. 使用教學</h2>
-                <p>這裡是使用教學的步驟。</p>
-            </section>
+                <h2>3. JavaScript 互動效果</h2>
+                <p>靜態網頁加上JS就能<span style="color:#ffee00fa">活起來</span>！最基本的互動：<span style="color:#fa6dff">「導覽列」</span>——監聽scroll事件，捲動超過一定距離時加上class讓navbar背景變深；漢堡選單按鈕切換側邊選單的顯示/隱藏（用classList.toggle()）。程式碼：<span style="color:#ffae00">document.querySelector('.menu-btn').addEventListener('click', () =&gt; { document.querySelector('.nav').classList.toggle('open'); })</span>。</p>
+                <p><span style="color:#fa6dff">「捲動動畫」</span>：元素進入視窗時才執行動畫，用<span style="color:#ffae00">Intersection Observer API</span>，比監聽scroll事件更高效：<span style="color:#ffae00">new IntersectionObserver((entries) =&gt; { entries.forEach(e =&gt; { if(e.isIntersecting) e.target.classList.add('visible') }) }).observe(element)</span>，配合CSS的transition就能做出漂亮的淡入效果。</p>
+                <p><span style="color:#fa6dff">「表單驗證」</span>：在送出前用JS驗證輸入，提供比原生HTML驗證更好的使用者體驗：即時驗證（input事件）、顯示自訂錯誤訊息、email格式用正則表達式檢查（<span style="color:#ffae00">/^[^\s@]+@[^\s@]+\.[^\s@]+$/</span>）、密碼強度檢測。驗證不通過就阻止送出：<span style="color:#ffae00">e.preventDefault()</span>。</p>
+                <p><span style="color:#fa6dff">「深色/淺色模式切換」</span>：讀取<span style="color:#ffae00">localStorage</span>記住使用者偏好，切換時對<span style="color:#ffae00">document.body</span>加上<span style="color:#ffae00">class="dark"</span>，CSS裡用<span style="color:#ffae00">.dark</span>選取器覆蓋CSS變數即可，例如：<span style="color:#ffae00">.dark { --bg-color: #141414; --text-color: #eee; }</span>。這是現代網頁的標配功能。</p>
+                <p>還可以用<span style="color:#ffae00">fetch()</span>打API取得動態資料，例如從公開API載入天氣、匯率、新聞等，讓你的靜態網頁也能顯示即時資訊。JSON資料用<span style="color:#ffae00">response.json()</span>解析，再用JS動態建立DOM元素插入頁面，這就是現代<span style="color:#fa6dff">「單頁應用程式（SPA）」</span>的基礎概念。</p>
+</section>
             <section id="section4">
-                <h2>4. 常見問題</h2>
-                <p>這裡列出 FAQ。</p>
-            </section>
+                <h2>4. 網頁效能與優化</h2>
+                <p>網頁載入速度直接影響使用者體驗和SEO排名。用<span style="color:#ffae00">Chrome開發者工具</span>的Lighthouse跑分析，它會給你Performance、Accessibility、SEO等項目的評分，並列出改善建議，是優化網頁最好的起點。</p>
+                <p>最大的效能殺手通常是<span style="color:#fa6dff">「圖片」</span>：改用<span style="color:#ffae00">WebP格式</span>（比JPEG/PNG小30-80%）；用線上工具或<span style="color:#ffae00">squoosh.app</span>壓縮圖片；設定<span style="color:#ffae00">loading="lazy"</span>讓圖片延遲載入（捲到才載入）；用CSS的<span style="color:#ffae00">object-fit: cover</span>控制圖片填充方式，不要用JS動態縮放圖片。</p>
+                <p>CSS和JS的載入優化：CSS放在<span style="color:#ffae00">&lt;head&gt;</span>裡（阻擋渲染，讓頁面一開始就有樣式）；JS加<span style="color:#ffae00">defer</span>（等HTML解析完再執行）或<span style="color:#ffae00">async</span>（異步下載，下載完立即執行）；把多個CSS/JS檔案合併並<span style="color:#ffee00fa">壓縮（Minify）</span>成一個，減少HTTP請求數量；用<span style="color:#ffae00">CDN</span>加速靜態資源分發。</p>
+                <p>CSS動畫效能：優先使用<span style="color:#ffae00">transform</span>和<span style="color:#ffae00">opacity</span>做動畫，這兩個屬性由GPU加速，不觸發頁面重排（reflow），非常流暢；避免動畫<span style="color:#ffae00">width</span>、<span style="color:#ffae00">height</span>、<span style="color:#ffae00">margin</span>等會引起重排的屬性，會讓頁面卡頓。<span style="color:#ffae00">will-change: transform</span>提示瀏覽器提前做GPU加速準備。</p>
+                <p><span style="color:#fa6dff">「無障礙設計（Accessibility）」</span>讓所有人都能使用你的網頁：圖片加<span style="color:#ffae00">alt</span>屬性（讓螢幕閱讀器描述圖片）；按鈕和連結有清楚的文字；表單用<span style="color:#ffae00">&lt;label&gt;</span>關聯input；確保色彩對比度足夠；網頁可以只用鍵盤瀏覽（Tab切換焦點）。這不只是做好事，也是法規要求的方向！</p>
+</section>
             <section id="section5">
-                <h2>5. 聯絡我們</h2>
-                <p>這裡有聯絡表單或資訊。</p>
-            </section>
+                <h2>5. 實作專案：個人作品集網站</h2>
+                <p>整合所學，做一個<span style="color:#fa6dff">「個人作品集網站（Portfolio）」</span>！這是展示你的技術能力最直接的方式，也是求職的重要加分項。規劃頁面區塊：Hero（大標題+自我介紹）、About（關於我）、Skills（技能清單）、Projects（作品展示）、Contact（聯絡方式），每個區塊對應一個&lt;section&gt;。</p>
+                <p>Hero區塊：用CSS背景漸層（<span style="color:#ffae00">linear-gradient</span>）或SVG圖案做背景；大標題用CSS動畫做打字機效果（用JS在setInterval裡逐字顯示）；CTA按鈕做hover時的滑動背景效果（用<span style="color:#ffae00">::before</span>偽元素+transform）。</p>
+                <p>作品卡片：用CSS Grid做卡片牆，每張卡片hover時輕微上移（<span style="color:#ffae00">transform: translateY(-8px)</span>+<span style="color:#ffae00">box-shadow</span>加深），點擊展開Modal顯示作品詳情，Modal用<span style="color:#ffae00">position: fixed</span>全螢幕遮罩。用JS的<span style="color:#ffae00">fetch()</span>從GitHub API自動拉取你的專案資料（<span style="color:#00eeff">api.github.com/users/你的名字/repos</span>），不用手動更新！</p>
+                <p>聯絡表單：用<span style="color:#ffae00">Formspree</span>或<span style="color:#ffae00">EmailJS</span>等免費服務，讓靜態網頁也能發送email，不需要後端。JS監聽表單送出，用fetch呼叫服務API，成功後顯示感謝訊息，失敗時顯示錯誤。</p>
+                <p>部署：把網站上傳到<span style="color:#ffae00">GitHub Pages</span>或<span style="color:#ffae00">Netlify</span>就能免費公開！GitHub Pages直接從你的Repository部署，Netlify更強大，支援自動從GitHub更新、自訂域名、HTTPS。讓全世界都能看到你的作品，這就是製作網頁最令人興奮的時刻！🌐</p>
+</section>
         </main>
     <script>
         const navLinks = document.querySelectorAll('.nav-link');

@@ -104,11 +104,11 @@
         <div style="height: 30px;"></div>
         <h3>章節目錄</h3>
         <ul>
-            <li><a href="#section1" class="nav-link">1. 產品簡介</a></li>
-            <li><a href="#section2" class="nav-link">2. 規格說明</a></li>
-            <li><a href="#section3" class="nav-link">3. 使用教學</a></li>
-            <li><a href="#section4" class="nav-link">4. 常見問題</a></li>
-            <li><a href="#section5" class="nav-link">5. 聯絡我們</a></li>
+            <li><a href="#section1" class="nav-link">1. AI 與機器學習概論</a></li>
+            <li><a href="#section2" class="nav-link">2. 資料處理與特徵工程</a></li>
+            <li><a href="#section3" class="nav-link">3. 傳統機器學習算法</a></li>
+            <li><a href="#section4" class="nav-link">4. 深度學習與神經網路</a></li>
+            <li><a href="#section5" class="nav-link">5. 實作專案：影像分類 AI</a></li>
         </ul>
     </nav>
     <header>
@@ -134,26 +134,45 @@
         <div style="height: 50px;"></div>
         <main class="content">
             <section id="section1">
-                <h2>1. 產品簡介</h2>
-                <p>這裡是產品簡介的內容。請向下滾動查看側邊欄的變化。</p>
-                <p>（為了演示效果，這裡填充一些空白高度...）</p>
-            </section>
+                <h2>1. AI 與機器學習概論</h2>
+                <p><span style="color:#fa6dff">「人工智慧（AI）」</span>是讓電腦展現類似人類智慧的技術；<span style="color:#fa6dff">「機器學習（Machine Learning）」</span>是AI的子集，讓電腦從資料中<span style="color:#ffee00fa">自動學習規律</span>，不需要人工編寫所有規則；<span style="color:#fa6dff">「深度學習（Deep Learning）」</span>是機器學習的子集，用多層神經網路處理複雜問題（圖像、語音、語言）。Python是AI領域的首選語言，幾乎所有主流AI框架都以Python為主。</p>
+                <p>機器學習的三大類型：<span style="color:#ffae00">監督式學習（Supervised Learning）</span>——有標記的訓練資料（輸入+正確答案），學習輸入到輸出的映射，例如圖片分類（輸入：圖片，輸出：貓/狗）；<span style="color:#ffae00">非監督式學習（Unsupervised Learning）</span>——沒有標記，讓模型自己找資料的結構，例如分群（Clustering）；<span style="color:#ffae00">強化學習（Reinforcement Learning）</span>——讓agent在環境中行動、獲得獎勵，學習最佳策略，例如AlphaGo。</p>
+                <p>必備的Python套件：<span style="color:#ffae00">NumPy</span>（數值計算，矩陣運算的基礎）；<span style="color:#ffae00">Pandas</span>（資料處理，讀CSV、清洗、分析）；<span style="color:#ffae00">Matplotlib / Seaborn</span>（資料視覺化）；<span style="color:#ffae00">Scikit-learn</span>（傳統機器學習算法的完整工具箱）；<span style="color:#ffae00">PyTorch</span>（深度學習框架，學術界首選）；<span style="color:#ffae00">TensorFlow / Keras</span>（深度學習框架，工業界廣用）。全部用pip安裝，或用<span style="color:#ffae00">Anaconda</span>一鍵建立AI開發環境。</p>
+                <p>用<span style="color:#ffae00">Jupyter Notebook</span>（或Google Colab）開發AI：在瀏覽器中分格執行程式碼、即時看圖表、記錄思路，是AI/資料科學的標準工作環境。Google Colab提供免費GPU，讓沒有高效能電腦的人也能訓練深度學習模型，是入門AI的最佳起點。</p>
+                <p>AI倫理與限制：現在的AI（包含GPT、Gemini等大型語言模型）是<span style="color:#ffee00fa">統計模式匹配</span>，不是真正的「理解」；AI會有偏見（反映訓練資料的偏見）；AI生成的內容可能不正確（幻覺問題）；學習AI不只是學技術，也要思考它的社會影響和使用倫理，這是現代AI工程師的重要素養。</p>
+</section>
             <section id="section2">
-                <h2>2. 規格說明</h2>
-                <p>這裡是規格說明的詳細資料。</p>
-            </section>
+                <h2>2. 資料處理與特徵工程</h2>
+                <p>「垃圾進、垃圾出（Garbage In, Garbage Out）」——AI模型的好壞70%取決於資料品質，<span style="color:#fa6dff">「資料前處理（Data Preprocessing）」</span>是AI專案最重要也最花時間的步驟。<span style="color:#ffae00">Pandas</span>是處理表格資料的核心工具：<span style="color:#ffae00">pd.read_csv('data.csv')</span>讀取資料；<span style="color:#ffae00">df.head()</span>查看前幾行；<span style="color:#ffae00">df.info()</span>查看欄位型態和缺失值；<span style="color:#ffae00">df.describe()</span>統計摘要。</p>
+                <p>處理缺失值：<span style="color:#ffae00">df.dropna()</span>刪除含缺失值的行（資料量夠多才用）；<span style="color:#ffae00">df['col'].fillna(df['col'].mean())</span>用均值填補（連續值）；<span style="color:#ffae00">df['col'].fillna(df['col'].mode()[0])</span>用眾數填補（類別值）。處理異常值：用<span style="color:#ffae00">箱型圖（boxplot）</span>視覺化發現離群值，根據業務理解決定是刪除、修正還是保留。</p>
+                <p><span style="color:#fa6dff">「特徵工程（Feature Engineering）」</span>是把原始資料轉換成對模型有用的特徵：數值標準化（<span style="color:#ffae00">StandardScaler</span>把資料縮放到均值0、標準差1；<span style="color:#ffae00">MinMaxScaler</span>縮放到0-1）；類別特徵轉數字（<span style="color:#ffae00">One-Hot Encoding</span>：pd.get_dummies()，把「紅/藍/綠」變成三個0/1欄位）；時間特徵拆分（從datetime萃取年、月、日、星期幾作為獨立特徵）。</p>
+                <p>資料探索（EDA）：在建模前充分了解資料。<span style="color:#ffae00">Seaborn</span>的<span style="color:#ffae00">heatmap(df.corr())</span>查看特徵相關性（高度相關的特徵可能是多餘的）；<span style="color:#ffae00">sns.pairplot(df)</span>一次畫所有特徵兩兩之間的散佈圖；<span style="color:#ffae00">df.groupby('label').mean()</span>看不同類別的特徵均值差異。EDA的目的是找到有意義的模式，指導特徵選擇和模型設計。</p>
+                <p>訓練/測試資料分割：<span style="color:#ffae00">from sklearn.model_selection import train_test_split</span>；<span style="color:#ffae00">X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</span>，把20%資料留作測試，確保模型在沒見過的資料上的效能才是真實能力。避免<span style="color:#ffee00fa">資料洩漏（Data Leakage）</span>——前處理（如標準化）要在訓練集上fit，再transform測試集，不能用整個資料集fit。</p>
+</section>
             <section id="section3">
-                <h2>3. 使用教學</h2>
-                <p>這裡是使用教學的步驟。</p>
-            </section>
+                <h2>3. 傳統機器學習算法</h2>
+                <p>Scikit-learn提供了完整的傳統ML算法，所有算法都有統一的介面：<span style="color:#ffae00">model.fit(X_train, y_train)</span>訓練；<span style="color:#ffae00">model.predict(X_test)</span>預測；<span style="color:#ffae00">model.score(X_test, y_test)</span>評分。這讓你可以快速嘗試不同算法。</p>
+                <p>常用分類算法：<span style="color:#ffae00">Logistic Regression</span>（邏輯迴歸，基本但強大，可解釋性高）；<span style="color:#ffae00">Decision Tree</span>（決策樹，直觀可視化，容易過擬合）；<span style="color:#ffae00">Random Forest</span>（隨機森林，多棵決策樹集成，效能好，是很多問題的好起點）；<span style="color:#ffae00">SVM</span>（支援向量機，在高維資料表現好）；<span style="color:#ffae00">K-Nearest Neighbors</span>（KNN，直觀但大資料集慢）；<span style="color:#ffae00">Gradient Boosting（XGBoost/LightGBM）</span>（競賽中最常拿第一的算法，強力推薦）。</p>
+                <p>評估分類模型：<span style="color:#ffae00">Accuracy</span>（準確率，資料不平衡時會有誤導）；<span style="color:#ffae00">Precision/Recall/F1-Score</span>（更全面，用<span style="color:#ffae00">classification_report(y_test, y_pred)</span>一次看）；<span style="color:#ffae00">混淆矩陣（Confusion Matrix）</span>視覺化模型哪裡錯得多；<span style="color:#ffae00">ROC-AUC</span>（不同閾值下的表現，越接近1越好）。</p>
+                <p>迴歸問題（預測連續值）：<span style="color:#ffae00">Linear Regression</span>（線性迴歸，基礎）；<span style="color:#ffae00">Ridge/Lasso</span>（加入正則化，防止過擬合）；<span style="color:#ffae00">Random Forest Regressor</span>；評估用<span style="color:#ffae00">MAE</span>（平均絕對誤差）、<span style="color:#ffae00">RMSE</span>（均方根誤差）、<span style="color:#ffae00">R²</span>（解釋變異比例，1是完美）。</p>
+                <p><span style="color:#fa6dff">「超參數調整（Hyperparameter Tuning）」</span>：模型有很多可以調整的參數（例如Random Forest的樹的數量、深度），不同值效果差很多。用<span style="color:#ffae00">GridSearchCV</span>或<span style="color:#ffae00">RandomizedSearchCV</span>自動搜尋最佳參數組合，搭配<span style="color:#ffae00">交叉驗證（Cross-Validation）</span>評估，讓模型選擇更可靠。</p>
+</section>
             <section id="section4">
-                <h2>4. 常見問題</h2>
-                <p>這裡列出 FAQ。</p>
-            </section>
+                <h2>4. 深度學習與神經網路</h2>
+                <p><span style="color:#fa6dff">「神經網路（Neural Network）」</span>模仿人腦神經元的連接方式，由多層<span style="color:#ffae00">神經元（Neuron）</span>組成，每個神經元對輸入做加權求和，再通過<span style="color:#fa6dff">「激活函式（Activation Function）」</span>增加非線性能力。常用激活函式：<span style="color:#ffae00">ReLU</span>（f(x)=max(0,x)，深層網路首選）；<span style="color:#ffae00">Sigmoid</span>（輸出0-1，二元分類輸出層）；<span style="color:#ffae00">Softmax</span>（多分類輸出層，所有輸出加總為1）。</p>
+                <p>用<span style="color:#ffae00">PyTorch</span>建立簡單神經網路：<span style="color:#ffae00">import torch.nn as nn</span>；定義一個繼承<span style="color:#ffae00">nn.Module</span>的class，在<span style="color:#ffae00">__init__</span>裡定義各層（<span style="color:#ffae00">nn.Linear(in, out)</span>是全連接層），在<span style="color:#ffae00">forward()</span>裡定義資料怎麼流過各層。訓練：定義<span style="color:#ffae00">loss function</span>（<span style="color:#ffae00">nn.CrossEntropyLoss</span>分類、<span style="color:#ffae00">nn.MSELoss</span>迴歸）和<span style="color:#ffae00">optimizer</span>（<span style="color:#ffae00">torch.optim.Adam</span>最常用），然後反覆做forward pass → 計算loss → backward pass（自動微分）→ optimizer.step()更新權重。</p>
+                <p><span style="color:#fa6dff">「卷積神經網路（CNN）」</span>是處理圖像的核心架構：卷積層（<span style="color:#ffae00">nn.Conv2d</span>）用濾波器掃描圖片提取局部特徵；池化層（<span style="color:#ffae00">nn.MaxPool2d</span>）降低維度；全連接層做最終分類。CNN的特點是<span style="color:#ffee00fa">位置不變性</span>——貓在圖片左上角或右下角都能認出。ImageNet上訓練好的模型（ResNet、VGG、EfficientNet）可以用<span style="color:#ffae00">遷移學習（Transfer Learning）</span>微調，讓少量資料也能做出好的圖像分類器。</p>
+                <p><span style="color:#fa6dff">「Transformer與大型語言模型（LLM）」</span>：2017年的Transformer架構徹底改變了NLP（自然語言處理），<span style="color:#ffae00">Attention機制</span>讓模型可以關注句子中任意位置的關係。GPT、BERT、T5等大型語言模型都基於Transformer。用Python的<span style="color:#ffae00">Hugging Face transformers</span>套件，可以用幾行程式載入並使用這些預訓練模型做情感分析、文字生成、問答等任務，而不需要從零訓練。</p>
+                <p>防止<span style="color:#fa6dff">「過擬合（Overfitting）」</span>：神經網路太強，容易把訓練資料的雜訊也記起來，導致測試資料表現差。解決方案：<span style="color:#ffae00">Dropout</span>（訓練時隨機丟棄一些神經元）；<span style="color:#ffae00">Batch Normalization</span>（對每層輸出做標準化，讓訓練更穩定）；<span style="color:#ffae00">Early Stopping</span>（監控驗證集loss，不再下降就停止訓練）；<span style="color:#ffae00">資料增強（Data Augmentation）</span>（對圖片隨機翻轉、旋轉、裁切，增加訓練資料的多樣性）。</p>
+</section>
             <section id="section5">
-                <h2>5. 聯絡我們</h2>
-                <p>這裡有聯絡表單或資訊。</p>
-            </section>
+                <h2>5. 實作專案：影像分類 AI</h2>
+                <p>整合所學做一個<span style="color:#fa6dff">「影像分類AI」</span>完整專案！以<span style="color:#ffae00">CIFAR-10</span>（10類物體：飛機、汽車、鳥、貓...）或自己蒐集的資料集為目標，訓練一個CNN分類器。用Google Colab（免費GPU）進行，整個流程從資料到部署一氣呵成。</p>
+                <p>資料準備：<span style="color:#ffae00">torchvision.datasets.CIFAR10</span>自動下載CIFAR-10；建立<span style="color:#ffae00">DataLoader</span>做批次訓練（batch_size=64）；做資料增強（<span style="color:#ffae00">transforms.RandomHorizontalFlip()</span>、<span style="color:#ffae00">transforms.RandomCrop()</span>）讓模型更有泛化能力；正規化圖片像素值（除以255，或用CIFAR-10的均值/標準差）。</p>
+                <p>模型設計：先試簡單的CNN（2-3個卷積塊+全連接層），了解基本流程；再試遷移學習——載入<span style="color:#ffae00">torchvision.models.resnet18(pretrained=True)</span>，只修改最後的全連接層（輸出改成10類），凍結前面的卷積層或只用低學習率微調，通常比自訓CNN準確率高很多，訓練也快。</p>
+                <p>訓練監控：用<span style="color:#ffae00">TensorBoard</span>或<span style="color:#ffae00">Weights &amp; Biases（wandb）</span>記錄每個epoch的loss和accuracy，畫成圖形即時監控訓練狀態，發現過擬合（訓練準確率高但驗證準確率低）或欠擬合（兩者都低）及時調整策略。</p>
+                <p>部署：訓練好的模型用<span style="color:#ffae00">torch.save(model.state_dict(), 'model.pth')</span>儲存；用<span style="color:#ffae00">Flask</span>建立一個API，接收上傳的圖片，推論後回傳預測類別和信心分數；用<span style="color:#ffae00">Gradio</span>套件可以更快速地建立一個漂亮的web介面（拖曳圖片直接看分類結果），一行程式就能分享給別人試用。完成後把連結分享給朋友，AI夢想實現的瞬間真的很有成就感！🤖</p>
+</section>
         </main>
     <script>
         const navLinks = document.querySelectorAll('.nav-link');

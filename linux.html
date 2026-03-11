@@ -96,7 +96,36 @@
         h2 {
             margin-top: 0;
         }
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            align-items: center;
+        }
+        .nav-menu li {
+            margin-left: 20px;
+        }
+        .nav-menu a {
+            text-decoration: none;
+            color: #ccc;
+            font-size: 1rem;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        .nav-menu a:hover {
+            color: white;
+            background-color: rgba(255,255,255,0.1);
+        }
     </style>
+    <ul class="nav-menu">
+        <li>
+            <button class="gdb-btn" onclick="toggleGdbWindow()">
+                GDB
+            </button>
+        </li>
+    </ul>
 </head>
 <body>
     <a href="index.html" class="back-button">← 回首頁</a>
@@ -115,6 +144,9 @@
         <div class="content">
         <img src="linuxlogo.png" class="big-logo">
         <h1>LINUX</h1>
+        <button class="gdb-btn" onclick="toggleGdbWindow()">
+            GDB
+        </button>
         <hr style="border-color: #333; margin: 20px 0;">
         <div style="height: 30px;"></div>
         <main class="content">
@@ -158,6 +190,9 @@
                 <p>最後，<span style="color:#ffae00">crontab -e</span>可以設定<span style="color:#fa6dff">「排程任務（Cron Job）」</span>，讓某個指令在固定時間自動執行，格式是「分 時 日 月 週 指令」，例如：0 2 * * * /home/backup.sh 代表每天凌晨2點執行備份腳本，是伺服器自動化維運的必學技能！</p>
 </section>
         </main>
+        <div style="height: 60px;"></div> 
+        <p>最後這裡提供一個用GoogleAI(Gemini)NotebookLM製作的教學綱要簡報簡報，下載起來，方便需要時做迅速的統整和複習~</p>
+        <a href="C  _基礎與實踐藍圖.pdf" download class="download-btn">立即下載檔案</a>
     <script>
         const navLinks = document.querySelectorAll('.nav-link');
         const sections = document.querySelectorAll('section');
@@ -179,5 +214,58 @@
         });
     </script>
     </header>
+    <div id="gdbFloatWindow">
+        <div class="window-header" id="dragHandle">
+            <span class="window-title">GDB</span>
+            <span class="close-btn" onclick="toggleGdbWindow()">&times;</span>
+        </div>
+        <div class="window-content">
+            <iframe 
+                id="gdbFrame"
+                data-src="https://www.onlinegdb.com/"
+                src="https://www.onlinegdb.com/"
+                sandbox="allow-forms allow-scripts allow-same-origin allow-popups">
+            </iframe>
+        </div>
+    </div>
+    <script>
+        const floatWindow = document.getElementById('gdbFloatWindow');
+        const iframe = document.getElementById('gdbFrame');
+        const dragHandle = document.getElementById('dragHandle');
+        function toggleGdbWindow() {
+            if (floatWindow.style.display === 'flex') {
+                floatWindow.style.display = 'none';
+            } else {
+                floatWindow.style.display = 'flex';
+                if (iframe.getAttribute('src') === "") {
+                    iframe.setAttribute('src', iframe.getAttribute('data-src'));
+                }
+            }
+        }
+        let isDragging = false;
+        let startX, startY, initialLeft, initialTop;
+        dragHandle.addEventListener('mousedown', function(e) {
+            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            const rect = floatWindow.getBoundingClientRect();
+            initialLeft = rect.left;
+            initialTop = rect.top;
+            floatWindow.classList.add('is-dragging');
+        });
+        document.addEventListener('mousemove', function(e) {
+            if (isDragging) {
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+                floatWindow.style.left = `${initialLeft + dx}px`;
+                floatWindow.style.top = `${initialTop + dy}px`;
+                floatWindow.style.right = 'auto'; 
+            }
+        });
+        document.addEventListener('mouseup', function() {
+            isDragging = false;
+            floatWindow.classList.remove('is-dragging');
+        });
+    </script>
 </body>
 </html>

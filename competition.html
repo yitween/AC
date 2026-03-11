@@ -104,11 +104,11 @@
         <div style="height: 30px;"></div>
         <h3>章節目錄</h3>
         <ul>
-            <li><a href="#section1" class="nav-link">1. 產品簡介</a></li>
-            <li><a href="#section2" class="nav-link">2. 規格說明</a></li>
-            <li><a href="#section3" class="nav-link">3. 使用教學</a></li>
-            <li><a href="#section4" class="nav-link">4. 常見問題</a></li>
-            <li><a href="#section5" class="nav-link">5. 聯絡我們</a></li>
+            <li><a href="#section1" class="nav-link">1. 競賽程式概論</a></li>
+            <li><a href="#section2" class="nav-link">2. 基礎資料結構</a></li>
+            <li><a href="#section3" class="nav-link">3. 核心演算法</a></li>
+            <li><a href="#section4" class="nav-link">4. APCS 考試解題策略</a></li>
+            <li><a href="#section5" class="nav-link">5. 進階演算法與備賽</a></li>
         </ul>
     </nav>
     <header>
@@ -134,26 +134,43 @@
         <div style="height: 50px;"></div>
         <main class="content">
             <section id="section1">
-                <h2>1. 產品簡介</h2>
-                <p>這裡是產品簡介的內容。請向下滾動查看側邊欄的變化。</p>
-                <p>（為了演示效果，這裡填充一些空白高度...）</p>
-            </section>
+                <h2>1. 競賽程式概論</h2>
+                <p><span style="color:#fa6dff">「競賽程式設計（Competitive Programming）」</span>是在限定時間內解決演算法問題的競技，考驗邏輯推理、資料結構和演算法的掌握程度。主要競賽：<span style="color:#ffae00">APCS</span>（大學入學先修測驗）、<span style="color:#ffae00">全國高中資訊奧林匹亞（TOI）</span>、<span style="color:#ffae00">ICPC</span>（國際大學生程式競賽）、<span style="color:#ffae00">LeetCode/Codeforces</span>（線上練習平台）。</p>
+                <p>語言選擇：<span style="color:#ffae00">C++</span>是競賽的主流語言，速度快、STL提供豐富資料結構、大多數競賽都支援；<span style="color:#ffae00">Python</span>語法簡潔，適合快速實作，但速度較慢，時間限制較嚴的題目可能超時；<span style="color:#ffae00">Java</span>速度介於C++和Python之間，BigInteger處理大數很方便。多數競賽選手以C++為主，Python/Java作為輔助。</p>
+                <p>C++競賽常用的開頭：<span style="color:#ffae00">#include &lt;bits/stdc++.h&gt;</span>（引入所有標準函式庫）；<span style="color:#ffae00">using namespace std;</span>；<span style="color:#ffae00">typedef long long ll;</span>（ll比int大，避免overflow）；<span style="color:#ffae00">ios_base::sync_with_stdio(false); cin.tie(NULL);</span>（加速輸入輸出，大量IO時很重要）。</p>
+                <p>解題的基本流程：讀清楚題目（輸入格式、限制條件、輸出要求）→ 分析規律找思路 → 考慮時間複雜度（N=10^5的題目通常要O(N log N)以內）→ 寫程式 → 手動測試基本案例和邊界案例（空、單元素、最大值）→ 提交。Time Limit Exceeded（TLE）通常是演算法複雜度太高；Runtime Error（RE）通常是陣列越界或除以0；Wrong Answer（WA）是邏輯錯誤。</p>
+                <p>心態：競賽題目設計來讓你挑戰極限，看不懂或想不出來是正常的！重要的是每次解完題要看其他人的解法，了解更好的思路；累積「見過的題型」，看到新題目才能聯想到解法。練習量是進步的關鍵，每天穩定練習比突擊更有效。</p>
+</section>
             <section id="section2">
-                <h2>2. 規格說明</h2>
-                <p>這裡是規格說明的詳細資料。</p>
-            </section>
+                <h2>2. 基礎資料結構</h2>
+                <p>競賽中最常用的<span style="color:#fa6dff">「資料結構」</span>都在C++ STL裡：<span style="color:#ffae00">vector</span>（動態陣列）、<span style="color:#ffae00">stack</span>（後進先出）、<span style="color:#ffae00">queue</span>（先進先出）、<span style="color:#ffae00">priority_queue</span>（堆積，自動維護最大/最小值）、<span style="color:#ffae00">set</span>（有序不重複集合，O(log N)操作）、<span style="color:#ffae00">map</span>（有序鍵值對，O(log N)）、<span style="color:#ffae00">unordered_map</span>（雜湊表，O(1)平均）。</p>
+                <p><span style="color:#fa6dff">「堆疊（Stack）」</span>的應用：括號配對（遇到左括號push，遇到右括號檢查pop的是否配對）、計算後綴表達式、DFS的迭代版本、單調堆疊（找每個元素左/右第一個更大的元素，O(N)）。<span style="color:#fa6dff">「佇列（Queue）」</span>的應用：BFS層序遍歷、滑動視窗最大值（用deque）。</p>
+                <p><span style="color:#fa6dff">「二元樹」</span>：理解前/中/後序遍歷（DFS，用遞迴或堆疊）和層序遍歷（BFS，用佇列）。<span style="color:#fa6dff">「二元搜尋樹（BST）」</span>讓搜尋/插入/刪除都是O(log N)；STL的<span style="color:#ffae00">set</span>和<span style="color:#ffae00">map</span>內部用紅黑樹實作，是平衡BST，保證最差O(log N)。<span style="color:#fa6dff">「Heap（堆積）」</span>快速取最大/最小，priority_queue就是max-heap；自訂比較函式：<span style="color:#ffae00">priority_queue&lt;int, vector&lt;int&gt;, greater&lt;int&gt;&gt;</span>是min-heap。</p>
+                <p>Python的對應：<span style="color:#ffae00">list</span>當stack（append/pop）；<span style="color:#ffae00">collections.deque</span>當queue（appendleft/pop）；<span style="color:#ffae00">heapq</span>模組做min-heap；<span style="color:#ffae00">collections.defaultdict</span>和<span style="color:#ffae00">Counter</span>很好用；Java的對應：<span style="color:#ffae00">Stack</span>、<span style="color:#ffae00">LinkedList</span>（當deque）、<span style="color:#ffae00">PriorityQueue</span>（min-heap）、<span style="color:#ffae00">TreeMap/TreeSet</span>、<span style="color:#ffae00">HashMap/HashSet</span>。</p>
+</section>
             <section id="section3">
-                <h2>3. 使用教學</h2>
-                <p>這裡是使用教學的步驟。</p>
-            </section>
+                <h2>3. 核心演算法</h2>
+                <p><span style="color:#fa6dff">「排序與搜尋」</span>：<span style="color:#ffae00">sort(v.begin(), v.end())</span>（C++ STL，O(N log N)）；自訂排序：<span style="color:#ffae00">sort(v.begin(), v.end(), [](int a, int b){ return a &gt; b; })</span>（降序）；<span style="color:#ffae00">binary_search</span>/<span style="color:#ffae00">lower_bound</span>/<span style="color:#ffae00">upper_bound</span>在排序陣列上O(log N)搜尋。二分搜尋的模板要背熟，很多題目用「二分答案」技巧（對答案二分，check函式判斷可行性）。</p>
+                <p><span style="color:#fa6dff">「圖論」</span>是競賽必考：圖的表示用<span style="color:#ffae00">鄰接表（Adjacency List）</span>，C++用<span style="color:#ffae00">vector&lt;vector&lt;pair&lt;int,int&gt;&gt;&gt; adj(n)</span>；<span style="color:#ffae00">BFS</span>（廣度優先搜尋）：用queue，找最短路徑（無權圖）；<span style="color:#ffae00">DFS</span>（深度優先搜尋）：用遞迴或stack，找連通塊、拓撲排序；<span style="color:#ffae00">Dijkstra</span>：有權圖最短路，用priority_queue，O((V+E)log V)；<span style="color:#ffae00">Floyd-Warshall</span>：所有點對最短路，O(V³)。</p>
+                <p><span style="color:#fa6dff">「動態規劃（DP）」</span>是競賽最重要也最難的技巧，把大問題分解成子問題、記憶化避免重複計算。入門題型：<span style="color:#ffae00">費氏數列</span>（dp[i] = dp[i-1]+dp[i-2]）→ <span style="color:#ffae00">爬樓梯</span>；<span style="color:#ffae00">0/1背包問題</span>（dp[i][w] = max選不選第i件物品）；<span style="color:#ffae00">最長公共子序列（LCS）</span>；<span style="color:#ffae00">最長遞增子序列（LIS）</span>。DP的關鍵是定義「狀態」和「轉移方程式」，把思路寫清楚再碼。</p>
+                <p>常用技巧：<span style="color:#ffae00">前綴和（Prefix Sum）</span>——O(1)查詢任意區間和；<span style="color:#ffae00">差分陣列</span>——O(1)區間更新；<span style="color:#ffae00">Union-Find（並查集）</span>——快速判斷兩點是否連通、合併集合（Kruskal最小生成樹用到）；<span style="color:#ffae00">位元運算</span>——用XOR找只出現一次的數、用AND/OR做狀態壓縮DP。</p>
+</section>
             <section id="section4">
-                <h2>4. 常見問題</h2>
-                <p>這裡列出 FAQ。</p>
-            </section>
+                <h2>4. APCS 考試解題策略</h2>
+                <p><span style="color:#ffae00">APCS（大學程式設計先修檢測）</span>是台灣高中生最重要的程式競賽考試，分為<span style="color:#fa6dff">「觀念題」</span>（選擇題，考基礎概念）和<span style="color:#fa6dff">「實作題」</span>（程式設計，提交程式碼評分）。觀念題考變數、迴圈、遞迴、資料結構等基本觀念，要熟悉各種程式追蹤（看一段程式推輸出）；實作題共4題，難度從1~5，建議先把能做的題目做完，再攻難題。</p>
+                <p>APCS常見題型：<span style="color:#ffae00">模擬題</span>——按照題目規則一步一步執行，忠實實作即可；<span style="color:#ffae00">字串處理</span>——切割、比對、計數；<span style="color:#ffae00">陣列操作</span>——前綴和、排序、二分；<span style="color:#ffae00">簡單圖論</span>——BFS/DFS連通塊；<span style="color:#ffae00">基礎DP</span>——背包、爬樓梯類型。3、4級對學測加分有利，5級需要深厚的演算法功底。</p>
+                <p>時間管理策略：每題先看題目和subtask（子題）分數配置，有些題目部分分數只需要O(N²)暴力解就夠了；先確保拿到每題的基本分，再挑戰難的部分；不要在一題卡太久，先跳過去做後面的題目。</p>
+                <p>Codeforces/LeetCode練習策略：每次做題前不要看提示，想不出來時再看（think first）；做完後一定要看別人的解法（editorial），了解更優雅的思路；建立自己的「題型筆記」，把每種題型的解法模板記下來；從Easy/CF Rating 800開始，每週挑戰高一點的難度，循序漸進。</p>
+                <p>Python在競賽中的加速技巧：<span style="color:#ffae00">sys.stdin.readline</span>比input()快很多（大量輸入時必用）；<span style="color:#ffae00">sys.setrecursionlimit(10**6)</span>增加遞迴深度限制；<span style="color:#ffae00">PyPy</span>（多數OJ支援）比CPython快3-5倍；用<span style="color:#ffae00">collections.Counter</span>、<span style="color:#ffae00">defaultdict</span>替代手動計數；避免在迴圈內做字串拼接（改用join）。</p>
+</section>
             <section id="section5">
-                <h2>5. 聯絡我們</h2>
-                <p>這裡有聯絡表單或資訊。</p>
-            </section>
+                <h2>5. 進階演算法與備賽</h2>
+                <p>進入TOI/ICPC等頂尖競賽需要更深的演算法知識。<span style="color:#fa6dff">「線段樹（Segment Tree）」</span>：支援O(log N)的區間查詢（max/min/sum）和單點/區間修改，是很多進階題的標配；<span style="color:#fa6dff">「樹狀陣列（BIT / Fenwick Tree）」</span>：實作更簡單，支援前綴和查詢和單點修改，O(log N)；兩者都比暴力的O(N)查詢快很多，在N=10^5的題目中是關鍵。</p>
+                <p><span style="color:#fa6dff">「最短路進階」</span>：Bellman-Ford（可處理負邊，O(VE)，偵測負環）；SPFA（Bellman-Ford的佇列優化，競賽中常被卡）；Johnson算法（全點對最短路，適合稀疏圖）。<span style="color:#fa6dff">「最小生成樹」</span>：Kruskal（排序邊，Union-Find合併）；Prim（類似Dijkstra，從一點出發擴張）。</p>
+                <p><span style="color:#fa6dff">「進階DP」</span>：<span style="color:#ffae00">樹狀DP</span>（在樹上做DP，根為子問題）；<span style="color:#ffae00">狀態壓縮DP</span>（用bitmask表示狀態，例如TSP旅行商問題）；<span style="color:#ffae00">區間DP</span>（dp[l][r]代表區間l到r的最優解）；<span style="color:#ffae00">斜率優化DP</span>（高級優化技巧，把O(N²) DP降到O(N)）。</p>
+                <p>數論：<span style="color:#ffae00">GCD（輾轉相除法）</span>；<span style="color:#ffae00">質數篩（Sieve of Eratosthenes）</span>；<span style="color:#ffae00">模運算</span>（<span style="color:#ffae00">__int128</span>處理超大數，或用取模防溢出）；<span style="color:#ffae00">快速冪（Fast Exponentiation）</span>計算a^b mod p，O(log b)。字串：<span style="color:#ffae00">KMP演算法</span>（字串比對O(N+M)）；<span style="color:#ffae00">Z-function</span>；<span style="color:#ffae00">字典樹（Trie）</span>高效前綴搜尋。</p>
+                <p>備賽計畫建議：至少提前3個月開始有系統地練習；用<span style="color:#ffae00">vjudge</span>建立虛擬比賽模擬真實考試感；每週至少做一場Codeforces虛擬比賽；把錯的題目整理成錯題本定期複習；找志同道合的同學組隊練習，互相講解思路是最好的學習方式。競賽之路漫長但充實，每次進步都是自己和過去的自己的競爭！💪</p>
+</section>
         </main>
     <script>
         const navLinks = document.querySelectorAll('.nav-link');
