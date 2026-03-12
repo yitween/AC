@@ -1,284 +1,258 @@
 <!DOCTYPE html>
+
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AC_JAVA</title>
-    <link rel="icon" href="螢幕擷取畫面 2026-01-05 125529.png" sizes="48x48" type="image/png">
-    <style>
-        body {
-            background-color: rgb(20, 20, 20);
-            color: white;
-            font-family: "Microsoft JhengHei", sans-serif;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AC — JAVA</title>
+<link href="螢幕擷取畫面 2026-01-05 125529.png" rel="icon" sizes="48x48" type="image/png"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="shared.css" rel="stylesheet"/>
+<style>
+        /* ── GDB FLOAT WINDOW ── */
+        #gdbFloatWindow {
+            display: none; position: fixed;
+            top: 100px; right: 50px;
+            width: 600px; height: 500px;
+            background: #1e1e1e;
+            border: 1px solid #444; border-radius: 10px;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.6);
+            z-index: 2000; flex-direction: column;
+            overflow: hidden; resize: both;
+            min-width: 320px; min-height: 250px;
+            max-width: 95vw; max-height: 95vh;
         }
-        .back-button {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            text-decoration: none;
-            color: aquamarine;
-            border: 1px solid aquamarine;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: all 0.3s;
-            z-index: 1000;
+        .window-header {
+            height: 40px; background: #2a2a2a;
+            display: flex; align-items: center;
+            justify-content: space-between;
+            padding: 0 14px; cursor: move;
+            border-bottom: 1px solid #444;
+            user-select: none; flex-shrink: 0;
         }
-        .back-button:hover {
-            background-color: aquamarine;
-            color: black;
+        .window-title {
+            color: #ccc; font-weight: 700; font-size: 0.85rem;
+            font-family: 'JetBrains Mono', monospace;
         }
-        .content {
-            max-width: 800px;
-            text-align: center;
-            margin-top: 50px;
+        .close-btn {
+            color: #888; font-size: 22px; cursor: pointer;
+            line-height: 1; transition: color 0.2s;
         }
-        h1 { color: aquamarine; font-size: 3rem; margin-bottom: 10px; }
-        p { font-size: 1.2rem; line-height: 1.6; color: #ddd; }
-        .big-logo {
-            width: 150px;
-            height: 150px;
-            object-fit: contain;
-            margin-bottom: 20px;
+        .close-btn:hover { color: #f87171; }
+        .window-content { flex: 1; height: calc(100% - 40px); }
+        .window-content iframe { width: 100%; height: 100%; border: none; }
+        .is-dragging iframe { pointer-events: none; }
+        /* ── PAGE HERO ── */
+        .page-hero {
+            display: flex; align-items: center; gap: 20px;
+            margin-bottom: 24px;
         }
-        html {
-            scroll-behavior: smooth;
+        .page-hero img {
+            width: 72px; height: 72px; object-fit: contain;
+            border-radius: 12px; background: rgba(255,255,255,0.04);
+            padding: 8px; border: 1px solid var(--border);
+            box-shadow: none; margin: 0;
         }
-        .sidebar {
-            width: 200px;
-            height: 100vh;
-            position: fixed; 
-            top: 0;
-            left: 0;
-            background-color: #faa11cd0;
-            padding: 20px;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            overflow-y: auto;
+        .page-hero h1 {
+            font-size: clamp(1.8rem, 4vw, 2.4rem);
+            color: var(--accent); font-weight: 700; margin: 0;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 0.03em;
         }
-        .sidebar ul {
-            list-style: none;
-            padding: 0;
+        /* ── DOWNLOAD BUTTON ── */
+        .download-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            margin-top: 32px; padding: 12px 24px;
+            background: #1d4ed8; color: #fff;
+            text-decoration: none; border-radius: 8px;
+            font-weight: 700; font-size: 0.9rem;
+            transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
         }
-        .sidebar li {
-            margin-bottom: 15px;
+        .download-btn::before { content: '⬇'; }
+        .download-btn:hover {
+            background: #2563eb; transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(29,78,216,0.35);
         }
-        .sidebar a {
-            text-decoration: none;
-            color: #333;
-            display: block;
-            padding: 8px 12px;
-            border-left: 4px solid transparent; 
-            transition: all 0.3s;
+        .download-btn:active { transform: translateY(0); }
+        /* ── GDB INLINE BTN ── */
+        .gdb-inline {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 16px; background: transparent;
+            color: var(--accent); border: 1px solid var(--accent);
+            border-radius: 6px; cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700; font-size: 0.85rem;
+            transition: background 0.2s, color 0.2s, transform 0.15s;
+            margin-left: 8px;
         }
-        .sidebar a:hover {
-            background-color: #faa11cd0;
+        .gdb-inline:hover {
+            background: var(--accent); color: #111;
+            transform: translateY(-1px);
         }
-        .sidebar a.active {
-            color: #007bff;    
-            font-weight: bold;
-            border-left: 4px solid #007bff;
-            background-color: #faa11cd0;
-        }
-        .content {
-            margin-left: 240px;
-            padding: 40px;
-            max-width: 800px;
-        }
-        section {
-            min-height: 80vh; 
-            padding-top: 20px;
-            border-bottom: 1px solid #faa11cd0;
-        }
-        h2 {
-            margin-top: 0;
-        }
-        .nav-menu {
-            display: flex;
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            align-items: center;
-        }
-        .nav-menu li {
-            margin-left: 20px;
-        }
-        .nav-menu a {
-            text-decoration: none;
-            color: #ccc;
-            font-size: 1rem;
-            padding: 5px 10px;
-            border-radius: 4px;
-            transition: all 0.3s;
-        }
-        .nav-menu a:hover {
-            color: white;
-            background-color: rgba(255,255,255,0.1);
-        }
+        .gdb-inline:active { transform: translateY(0); }
     </style>
-    <ul class="nav-menu">
-        <li>
-            <button class="gdb-btn" onclick="toggleGdbWindow()">
-                GDB
-            </button>
-        </li>
-    </ul>
-</head>
+<style>
+/* ── TOOLTIP ── */
+[data-tip] {
+    position: relative;
+    cursor: help;
+    text-decoration: underline dotted currentColor;
+    text-underline-offset: 3px;
+}
+[data-tip]::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e1e2e;
+    color: #e0e0e0;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    white-space: normal;
+    width: max-content;
+    max-width: 260px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(127,255,212,0.25);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    transform: translateX(-50%) translateY(4px);
+    z-index: 9999;
+}
+[data-tip]:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+/* arrow */
+[data-tip]::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 2px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: rgba(127,255,212,0.25);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.18s ease;
+    z-index: 9999;
+}
+[data-tip]:hover::before { opacity: 1; }
+</style></head>
 <body>
-    <a href="index.html" class="back-button">← 回首頁</a>
-    <nav class="sidebar">
-        <div style="height: 30px;"></div>
-        <h3>章節目錄</h3>
-        <ul>
-            <li><a href="#section1" class="nav-link">1. 類別結構與基礎</a></li>
-            <li><a href="#section2" class="nav-link">2. 變數與資料</a></li>
-            <li><a href="#section3" class="nav-link">3. 流程控制</a></li>
-            <li><a href="#section4" class="nav-link">4. 方法</a></li>
-            <li><a href="#section5" class="nav-link">5. 物件導向核心</a></li>
-        </ul>
-    </nav>
-    <header>
-        <div class="content">
-        <img src="Java_logo.png" class="big-logo">
-        <h1>JAVA</h1>
-        <button class="gdb-btn" onclick="toggleGdbWindow()">
-            GDB
-        </button>
-        <hr style="border-color: #333; margin: 20px 0;">
-        <div style="height: 50px;"></div>
-        <center>
-            <p style="color:#ddd;font-size:2rem"><B><I>Try Code Here!</I></B></p>
-        </center>
-        <div style="height: 30px;"></div>
-        <div style="max-width: 90%; margin: 0 auto; box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);">
-            <iframe 
-                src="https://www.onlinegdb.com/" 
-                width="100%" 
-                height="600px" 
-                frameborder="0" 
-                style="border-radius: 10px; border: 1px solid #333;"
-                allowfullscreen>
-            </iframe>
-        </div>
-        <div style="height: 30px;"></div>
-        <main class="content">
-            <section id="section1">
-                <h2>1. 類別結構與基礎</h2>
-                <p>Java是一個強型別、物件導向的程式語言，由Sun Microsystems（現Oracle）開發，最大特色是「<span style="color:#ffee00fa">Write Once, Run Anywhere</span>」——Java程式先編譯成<span style="color:#fa6dff">「位元組碼（Bytecode）」</span>，再由<span style="color:#ffae00">JVM（Java Virtual Machine）</span>執行，所以可以跨平台運作。Android開發、企業後端系統大量使用Java。</p>
-                <p>Java程式的每個檔案都必須有一個同名的<span style="color:#ffae00">public class</span>，例如檔案叫Main.java，裡面就要有 <span style="color:#ffae00">public class</span> <span style="color:#00eeff">Main</span> {...}。程式進入點是固定語法：<span style="color:#ffae00">public static void main</span>(<span style="color:#ffae00">String</span>[] args) {...}，一個字都不能差。</p>
-                <p>Java的<span style="color:#ffee00fa">輸出</span>用<span style="color:#ffae00">System.out.println()</span>（自動換行）或<span style="color:#ffae00">System.out.print()</span>（不換行），<span style="color:#ffee00fa">輸入</span>要先建立<span style="color:#ffae00">Scanner</span>物件：<span style="color:#ffae00">Scanner</span> <span style="color:#00eeff">sc</span> = <span style="color:#ffae00">new Scanner</span>(<span style="color:#ffae00">System.in</span>);，然後用 sc.<span style="color:#ffae00">nextInt()</span>讀整數、sc.<span style="color:#ffae00">nextLine()</span>讀字串。</p>
-                <p>Java的字串用<span style="color:#ffae00">String</span>型態（注意大寫S），字串串接用<span style="color:#ffae00">+</span>；現代Java（15+）支援文字區塊，也可以用<span style="color:#ffae00">String.format()</span>格式化，例如：<span style="color:#ffae00">String.format</span>(<span style="color:#00eeff">"我叫%s，今年%d歲"</span>, name, age)，格式符和C的printf相同。</p>
-                <p>Java的<span style="color:#fa6dff">「運算子」</span>和C/C++完全相同，加減乘除、%取餘數、比較運算子、邏輯運算子（&&、||、!）都一樣，沒什麼需要特別說明的，直接套用過來用就行！每行敘述結尾要加<span style="color:#ffee00fa">分號（;）</span>。</p>
+<nav class="top-nav">
+<a class="back" href="index.html">← 回首頁</a>
+<ul class="nav-menu">
+<li><a href="index.html">首頁</a></li>
+<li><a href="guide.html">網站導覽</a></li>
+<li><a href="about.html">關於我們</a></li>
+<li><a href="others.html">其他</a></li>
+<li><button class="gdb-inline" onclick="toggleGdbWindow()">⌨ GDB</button></li>
+</ul>
+</nav>
+<div class="layout">
+<nav class="sidebar">
+<h3>章節目錄</h3>
+<ul>
+<li><a href="#section1">1. 類別結構與基礎</a></li>
+<li><a href="#section2">2. 變數與資料</a></li>
+<li><a href="#section3">3. 流程控制</a></li>
+<li><a href="#section4">4. 方法</a></li>
+<li><a href="#section5">5. 物件導向核心</a></li>
+</ul>
+</nav>
+<div class="main-content">
+<div class="page-hero">
+<img alt="JAVA" src="Java_logo.png"/>
+<h1>JAVA</h1>
+</div>
+<hr class="page-divider"/>
+<section id="section1">
+<h2>1. 類別結構與基礎</h2>
+<p>Java是一個強型別、物件導向的程式語言，由Sun Microsystems（現Oracle）開發，最大特色是「<span style="color:#ffee00fa">Write Once, Run Anywhere</span>」——Java程式先編譯成<span data-tip="Java 編譯後的中間碼，由 JVM 解釋執行以達跨平台" style="color:#fa6dff">「位元組碼（Bytecode）」</span>，再由<span data-tip="Java 虛擬機，將 Java 位元組碼轉換為機器碼執行" style="color:#ffae00">JVM（Java Virtual Machine）</span>執行，所以可以跨平台運作。Android開發、企業後端系統大量使用Java。</p>
+<p>Java程式的每個檔案都必須有一個同名的<span data-tip="Java 公開類別宣告，可從其他套件存取此類別" style="color:#ffae00">public class</span>，例如檔案叫Main.java，裡面就要有 <span data-tip="Java 公開類別宣告，可從其他套件存取此類別" style="color:#ffae00">public class</span> <span style="color:#00eeff">Main</span> {...}。程式進入點是固定語法：<span data-tip="Java 程式入口方法，程式執行的起點" style="color:#ffae00">public static void main</span>(<span data-tip="字串型態，儲存文字資料的不可變序列" style="color:#ffae00">String</span>[] args) {...}，一個字都不能差。</p>
+<p>Java的<span style="color:#ffee00fa">輸出</span>用<span data-tip="Java 標準輸出方法，在主控台輸出文字並換行" style="color:#ffae00">System.out.println()</span>（自動換行）或<span style="color:#ffae00">System.out.print()</span>（不換行），<span style="color:#ffee00fa">輸入</span>要先建立<span data-tip="Java 輸入類別，從標準輸入或檔案讀取各種型態的資料" style="color:#ffae00">Scanner</span>物件：<span data-tip="Java 輸入類別，從標準輸入或檔案讀取各種型態的資料" style="color:#ffae00">Scanner</span> <span style="color:#00eeff">sc</span> = <span style="color:#ffae00">new Scanner</span>(<span style="color:#ffae00">System.in</span>);，然後用 sc.<span data-tip="Java Scanner 方法，從輸入讀取下一個整數" style="color:#ffae00">nextInt()</span>讀整數、sc.<span data-tip="Java Scanner 方法，從輸入讀取下一行字串" style="color:#ffae00">nextLine()</span>讀字串。</p>
+<p>Java的字串用<span data-tip="字串型態，儲存文字資料的不可變序列" style="color:#ffae00">String</span>型態（注意大寫S），字串串接用<span style="color:#ffae00">+</span>；現代Java（15+）支援文字區塊，也可以用<span data-tip="Java 方法，用格式化樣板產生字串，類似 C 的 printf" style="color:#ffae00">String.format()</span>格式化，例如：<span style="color:#ffae00">String.format</span>(<span style="color:#00eeff">"我叫%s，今年%d歲"</span>, name, age)，格式符和C的printf相同。</p>
+<p>Java的<span data-tip="執行特定操作的符號（+、-、==、&amp;&amp;等）" style="color:#fa6dff">「運算子」</span>和C/C++完全相同，加減乘除、%取餘數、比較運算子、邏輯運算子（&amp;&amp;、||、!）都一樣，沒什麼需要特別說明的，直接套用過來用就行！每行敘述結尾要加<span style="color:#ffee00fa">分號（;）</span>。</p>
 </section>
-            <section id="section2">
-                <h2>2. 變數與資料</h2>
-                <p>Java是<span style="color:#ffae00">強型別語言</span>，所有變數宣告時都必須指定型態。<span style="color:#fa6dff">「基本型態（Primitive Types）」</span>有八種：<span style="color:#ffae00">int</span>（整數）、<span style="color:#ffae00">long</span>（大整數）、<span style="color:#ffae00">short</span>（小整數）、<span style="color:#ffae00">byte</span>（更小的整數）、<span style="color:#ffae00">float</span>（單精浮點，後面加f）、<span style="color:#ffae00">double</span>（雙精浮點）、<span style="color:#ffae00">char</span>（字元，用單引號）、<span style="color:#ffae00">boolean</span>（true/false）。</p>
-                <p>和C#類似，Java也有<span style="color:#fa6dff">「包裝類別（Wrapper Classes）」</span>，讓基本型態變成物件，例如<span style="color:#ffae00">int</span>對應<span style="color:#ffae00">Integer</span>、<span style="color:#ffae00">double</span>對應<span style="color:#ffae00">Double</span>，在需要物件的場合（如放進集合）就要用包裝類別。Java會自動在基本型態和包裝類別之間轉換，叫做<span style="color:#ffee00fa">自動裝箱/拆箱（Auto-boxing）</span>。</p>
-                <p>Java的<span style="color:#fa6dff">「陣列」</span>宣告語法和C#相同：<span style="color:#ffae00">int</span>[] arr = <span style="color:#ffae00">new int</span>[5];，或直接初始化：<span style="color:#ffae00">int</span>[] arr = {1, 2, 3, 4, 5};，索引從0開始，用<span style="color:#ffae00">.length</span>取得長度（注意不是方法，不用加括號）。</p>
-                <p>更靈活的集合用<span style="color:#ffae00">ArrayList</span>，需要<span style="color:#ffee00fa">引入</span><span style="color:#00eeff">java.util.ArrayList</span>。宣告：<span style="color:#ffae00">ArrayList</span>&lt;<span style="color:#ffae00">Integer</span>&gt; list = <span style="color:#ffae00">new ArrayList</span>&lt;&gt;();（注意要用包裝類別），常用方法：<span style="color:#ffae00">.add()</span>新增、<span style="color:#ffae00">.get(i)</span>取值、<span style="color:#ffae00">.set(i, x)</span>修改、<span style="color:#ffae00">.remove(i)</span>刪除、<span style="color:#ffae00">.size()</span>大小。</p>
+<section id="section2">
+<h2>2. 變數與資料</h2>
+<p>Java是<span data-tip="變數型態在編譯期嚴格檢查，不允許隱性型態轉換" style="color:#ffae00">強型別語言</span>，所有變數宣告時都必須指定型態。<span data-tip="直接儲存值的型態（int、char、bool 等），非物件" style="color:#fa6dff">「基本型態（Primitive Types）」</span>有八種：<span data-tip="整數型態，儲存不含小數點的數字" style="color:#ffae00">int</span>（整數）、<span data-tip="長整數型態，比 int 範圍更大（通常 64 位元）" style="color:#ffae00">long</span>（大整數）、<span data-tip="短整數型態，佔 16 位元，值域 -32768 到 32767" style="color:#ffae00">short</span>（小整數）、<span data-tip="最小整數型態，佔 8 位元，值域 -128 到 127" style="color:#ffae00">byte</span>（更小的整數）、<span data-tip="浮點數型態，或 CSS 的浮動排版屬性" style="color:#ffae00">float</span>（單精浮點，後面加f）、<span data-tip="雙精度浮點型態，佔 64 位元，比 float 精度更高" style="color:#ffae00">double</span>（雙精浮點）、<span data-tip="字元型態，儲存單一字元（通常為 ASCII 或 Unicode）" style="color:#ffae00">char</span>（字元，用單引號）、<span data-tip="Java 布林型態，只有 true 或 false 兩種值" style="color:#ffae00">boolean</span>（true/false）。</p>
+<p>和C#類似，Java也有<span data-tip="Java 將基本型態封裝為物件的類別（Integer、Boolean 等）" style="color:#fa6dff">「包裝類別（Wrapper Classes）」</span>，讓基本型態變成物件，例如<span data-tip="整數型態，儲存不含小數點的數字" style="color:#ffae00">int</span>對應<span style="color:#ffae00">Integer</span>、<span data-tip="雙精度浮點型態，佔 64 位元，比 float 精度更高" style="color:#ffae00">double</span>對應<span data-tip="C#/Java 雙精度浮點數型態，佔 64 位元，精確度高於 float" style="color:#ffae00">Double</span>，在需要物件的場合（如放進集合）就要用包裝類別。Java會自動在基本型態和包裝類別之間轉換，叫做<span style="color:#ffee00fa">自動裝箱/拆箱（Auto-boxing）</span>。</p>
+<p>Java的<span data-tip="連續記憶體儲存相同型態元素的基本資料結構" style="color:#fa6dff">「陣列」</span>宣告語法和C#相同：<span data-tip="整數型態，儲存不含小數點的數字" style="color:#ffae00">int</span>[] arr = <span style="color:#ffae00">new int</span>[5];，或直接初始化：<span data-tip="整數型態，儲存不含小數點的數字" style="color:#ffae00">int</span>[] arr = {1, 2, 3, 4, 5};，索引從0開始，用<span data-tip="JavaScript 屬性，回傳陣列或字串的元素數量" style="color:#ffae00">.length</span>取得長度（注意不是方法，不用加括號）。</p>
+<p>更靈活的集合用<span data-tip="Java 動態陣列類別，可自動調整大小的串列容器" style="color:#ffae00">ArrayList</span>，需要<span style="color:#ffee00fa">引入</span><span style="color:#00eeff">java.util.ArrayList</span>。宣告：<span data-tip="Java 動態陣列類別，可自動調整大小的串列容器" style="color:#ffae00">ArrayList</span>&lt;<span style="color:#ffae00">Integer</span>&gt; list = <span style="color:#ffae00">new ArrayList</span>&lt;&gt;();（注意要用包裝類別），常用方法：<span data-tip="集合或清單方法，新增元素至容器中" style="color:#ffae00">.add()</span>新增、<span data-tip="Java List 方法，取得索引 i 位置的元素" style="color:#ffae00">.get(i)</span>取值、<span data-tip="Java List 方法，將索引 i 位置的元素替換為 x" style="color:#ffae00">.set(i, x)</span>修改、<span data-tip="Java List 方法，移除索引 i 位置的元素" style="color:#ffae00">.remove(i)</span>刪除、<span data-tip="Java 集合方法，回傳容器內元素的數量" style="color:#ffae00">.size()</span>大小。</p>
 </section>
-            <section id="section3">
-                <h2>3. 流程控制</h2>
-                <p>Java的<span style="color:#fa6dff">「流程控制」</span>語法和C/C++幾乎完全相同，學過一個就等於學過另一個，這邊快速過一遍。<span style="color:#ffae00">if...else if...else</span>條件判斷、<span style="color:#ffae00">switch</span>多分支（記得加<span style="color:#ffae00">break</span>），Java的switch從Java 14起支援更現代的箭頭語法：<span style="color:#ffae00">case</span> 1 <span style="color:#ffae00">-&gt;</span> ...，不需要break。</p>
-                <p>迴圈有<span style="color:#ffae00">for</span>、<span style="color:#ffae00">while</span>、<span style="color:#ffae00">do...while</span>，語法和C完全一樣。遍歷陣列或集合可以用<span style="color:#fa6dff">「增強型for迴圈（Enhanced for）」</span>，也叫for-each：<span style="color:#ffae00">for</span>(<span style="color:#ffae00">int</span> item : arr){...}，和C#的foreach語法類似，不需要管索引，簡潔易讀。</p>
-                <p><span style="color:#ffae00">break</span>跳出迴圈、<span style="color:#ffae00">continue</span>跳過這一輪，用法和C/C++相同。Java還有<span style="color:#fa6dff">「帶標籤的break（Labeled break）」</span>，可以跳出指定的外層迴圈，語法是在迴圈前加標籤：<span style="color:#ffae00">outer: for</span>(...){<span style="color:#ffae00">for</span>(...){<span style="color:#ffae00">break outer</span>;}}，在多層巢狀迴圈中很有用。</p>
-                <p>Java的<span style="color:#ffae00">String</span>比較要用<span style="color:#ffae00">.equals()</span>而不是<span style="color:#ffae00">==</span>，這是Java初學者最常犯的錯誤！因為==比較的是物件的記憶體位址，而.equals()才是比較字串內容。例如：<span style="color:#ffae00">if</span>(name.<span style="color:#ffae00">equals</span>(<span style="color:#00eeff">"小明"</span>)){...}。</p>
+<section id="section3">
+<h2>3. 流程控制</h2>
+<p>Java的<span data-tip="決定程式執行順序的語法（條件判斷、迴圈、跳轉）" style="color:#fa6dff">「流程控制」</span>語法和C/C++幾乎完全相同，學過一個就等於學過另一個，這邊快速過一遍。<span style="color:#ffae00">if...else if...else</span>條件判斷、<span data-tip="多分支條件語句，依變數值選擇對應的 case 執行" style="color:#ffae00">switch</span>多分支（記得加<span data-tip="跳出當前迴圈或 switch 語句，繼續執行後續程式碼" style="color:#ffae00">break</span>），Java的switch從Java 14起支援更現代的箭頭語法：<span data-tip="switch 語句中的分支條件標籤" style="color:#ffae00">case</span> 1 <span style="color:#ffae00">-&gt;</span> ...，不需要break。</p>
+<p>迴圈有<span data-tip="計數迴圈語法，重複執行指定次數或遍歷集合" style="color:#ffae00">for</span>、<span data-tip="條件迴圈語法，條件為真時持續重複執行" style="color:#ffae00">while</span>、<span data-tip="先執行一次再判斷條件的迴圈，確保至少執行一次" style="color:#ffae00">do...while</span>，語法和C完全一樣。遍歷陣列或集合可以用<span data-tip="Java for-each 語法，簡化遍歷集合的寫法" style="color:#fa6dff">「增強型for迴圈（Enhanced for）」</span>，也叫for-each：<span data-tip="計數迴圈語法，重複執行指定次數或遍歷集合" style="color:#ffae00">for</span>(<span data-tip="整數型態，儲存不含小數點的數字" style="color:#ffae00">int</span> item : arr){...}，和C#的foreach語法類似，不需要管索引，簡潔易讀。</p>
+<p><span data-tip="跳出當前迴圈或 switch 語句，繼續執行後續程式碼" style="color:#ffae00">break</span>跳出迴圈、<span data-tip="跳過本次迴圈剩餘程式碼，直接進入下一次迭代" style="color:#ffae00">continue</span>跳過這一輪，用法和C/C++相同。Java還有<span data-tip="Java/Kotlin 語法，跳出指定名稱的外層迴圈" style="color:#fa6dff">「帶標籤的break（Labeled break）」</span>，可以跳出指定的外層迴圈，語法是在迴圈前加標籤：<span style="color:#ffae00">outer: for</span>(...){<span data-tip="計數迴圈語法，重複執行指定次數或遍歷集合" style="color:#ffae00">for</span>(...){<span style="color:#ffae00">break outer</span>;}}，在多層巢狀迴圈中很有用。</p>
+<p>Java的<span data-tip="字串型態，儲存文字資料的不可變序列" style="color:#ffae00">String</span>比較要用<span data-tip="Java/C# 方法，比較兩個物件的內容是否相等" style="color:#ffae00">.equals()</span>而不是<span style="color:#ffae00">==</span>，這是Java初學者最常犯的錯誤！因為==比較的是物件的記憶體位址，而.equals()才是比較字串內容。例如：<span data-tip="條件判斷關鍵字，條件成立時執行指定區塊" style="color:#ffae00">if</span>(name.<span data-tip="Java 方法，比較兩個物件的內容是否相等（非參考比較）" style="color:#ffae00">equals</span>(<span style="color:#00eeff">"小明"</span>)){...}。</p>
 </section>
-            <section id="section4">
-                <h2>4. 方法</h2>
-                <p>Java把函式叫做<span style="color:#fa6dff">「方法（Method）」</span>，所有方法都必須在class內宣告。完整語法是：「<span style="color:#ffae00">存取修飾詞</span> [static] <span style="color:#ffae00">回傳型態</span> <span style="color:#00eeff">方法名稱</span>（<span style="color:#fa6dff">參數型態 參數名稱</span>）{... <span style="color:#ffae00">return</span> 值;}」。在main裡呼叫的方法一樣要加<span style="color:#ffae00">static</span>。</p>
-                <p><span style="color:#fa6dff">「存取修飾詞」</span>有四種：<span style="color:#ffae00">public</span>（任何地方可存取）、<span style="color:#ffae00">private</span>（同class內）、<span style="color:#ffae00">protected</span>（同package和子類別）、無修飾詞（同package，叫package-private）。封裝原則建議屬性設<span style="color:#ffae00">private</span>，再提供<span style="color:#ffae00">public</span>的getter/setter方法來存取。</p>
-                <p>Java支援<span style="color:#fa6dff">「方法多載（Overloading）」</span>，同名方法有不同參數型態或數量。Java是<span style="color:#ffee00fa">傳值</span>的語言，但傳物件時傳的是<span style="color:#ffee00fa">參考的副本</span>，所以在方法內修改物件的屬性會影響原物件，但重新指定整個物件（如 obj = new Object()）不會影響原來的參考。</p>
-                <p>Java也支援<span style="color:#fa6dff">「遞迴」</span>，語法和其他語言相同，記得要有終止條件。Java 8之後加入了<span style="color:#fa6dff">「Lambda運算式」</span>，語法是 (參數) <span style="color:#ffae00">-&gt;</span> 運算式，例如：<span style="color:#ffae00">Comparator</span>&lt;<span style="color:#ffae00">Integer</span>&gt; cmp = (a, b) <span style="color:#ffae00">-&gt;</span> a - b;，常搭配Stream API做集合操作，是現代Java開發的重要特性。</p>
+<section id="section4">
+<h2>4. 方法</h2>
+<p>Java把函式叫做<span style="color:#fa6dff">「方法（Method）」</span>，所有方法都必須在class內宣告。完整語法是：「<span data-tip="控制類別成員可被存取範圍的關鍵字（public/private）" style="color:#ffae00">存取修飾詞</span> [static] <span data-tip="函式宣告中指定回傳值的資料型態" style="color:#ffae00">回傳型態</span> <span style="color:#00eeff">方法名稱</span>（<span style="color:#fa6dff">參數型態 參數名稱</span>）{... <span data-tip="函式回傳值的關鍵字，結束函式執行並傳回結果" style="color:#ffae00">return</span> 值;}」。在main裡呼叫的方法一樣要加<span data-tip="靜態修飾詞，讓成員屬於類別本身而非特定實例" style="color:#ffae00">static</span>。</p>
+<p><span data-tip="控制類別成員可被存取範圍的關鍵字（public/private）" style="color:#fa6dff">「存取修飾詞」</span>有四種：<span data-tip="存取修飾詞，成員可從任何地方存取" style="color:#ffae00">public</span>（任何地方可存取）、<span data-tip="存取修飾詞，成員只能在類別內部存取" style="color:#ffae00">private</span>（同class內）、<span data-tip="存取修飾詞，成員可在類別內部和子類別中存取" style="color:#ffae00">protected</span>（同package和子類別）、無修飾詞（同package，叫package-private）。封裝原則建議屬性設<span data-tip="存取修飾詞，成員只能在類別內部存取" style="color:#ffae00">private</span>，再提供<span data-tip="存取修飾詞，成員可從任何地方存取" style="color:#ffae00">public</span>的getter/setter方法來存取。</p>
+<p>Java支援<span data-tip="同名方法有不同參數型態或數量，編譯器依呼叫自動選擇" style="color:#fa6dff">「方法多載（Overloading）」</span>，同名方法有不同參數型態或數量。Java是<span style="color:#ffee00fa">傳值</span>的語言，但傳物件時傳的是<span style="color:#ffee00fa">參考的副本</span>，所以在方法內修改物件的屬性會影響原物件，但重新指定整個物件（如 obj = new Object()）不會影響原來的參考。</p>
+<p>Java也支援<span data-tip="函式呼叫自身以解決規模更小的相同問題" style="color:#fa6dff">「遞迴」</span>，語法和其他語言相同，記得要有終止條件。Java 8之後加入了<span data-tip="匿名函式的簡潔語法，不需宣告函式名稱" style="color:#fa6dff">「Lambda運算式」</span>，語法是 (參數) <span style="color:#ffae00">-&gt;</span> 運算式，例如：<span data-tip="Java 介面，自定義物件的比較邏輯，用於排序" style="color:#ffae00">Comparator</span>&lt;<span style="color:#ffae00">Integer</span>&gt; cmp = (a, b) <span style="color:#ffae00">-&gt;</span> a - b;，常搭配Stream API做集合操作，是現代Java開發的重要特性。</p>
 </section>
-            <section id="section5">
-                <h2>5. 物件導向核心</h2>
-                <p>Java是<span style="color:#fa6dff">「純物件導向語言」</span>（除了基本型態），OOP的四大特性：<span style="color:#ffae00">封裝</span>（把資料和方法包在class內，隱藏實作細節）、<span style="color:#ffae00">繼承</span>（子類別繼承父類別）、<span style="color:#ffae00">多型</span>（同名方法在不同類別有不同行為）、<span style="color:#ffae00">抽象</span>（用介面或抽象類別定義規範），Java把這四個都實作得非常完整。</p>
-                <p>繼承語法：<span style="color:#ffae00">class</span> <span style="color:#00eeff">Dog</span> <span style="color:#ffae00">extends</span> <span style="color:#00eeff">Animal</span> {...}，Java只支援<span style="color:#ffee00fa">單一繼承</span>（只能extends一個父類別）。子類別用<span style="color:#ffae00">super()</span>呼叫父類別建構子，用<span style="color:#ffae00">@Override</span>覆寫父類別方法（加這個標註有助於編譯器幫你抓錯）。</p>
-                <p>多重繼承的需求靠<span style="color:#fa6dff">「介面（Interface）」</span>解決，介面用<span style="color:#ffae00">interface</span>宣告，class用<span style="color:#ffae00">implements</span>實作，且可以實作多個介面，例如：<span style="color:#ffae00">class</span> <span style="color:#00eeff">Robot</span> <span style="color:#ffae00">implements</span> <span style="color:#00eeff">Workable</span>, <span style="color:#00eeff">Chargeable</span> {...}。<span style="color:#fa6dff">「抽象類別（Abstract class）」</span>用<span style="color:#ffae00">abstract</span>修飾，可以有未實作的方法，介於一般class和interface之間。</p>
-                <p>Java的<span style="color:#fa6dff">「例外處理」</span>用<span style="color:#ffae00">try...catch...finally</span>，語法和C#相同。Java的例外分兩類：<span style="color:#ffae00">checked exception</span>（編譯器強制要處理，例如IOException）和<span style="color:#ffae00">unchecked exception</span>（執行時才發現，例如NullPointerException）。方法若可能拋出checked exception，要在宣告加<span style="color:#ffae00">throws</span>，例如：<span style="color:#ffae00">void</span> readFile() <span style="color:#ffae00">throws</span> <span style="color:#ffae00">IOException</span> {...}。</p>
-                <p>恭喜完成Java基礎！Java雖然語法較為嚴謹囉嗦，但這種嚴格正是大型專案的保障。下一步可以深入學習Java的泛型、Stream API、多執行緒，或是往Spring Boot框架發展，做後端服務開發——Java在企業級應用的地位無可撼動！</p>
+<section id="section5">
+<h2>5. 物件導向核心</h2>
+<p>Java是<span data-tip="所有資料都是物件，無基本型態（如 Ruby）" style="color:#fa6dff">「純物件導向語言」</span>（除了基本型態），OOP的四大特性：<span data-tip="物件導向特性，將資料與方法包裝在類別中並隱藏實作細節" style="color:#ffae00">封裝</span>（把資料和方法包在class內，隱藏實作細節）、<span data-tip="子類別自動取得父類別的屬性和方法的物件導向機制" style="color:#ffae00">繼承</span>（子類別繼承父類別）、<span data-tip="相同介面在不同物件上有不同實作行為的物件導向特性" style="color:#ffae00">多型</span>（同名方法在不同類別有不同行為）、<span data-tip="物件導向概念，隱藏實作細節只暴露必要介面" style="color:#ffae00">抽象</span>（用介面或抽象類別定義規範），Java把這四個都實作得非常完整。</p>
+<p>繼承語法：<span data-tip="類別定義關鍵字，封裝屬性和方法的物件導向基本單元" style="color:#ffae00">class</span> <span style="color:#00eeff">Dog</span> <span data-tip="繼承關鍵字，讓子類別取得父類別的屬性與方法" style="color:#ffae00">extends</span> <span style="color:#00eeff">Animal</span> {...}，Java只支援<span style="color:#ffee00fa">單一繼承</span>（只能extends一個父類別）。子類別用<span data-tip="呼叫父類別的建構子或方法" style="color:#ffae00">super()</span>呼叫父類別建構子，用<span data-tip="Java 注解，標示此方法覆寫父類別的同名方法" style="color:#ffae00">@Override</span>覆寫父類別方法（加這個標註有助於編譯器幫你抓錯）。</p>
+<p>多重繼承的需求靠<span data-tip="定義類別必須實作的方法契約，不包含實作細節" style="color:#fa6dff">「介面（Interface）」</span>解決，介面用<span data-tip="介面定義關鍵字，規定類別必須實作的方法契約" style="color:#ffae00">interface</span>宣告，class用<span data-tip="Java 關鍵字，宣告類別實作指定的介面" style="color:#ffae00">implements</span>實作，且可以實作多個介面，例如：<span data-tip="類別定義關鍵字，封裝屬性和方法的物件導向基本單元" style="color:#ffae00">class</span> <span style="color:#00eeff">Robot</span> <span data-tip="Java 關鍵字，宣告類別實作指定的介面" style="color:#ffae00">implements</span> <span style="color:#00eeff">Workable</span>, <span style="color:#00eeff">Chargeable</span> {...}。<span data-tip="不可直接實例化的類別，定義子類別必須實作的方法" style="color:#fa6dff">「抽象類別（Abstract class）」</span>用<span data-tip="抽象修飾詞，標示類別或方法不能直接實例化，需由子類別實作" style="color:#ffae00">abstract</span>修飾，可以有未實作的方法，介於一般class和interface之間。</p>
+<p>Java的<span data-tip="捕捉並妥善處理程式執行時錯誤的機制" style="color:#fa6dff">「例外處理」</span>用<span data-tip="例外處理完整語法，捕捉錯誤並確保清理程式碼執行" style="color:#ffae00">try...catch...finally</span>，語法和C#相同。Java的例外分兩類：<span style="color:#ffae00">checked exception</span>（編譯器強制要處理，例如IOException）和<span style="color:#ffae00">unchecked exception</span>（執行時才發現，例如NullPointerException）。方法若可能拋出checked exception，要在宣告加<span data-tip="Java 方法宣告，標示此方法可能拋出哪些受檢例外" style="color:#ffae00">throws</span>，例如：<span data-tip="無回傳值的函式宣告型態" style="color:#ffae00">void</span> readFile() <span data-tip="Java 方法宣告，標示此方法可能拋出哪些受檢例外" style="color:#ffae00">throws</span> <span data-tip="Java/C# 例外類型，處理輸入輸出操作失敗時的錯誤" style="color:#ffae00">IOException</span> {...}。</p>
+<p>恭喜完成Java基礎！Java雖然語法較為嚴謹囉嗦，但這種嚴格正是大型專案的保障。下一步可以深入學習Java的泛型、Stream API、多執行緒，或是往Spring Boot框架發展，做後端服務開發——Java在企業級應用的地位無可撼動！</p>
 </section>
-        </main>
-        <div style="height: 60px;"></div> 
-        <p>最後這裡提供一個用GoogleAI(Gemini)NotebookLM製作的教學綱要簡報簡報，下載起來，方便需要時做迅速的統整和複習~</p>
-        <a href="C  _基礎與實踐藍圖.pdf" download class="download-btn">立即下載檔案</a>
-    <script>
-        const navLinks = document.querySelectorAll('.nav-link');
-        const sections = document.querySelectorAll('section');
-        window.addEventListener('scroll', () => {
-            let current = '';
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                const sectionHeight = section.clientHeight;
-                if (window.pageYOffset >= (sectionTop - 100)) {
-                    current = section.getAttribute('id');
-                }
-            });
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href').includes(current)) {
-                    link.classList.add('active');
-                }
-            });
-        });
-    </script>
-    </header>
-    <div id="gdbFloatWindow">
-        <div class="window-header" id="dragHandle">
-            <span class="window-title">GDB</span>
-            <span class="close-btn" onclick="toggleGdbWindow()">&times;</span>
-        </div>
-        <div class="window-content">
-            <iframe 
-                id="gdbFrame"
-                data-src="https://www.onlinegdb.com/"
-                src="https://www.onlinegdb.com/"
-                sandbox="allow-forms allow-scripts allow-same-origin allow-popups">
-            </iframe>
-        </div>
-    </div>
-    <script>
+<div style="margin-top: 40px; padding: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px;">
+<p style="color: var(--muted); margin-bottom: 16px;">📄 最後這裡提供一個用GoogleAI(Gemini)NotebookLM製作的教學綱要簡報簡報，下載起來，方便需要時做迅速的統整和複習~</p>
+<a class="download-btn" download="" href="C  _基礎與實踐藍圖.pdf">立即下載檔案</a>
+</div>
+</div>
+</div>
+<!-- GDB Float Window -->
+<div id="gdbFloatWindow">
+<div class="window-header" id="dragHandle">
+<span class="window-title">⌨ GDB Online</span>
+<span class="close-btn" onclick="toggleGdbWindow()">×</span>
+</div>
+<div class="window-content">
+<iframe id="gdbFrame" sandbox="allow-forms allow-scripts allow-same-origin allow-popups" src="https://www.onlinegdb.com/"></iframe>
+</div>
+</div>
+<script src="shared.js"></script>
+<script>
         const floatWindow = document.getElementById('gdbFloatWindow');
-        const iframe = document.getElementById('gdbFrame');
-        const dragHandle = document.getElementById('dragHandle');
+        const dragHandle  = document.getElementById('dragHandle');
         function toggleGdbWindow() {
-            if (floatWindow.style.display === 'flex') {
-                floatWindow.style.display = 'none';
-            } else {
-                floatWindow.style.display = 'flex';
-                if (iframe.getAttribute('src') === "") {
-                    iframe.setAttribute('src', iframe.getAttribute('data-src'));
-                }
-            }
+            floatWindow.style.display = floatWindow.style.display === 'flex' ? 'none' : 'flex';
         }
-        let isDragging = false;
-        let startX, startY, initialLeft, initialTop;
-        dragHandle.addEventListener('mousedown', function(e) {
+        let isDragging = false, startX, startY, initLeft, initTop;
+        dragHandle.addEventListener('mousedown', e => {
             isDragging = true;
-            startX = e.clientX;
-            startY = e.clientY;
-            const rect = floatWindow.getBoundingClientRect();
-            initialLeft = rect.left;
-            initialTop = rect.top;
+            startX = e.clientX; startY = e.clientY;
+            const r = floatWindow.getBoundingClientRect();
+            initLeft = r.left; initTop = r.top;
             floatWindow.classList.add('is-dragging');
         });
-        document.addEventListener('mousemove', function(e) {
-            if (isDragging) {
-                const dx = e.clientX - startX;
-                const dy = e.clientY - startY;
-                floatWindow.style.left = `${initialLeft + dx}px`;
-                floatWindow.style.top = `${initialTop + dy}px`;
-                floatWindow.style.right = 'auto'; 
-            }
+        document.addEventListener('mousemove', e => {
+            if (!isDragging) return;
+            floatWindow.style.left = `${initLeft + e.clientX - startX}px`;
+            floatWindow.style.top  = `${initTop  + e.clientY - startY}px`;
+            floatWindow.style.right = 'auto';
         });
-        document.addEventListener('mouseup', function() {
+        document.addEventListener('mouseup', () => {
             isDragging = false;
             floatWindow.classList.remove('is-dragging');
         });
     </script>
+<script src="tooltips.js"></script>
 </body>
 </html>

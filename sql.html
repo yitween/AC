@@ -1,286 +1,260 @@
 <!DOCTYPE html>
+
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AC_SQL</title>
-    <link rel="icon" href="螢幕擷取畫面 2026-01-05 125529.png" sizes="48x48" type="image/png">
-    <style>
-        body {
-            background-color: rgb(20, 20, 20);
-            color: white;
-            font-family: "Microsoft JhengHei", sans-serif;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AC — SQL</title>
+<link href="螢幕擷取畫面 2026-01-05 125529.png" rel="icon" sizes="48x48" type="image/png"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="shared.css" rel="stylesheet"/>
+<style>
+        /* ── GDB FLOAT WINDOW ── */
+        #gdbFloatWindow {
+            display: none; position: fixed;
+            top: 100px; right: 50px;
+            width: 600px; height: 500px;
+            background: #1e1e1e;
+            border: 1px solid #444; border-radius: 10px;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.6);
+            z-index: 2000; flex-direction: column;
+            overflow: hidden; resize: both;
+            min-width: 320px; min-height: 250px;
+            max-width: 95vw; max-height: 95vh;
         }
-        .back-button {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            text-decoration: none;
-            color: aquamarine;
-            border: 1px solid aquamarine;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: all 0.3s;
-            z-index: 1000;
+        .window-header {
+            height: 40px; background: #2a2a2a;
+            display: flex; align-items: center;
+            justify-content: space-between;
+            padding: 0 14px; cursor: move;
+            border-bottom: 1px solid #444;
+            user-select: none; flex-shrink: 0;
         }
-        .back-button:hover {
-            background-color: aquamarine;
-            color: black;
+        .window-title {
+            color: #ccc; font-weight: 700; font-size: 0.85rem;
+            font-family: 'JetBrains Mono', monospace;
         }
-        .content {
-            max-width: 800px;
-            text-align: center;
-            margin-top: 50px;
+        .close-btn {
+            color: #888; font-size: 22px; cursor: pointer;
+            line-height: 1; transition: color 0.2s;
         }
-        h1 { color: aquamarine; font-size: 3rem; margin-bottom: 10px; }
-        p { font-size: 1.2rem; line-height: 1.6; color: #ddd; }
-        .big-logo {
-            width: 150px;
-            height: 150px;
-            object-fit: contain;
-            margin-bottom: 20px;
+        .close-btn:hover { color: #f87171; }
+        .window-content { flex: 1; height: calc(100% - 40px); }
+        .window-content iframe { width: 100%; height: 100%; border: none; }
+        .is-dragging iframe { pointer-events: none; }
+        /* ── PAGE HERO ── */
+        .page-hero {
+            display: flex; align-items: center; gap: 20px;
+            margin-bottom: 24px;
         }
-        html {
-            scroll-behavior: smooth;
+        .page-hero img {
+            width: 72px; height: 72px; object-fit: contain;
+            border-radius: 12px; background: rgba(255,255,255,0.04);
+            padding: 8px; border: 1px solid var(--border);
+            box-shadow: none; margin: 0;
         }
-        .sidebar {
-            width: 200px;
-            height: 100vh;
-            position: fixed; 
-            top: 0;
-            left: 0;
-            background-color: #faa11cd0;
-            padding: 20px;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            overflow-y: auto;
+        .page-hero h1 {
+            font-size: clamp(1.8rem, 4vw, 2.4rem);
+            color: var(--accent); font-weight: 700; margin: 0;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 0.03em;
         }
-        .sidebar ul {
-            list-style: none;
-            padding: 0;
+        /* ── DOWNLOAD BUTTON ── */
+        .download-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            margin-top: 32px; padding: 12px 24px;
+            background: #1d4ed8; color: #fff;
+            text-decoration: none; border-radius: 8px;
+            font-weight: 700; font-size: 0.9rem;
+            transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
         }
-        .sidebar li {
-            margin-bottom: 15px;
+        .download-btn::before { content: '⬇'; }
+        .download-btn:hover {
+            background: #2563eb; transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(29,78,216,0.35);
         }
-        .sidebar a {
-            text-decoration: none;
-            color: #333;
-            display: block;
-            padding: 8px 12px;
-            border-left: 4px solid transparent; 
-            transition: all 0.3s;
+        .download-btn:active { transform: translateY(0); }
+        /* ── GDB INLINE BTN ── */
+        .gdb-inline {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 16px; background: transparent;
+            color: var(--accent); border: 1px solid var(--accent);
+            border-radius: 6px; cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700; font-size: 0.85rem;
+            transition: background 0.2s, color 0.2s, transform 0.15s;
+            margin-left: 8px;
         }
-        .sidebar a:hover {
-            background-color: #faa11cd0;
+        .gdb-inline:hover {
+            background: var(--accent); color: #111;
+            transform: translateY(-1px);
         }
-        .sidebar a.active {
-            color: #007bff;    
-            font-weight: bold;
-            border-left: 4px solid #007bff;
-            background-color: #faa11cd0;
-        }
-        .content {
-            margin-left: 240px;
-            padding: 40px;
-            max-width: 800px;
-        }
-        section {
-            min-height: 80vh; 
-            padding-top: 20px;
-            border-bottom: 1px solid #faa11cd0;
-        }
-        h2 {
-            margin-top: 0;
-        }
-        .nav-menu {
-            display: flex;
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            align-items: center;
-        }
-        .nav-menu li {
-            margin-left: 20px;
-        }
-        .nav-menu a {
-            text-decoration: none;
-            color: #ccc;
-            font-size: 1rem;
-            padding: 5px 10px;
-            border-radius: 4px;
-            transition: all 0.3s;
-        }
-        .nav-menu a:hover {
-            color: white;
-            background-color: rgba(255,255,255,0.1);
-        }
+        .gdb-inline:active { transform: translateY(0); }
     </style>
-    <ul class="nav-menu">
-        <li>
-            <button class="gdb-btn" onclick="toggleGdbWindow()">
-                GDB
-            </button>
-        </li>
-    </ul>
-</head>
+<style>
+/* ── TOOLTIP ── */
+[data-tip] {
+    position: relative;
+    cursor: help;
+    text-decoration: underline dotted currentColor;
+    text-underline-offset: 3px;
+}
+[data-tip]::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e1e2e;
+    color: #e0e0e0;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    white-space: normal;
+    width: max-content;
+    max-width: 260px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(127,255,212,0.25);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    transform: translateX(-50%) translateY(4px);
+    z-index: 9999;
+}
+[data-tip]:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+/* arrow */
+[data-tip]::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 2px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: rgba(127,255,212,0.25);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.18s ease;
+    z-index: 9999;
+}
+[data-tip]:hover::before { opacity: 1; }
+</style></head>
 <body>
-    <a href="index.html" class="back-button">← 回首頁</a>
-    <nav class="sidebar">
-        <div style="height: 30px;"></div>
-        <h3>章節目錄</h3>
-        <ul>
-            <li><a href="#section1" class="nav-link">1. 基礎查詢</a></li>
-            <li><a href="#section2" class="nav-link">2. 條件篩選</a></li>
-            <li><a href="#section3" class="nav-link">3. 排序與限制</a></li>
-            <li><a href="#section4" class="nav-link">4. 聚合與分組</a></li>
-            <li><a href="#section5" class="nav-link">5. 多表與異動</a></li>
-        </ul>
-    </nav>
-    <header>
-        <div class="content">
-        <img src="SQLlogo.png" class="big-logo">
-        <h1>SQL</h1>
-        <button class="gdb-btn" onclick="toggleGdbWindow()">
-            GDB
-        </button>
-        <hr style="border-color: #333; margin: 20px 0;">
-         <div style="height: 50px;"></div>
-        <center>
-            <p style="color:#ddd;font-size:2rem"><B><I>Try Code Here!</I></B></p>
-        </center>
-        <div style="height: 30px;"></div>
-        <div style="max-width: 90%; margin: 0 auto; box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);">
-            <iframe 
-                src="https://www.onlinegdb.com/" 
-                width="100%" 
-                height="600px" 
-                frameborder="0" 
-                style="border-radius: 10px; border: 1px solid #333;"
-                allowfullscreen>
-            </iframe>
-        </div>
-        <div style="height: 50px;"></div>
-        <main class="content">
-            <section id="section1">
-                <h2>1. 基礎查詢</h2>
-                <p>SQL（Structured Query Language）是用來和<span style="color:#fa6dff">「關聯式資料庫」</span>溝通的語言，幾乎所有主流資料庫（MySQL、PostgreSQL、SQLite、SQL Server）都支援它。SQL的指令分為幾大類：<span style="color:#ffae00">DQL</span>（查詢）、<span style="color:#ffae00">DML</span>（資料操作）、<span style="color:#ffae00">DDL</span>（結構定義），本節先從最常用的查詢開始。</p>
-                <p>最基本的查詢語法是<span style="color:#ffae00">SELECT ... FROM ...</span>，意思是「從哪張表取出哪些欄位」。例如：<span style="color:#ffae00">SELECT</span> <span style="color:#00eeff">name, age</span> <span style="color:#ffae00">FROM</span> <span style="color:#00eeff">students</span>; 就是從students表取出name和age兩欄。如果要取全部欄位，用<span style="color:#ffae00">*</span>代替，例如：<span style="color:#ffae00">SELECT</span> <span style="color:#00eeff">*</span> <span style="color:#ffae00">FROM</span> <span style="color:#00eeff">students</span>;，但實務上<span style="color:#ffee00fa">不建議濫用 *</span>，因為會拉回不必要的欄位，拖慢效能。</p>
-                <p>想要去除重複的結果，可以在SELECT後加上<span style="color:#ffae00">DISTINCT</span>，例如：<span style="color:#ffae00">SELECT DISTINCT</span> <span style="color:#00eeff">city</span> <span style="color:#ffae00">FROM</span> <span style="color:#00eeff">students</span>; 就只會列出不重複的城市名稱。</p>
-                <p>也可以在SELECT裡做<span style="color:#fa6dff">「運算或組合」</span>，例如：<span style="color:#ffae00">SELECT</span> <span style="color:#00eeff">name</span>, age * 12 <span style="color:#ffae00">AS</span> <span style="color:#00eeff">age_in_months</span> <span style="color:#ffae00">FROM</span> <span style="color:#00eeff">students</span>;，<span style="color:#ffae00">AS</span>是幫欄位取<span style="color:#ffee00fa">別名（Alias）</span>，讓結果更好讀。字串也可以用<span style="color:#ffae00">CONCAT()</span>串接，例如：<span style="color:#ffae00">SELECT</span> <span style="color:#ffae00">CONCAT</span>(<span style="color:#00eeff">first_name, ' ', last_name</span>) <span style="color:#ffae00">AS</span> <span style="color:#00eeff">full_name</span> <span style="color:#ffae00">FROM</span> <span style="color:#00eeff">students</span>;。</p>
-                <p>SQL語法<span style="color:#ffee00fa">不區分大小寫</span>，但業界慣例是關鍵字全大寫、表名和欄位名小寫，這樣更容易一眼區分，養成好習慣！每一句SQL結尾要加<span style="color:#ffee00fa">分號（;）</span>。</p>
+<nav class="top-nav">
+<a class="back" href="index.html">← 回首頁</a>
+<ul class="nav-menu">
+<li><a href="index.html">首頁</a></li>
+<li><a href="guide.html">網站導覽</a></li>
+<li><a href="about.html">關於我們</a></li>
+<li><a href="others.html">其他</a></li>
+<li><button class="gdb-inline" onclick="toggleGdbWindow()">⌨ GDB</button></li>
+</ul>
+</nav>
+<div class="layout">
+<nav class="sidebar">
+<h3>章節目錄</h3>
+<ul>
+<li><a href="#section1">1. 基礎查詢</a></li>
+<li><a href="#section2">2. 條件篩選</a></li>
+<li><a href="#section3">3. 排序與限制</a></li>
+<li><a href="#section4">4. 聚合與分組</a></li>
+<li><a href="#section5">5. 多表與異動</a></li>
+</ul>
+</nav>
+<div class="main-content">
+<div class="page-hero">
+<img alt="SQL" src="SQLlogo.png"/>
+<h1>SQL</h1>
+</div>
+<hr class="page-divider"/>
+<section id="section1">
+<h2>1. 基礎查詢</h2>
+<p>SQL（Structured Query Language）是用來和<span data-tip="以表格結構儲存資料並支援 SQL 查詢的資料庫系統" style="color:#fa6dff">「關聯式資料庫」</span>溝通的語言，幾乎所有主流資料庫（MySQL、PostgreSQL、SQLite、SQL Server）都支援它。SQL的指令分為幾大類：<span data-tip="資料查詢語言，主要指 SELECT 語句用於讀取資料" style="color:#ffae00">DQL</span>（查詢）、<span data-tip="資料操作語言，包含 INSERT、UPDATE、DELETE 等資料內容操作" style="color:#ffae00">DML</span>（資料操作）、<span data-tip="資料定義語言，包含 CREATE、ALTER、DROP 等資料表結構操作" style="color:#ffae00">DDL</span>（結構定義），本節先從最常用的查詢開始。</p>
+<p>最基本的查詢語法是<span style="color:#ffae00">SELECT ... FROM ...</span>，意思是「從哪張表取出哪些欄位」。例如：<span data-tip="SQL 最核心指令，從資料表讀取並回傳指定欄位的資料" style="color:#ffae00">SELECT</span> <span style="color:#00eeff">name, age</span> <span data-tip="SQL 查詢子句，指定要從哪個資料表讀取資料" style="color:#ffae00">FROM</span> <span style="color:#00eeff">students</span>; 就是從students表取出name和age兩欄。如果要取全部欄位，用<span style="color:#ffae00">*</span>代替，例如：<span data-tip="SQL 最核心指令，從資料表讀取並回傳指定欄位的資料" style="color:#ffae00">SELECT</span> <span style="color:#00eeff">*</span> <span data-tip="SQL 查詢子句，指定要從哪個資料表讀取資料" style="color:#ffae00">FROM</span> <span style="color:#00eeff">students</span>;，但實務上<span style="color:#ffee00fa">不建議濫用 *</span>，因為會拉回不必要的欄位，拖慢效能。</p>
+<p>想要去除重複的結果，可以在SELECT後加上<span data-tip="SQL 關鍵字，去除查詢結果中的重複列" style="color:#ffae00">DISTINCT</span>，例如：<span style="color:#ffae00">SELECT DISTINCT</span> <span style="color:#00eeff">city</span> <span data-tip="SQL 查詢子句，指定要從哪個資料表讀取資料" style="color:#ffae00">FROM</span> <span style="color:#00eeff">students</span>; 就只會列出不重複的城市名稱。</p>
+<p>也可以在SELECT裡做<span style="color:#fa6dff">「運算或組合」</span>，例如：<span data-tip="SQL 最核心指令，從資料表讀取並回傳指定欄位的資料" style="color:#ffae00">SELECT</span> <span style="color:#00eeff">name</span>, age * 12 <span data-tip="SQL 別名關鍵字，為欄位或資料表指定臨時名稱" style="color:#ffae00">AS</span> <span style="color:#00eeff">age_in_months</span> <span data-tip="SQL 查詢子句，指定要從哪個資料表讀取資料" style="color:#ffae00">FROM</span> <span style="color:#00eeff">students</span>;，<span data-tip="SQL 別名關鍵字，為欄位或資料表指定臨時名稱" style="color:#ffae00">AS</span>是幫欄位取<span style="color:#ffee00fa">別名（Alias）</span>，讓結果更好讀。字串也可以用<span data-tip="SQL 函式，將多個字串欄位串接為一個字串" style="color:#ffae00">CONCAT()</span>串接，例如：<span data-tip="SQL 最核心指令，從資料表讀取並回傳指定欄位的資料" style="color:#ffae00">SELECT</span> <span data-tip="SQL 函式，將多個字串欄位串接為一個字串" style="color:#ffae00">CONCAT</span>(<span style="color:#00eeff">first_name, ' ', last_name</span>) <span data-tip="SQL 別名關鍵字，為欄位或資料表指定臨時名稱" style="color:#ffae00">AS</span> <span style="color:#00eeff">full_name</span> <span data-tip="SQL 查詢子句，指定要從哪個資料表讀取資料" style="color:#ffae00">FROM</span> <span style="color:#00eeff">students</span>;。</p>
+<p>SQL語法<span style="color:#ffee00fa">不區分大小寫</span>，但業界慣例是關鍵字全大寫、表名和欄位名小寫，這樣更容易一眼區分，養成好習慣！每一句SQL結尾要加<span style="color:#ffee00fa">分號（;）</span>。</p>
 </section>
-            <section id="section2">
-                <h2>2. 條件篩選</h2>
-                <p>光是SELECT全部資料通常不夠用，大多數時候我們只想要<span style="color:#ffee00fa">符合特定條件</span>的資料，這時就用<span style="color:#ffae00">WHERE</span>子句。語法是：<span style="color:#ffae00">SELECT</span> 欄位 <span style="color:#ffae00">FROM</span> 表 <span style="color:#ffae00">WHERE</span> 條件;，例如：<span style="color:#ffae00">SELECT</span> <span style="color:#00eeff">*</span> <span style="color:#ffae00">FROM</span> <span style="color:#00eeff">students</span> <span style="color:#ffae00">WHERE</span> age &gt; 18;。</p>
-                <p>WHERE裡可以用各種<span style="color:#fa6dff">比較運算子</span>：<span style="color:#ffae00">=</span>（等於）、<span style="color:#ffae00">!=</span> 或 <span style="color:#ffae00">&lt;&gt;</span>（不等於）、<span style="color:#ffae00">&gt;</span>、<span style="color:#ffae00">&lt;</span>、<span style="color:#ffae00">&gt;=</span>、<span style="color:#ffae00">&lt;=</span>。多個條件可以用<span style="color:#ffae00">AND</span>（且）、<span style="color:#ffae00">OR</span>（或）、<span style="color:#ffae00">NOT</span>（否）串接，例如：<span style="color:#ffae00">WHERE</span> age &gt;= 18 <span style="color:#ffae00">AND</span> city = <span style="color:#00eeff">'台北'</span>;。</p>
-                <p>篩選範圍可以用<span style="color:#ffae00">BETWEEN ... AND ...</span>，例如：<span style="color:#ffae00">WHERE</span> age <span style="color:#ffae00">BETWEEN</span> 18 <span style="color:#ffae00">AND</span> 25; 等同於 age &gt;= 18 AND age &lt;= 25。篩選是否在某個清單內，用<span style="color:#ffae00">IN</span>，例如：<span style="color:#ffae00">WHERE</span> city <span style="color:#ffae00">IN</span> (<span style="color:#00eeff">'台北', '台中', '高雄'</span>);，比寫一堆OR優雅很多！</p>
-                <p>字串的模糊比對用<span style="color:#ffae00">LIKE</span>，搭配兩個萬用字元：<span style="color:#ffae00">%</span>代表任意多個字元，<span style="color:#ffae00">_</span>代表剛好一個字元。例如：<span style="color:#ffae00">WHERE</span> name <span style="color:#ffae00">LIKE</span> <span style="color:#00eeff">'陳%'</span>; 找所有姓陳的；<span style="color:#ffae00">WHERE</span> name <span style="color:#ffae00">LIKE</span> <span style="color:#00eeff">'%志_'</span>; 找名字中有「志」且後面只有一個字的。</p>
-                <p>最後，判斷欄位是否為空值要用<span style="color:#ffae00">IS NULL</span>或<span style="color:#ffae00">IS NOT NULL</span>，不能用 = NULL，這是初學者超常犯的錯誤！例如：<span style="color:#ffae00">WHERE</span> email <span style="color:#ffae00">IS NULL</span>; 找出沒有填email的學生。</p>
+<section id="section2">
+<h2>2. 條件篩選</h2>
+<p>光是SELECT全部資料通常不夠用，大多數時候我們只想要<span style="color:#ffee00fa">符合特定條件</span>的資料，這時就用<span data-tip="SQL 條件子句，篩選符合指定條件的資料列" style="color:#ffae00">WHERE</span>子句。語法是：<span data-tip="SQL 最核心指令，從資料表讀取並回傳指定欄位的資料" style="color:#ffae00">SELECT</span> 欄位 <span data-tip="SQL 查詢子句，指定要從哪個資料表讀取資料" style="color:#ffae00">FROM</span> 表 <span data-tip="SQL 條件子句，篩選符合指定條件的資料列" style="color:#ffae00">WHERE</span> 條件;，例如：<span data-tip="SQL 最核心指令，從資料表讀取並回傳指定欄位的資料" style="color:#ffae00">SELECT</span> <span style="color:#00eeff">*</span> <span data-tip="SQL 查詢子句，指定要從哪個資料表讀取資料" style="color:#ffae00">FROM</span> <span style="color:#00eeff">students</span> <span data-tip="SQL 條件子句，篩選符合指定條件的資料列" style="color:#ffae00">WHERE</span> age &gt; 18;。</p>
+<p>WHERE裡可以用各種<span data-tip="比較兩個值大小的運算子（==、&lt;、&gt; 等）" style="color:#fa6dff">比較運算子</span>：<span style="color:#ffae00">=</span>（等於）、<span style="color:#ffae00">!=</span> 或 <span style="color:#ffae00">&lt;&gt;</span>（不等於）、<span style="color:#ffae00">&gt;</span>、<span style="color:#ffae00">&lt;</span>、<span style="color:#ffae00">&gt;=</span>、<span style="color:#ffae00">&lt;=</span>。多個條件可以用<span data-tip="SQL/邏輯運算子，兩個條件都成立才為真" style="color:#ffae00">AND</span>（且）、<span data-tip="SQL/邏輯運算子，任一條件成立即為真" style="color:#ffae00">OR</span>（或）、<span data-tip="SQL/邏輯運算子，反轉條件的真假值" style="color:#ffae00">NOT</span>（否）串接，例如：<span data-tip="SQL 條件子句，篩選符合指定條件的資料列" style="color:#ffae00">WHERE</span> age &gt;= 18 <span data-tip="SQL/邏輯運算子，兩個條件都成立才為真" style="color:#ffae00">AND</span> city = <span style="color:#00eeff">'台北'</span>;。</p>
+<p>篩選範圍可以用<span style="color:#ffae00">BETWEEN ... AND ...</span>，例如：<span data-tip="SQL 條件子句，篩選符合指定條件的資料列" style="color:#ffae00">WHERE</span> age <span data-tip="SQL 條件運算子，篩選介於兩個值之間的資料" style="color:#ffae00">BETWEEN</span> 18 <span data-tip="SQL/邏輯運算子，兩個條件都成立才為真" style="color:#ffae00">AND</span> 25; 等同於 age &gt;= 18 AND age &lt;= 25。篩選是否在某個清單內，用<span data-tip="SQL 條件運算子，判斷欄位值是否在指定的清單中" style="color:#ffae00">IN</span>，例如：<span data-tip="SQL 條件子句，篩選符合指定條件的資料列" style="color:#ffae00">WHERE</span> city <span data-tip="SQL 條件運算子，判斷欄位值是否在指定的清單中" style="color:#ffae00">IN</span> (<span style="color:#00eeff">'台北', '台中', '高雄'</span>);，比寫一堆OR優雅很多！</p>
+<p>字串的模糊比對用<span data-tip="SQL 模糊比對運算子，搭配 % 和 _ 萬用字元進行字串比對" style="color:#ffae00">LIKE</span>，搭配兩個萬用字元：<span style="color:#ffae00">%</span>代表任意多個字元，<span style="color:#ffae00">_</span>代表剛好一個字元。例如：<span data-tip="SQL 條件子句，篩選符合指定條件的資料列" style="color:#ffae00">WHERE</span> name <span data-tip="SQL 模糊比對運算子，搭配 % 和 _ 萬用字元進行字串比對" style="color:#ffae00">LIKE</span> <span style="color:#00eeff">'陳%'</span>; 找所有姓陳的；<span data-tip="SQL 條件子句，篩選符合指定條件的資料列" style="color:#ffae00">WHERE</span> name <span data-tip="SQL 模糊比對運算子，搭配 % 和 _ 萬用字元進行字串比對" style="color:#ffae00">LIKE</span> <span style="color:#00eeff">'%志_'</span>; 找名字中有「志」且後面只有一個字的。</p>
+<p>最後，判斷欄位是否為空值要用<span data-tip="SQL 條件，篩選欄位值為空（NULL）的資料列" style="color:#ffae00">IS NULL</span>或<span data-tip="SQL 條件，篩選欄位值不為空（NULL）的資料列" style="color:#ffae00">IS NOT NULL</span>，不能用 = NULL，這是初學者超常犯的錯誤！例如：<span data-tip="SQL 條件子句，篩選符合指定條件的資料列" style="color:#ffae00">WHERE</span> email <span data-tip="SQL 條件，篩選欄位值為空（NULL）的資料列" style="color:#ffae00">IS NULL</span>; 找出沒有填email的學生。</p>
 </section>
-            <section id="section3">
-                <h2>3. 排序與限制</h2>
-                <p>查詢結果預設沒有固定順序，要讓結果<span style="color:#ffee00fa">排序</span>就用<span style="color:#ffae00">ORDER BY</span>。語法是：<span style="color:#ffae00">ORDER BY</span> 欄位 <span style="color:#ffae00">ASC</span>（升冪，預設）或 <span style="color:#ffae00">DESC</span>（降冪）。例如：<span style="color:#ffae00">SELECT</span> <span style="color:#00eeff">*</span> <span style="color:#ffae00">FROM</span> <span style="color:#00eeff">students</span> <span style="color:#ffae00">ORDER BY</span> score <span style="color:#ffae00">DESC</span>; 讓分數最高的排第一。</p>
-                <p>也可以同時對多個欄位排序，用逗號分開，例如：<span style="color:#ffae00">ORDER BY</span> city <span style="color:#ffae00">ASC</span>, score <span style="color:#ffae00">DESC</span>; 先按城市升冪排，城市相同的再按分數降冪排。ORDER BY一定要放在WHERE之後。</p>
-                <p>如果只想要前幾筆結果，用<span style="color:#ffae00">LIMIT</span>（MySQL/SQLite語法），例如：<span style="color:#ffae00">SELECT</span> <span style="color:#00eeff">*</span> <span style="color:#ffae00">FROM</span> <span style="color:#00eeff">students</span> <span style="color:#ffae00">ORDER BY</span> score <span style="color:#ffae00">DESC</span> <span style="color:#ffae00">LIMIT</span> 10; 取出分數前十名，超常用！SQL Server是用<span style="color:#ffae00">TOP</span>，Oracle是用<span style="color:#ffae00">ROWNUM</span>，語法略有不同。</p>
-                <p>搭配<span style="color:#ffae00">OFFSET</span>可以做<span style="color:#fa6dff">「分頁」</span>，例如：<span style="color:#ffae00">LIMIT</span> 10 <span style="color:#ffae00">OFFSET</span> 20; 跳過前20筆、取接下來10筆，這就是第3頁（每頁10筆）的資料，網頁的分頁功能幾乎都是這樣實作的！</p>
-                <p>完整的SQL語句執行順序要記清楚：<span style="color:#ffae00">FROM</span> → <span style="color:#ffae00">WHERE</span> → <span style="color:#ffae00">GROUP BY</span> → <span style="color:#ffae00">HAVING</span> → <span style="color:#ffae00">SELECT</span> → <span style="color:#ffae00">ORDER BY</span> → <span style="color:#ffae00">LIMIT</span>，雖然我們寫的順序是SELECT在前，但資料庫實際執行時FROM和WHERE是最先處理的，理解這個順序能幫助你寫出更正確的查詢！</p>
+<section id="section3">
+<h2>3. 排序與限制</h2>
+<p>查詢結果預設沒有固定順序，要讓結果<span style="color:#ffee00fa">排序</span>就用<span data-tip="SQL 子句，依指定欄位排序查詢結果" style="color:#ffae00">ORDER BY</span>。語法是：<span data-tip="SQL 子句，依指定欄位排序查詢結果" style="color:#ffae00">ORDER BY</span> 欄位 <span data-tip="SQL 排序關鍵字，指定查詢結果由小到大升冪排列" style="color:#ffae00">ASC</span>（升冪，預設）或 <span data-tip="SQL 排序關鍵字，指定查詢結果由大到小降冪排列" style="color:#ffae00">DESC</span>（降冪）。例如：<span data-tip="SQL 最核心指令，從資料表讀取並回傳指定欄位的資料" style="color:#ffae00">SELECT</span> <span style="color:#00eeff">*</span> <span data-tip="SQL 查詢子句，指定要從哪個資料表讀取資料" style="color:#ffae00">FROM</span> <span style="color:#00eeff">students</span> <span data-tip="SQL 子句，依指定欄位排序查詢結果" style="color:#ffae00">ORDER BY</span> score <span data-tip="SQL 排序關鍵字，指定查詢結果由大到小降冪排列" style="color:#ffae00">DESC</span>; 讓分數最高的排第一。</p>
+<p>也可以同時對多個欄位排序，用逗號分開，例如：<span data-tip="SQL 子句，依指定欄位排序查詢結果" style="color:#ffae00">ORDER BY</span> city <span data-tip="SQL 排序關鍵字，指定查詢結果由小到大升冪排列" style="color:#ffae00">ASC</span>, score <span data-tip="SQL 排序關鍵字，指定查詢結果由大到小降冪排列" style="color:#ffae00">DESC</span>; 先按城市升冪排，城市相同的再按分數降冪排。ORDER BY一定要放在WHERE之後。</p>
+<p>如果只想要前幾筆結果，用<span data-tip="SQL 子句，限制查詢結果回傳的最大列數" style="color:#ffae00">LIMIT</span>（MySQL/SQLite語法），例如：<span data-tip="SQL 最核心指令，從資料表讀取並回傳指定欄位的資料" style="color:#ffae00">SELECT</span> <span style="color:#00eeff">*</span> <span data-tip="SQL 查詢子句，指定要從哪個資料表讀取資料" style="color:#ffae00">FROM</span> <span style="color:#00eeff">students</span> <span data-tip="SQL 子句，依指定欄位排序查詢結果" style="color:#ffae00">ORDER BY</span> score <span data-tip="SQL 排序關鍵字，指定查詢結果由大到小降冪排列" style="color:#ffae00">DESC</span> <span data-tip="SQL 子句，限制查詢結果回傳的最大列數" style="color:#ffae00">LIMIT</span> 10; 取出分數前十名，超常用！SQL Server是用<span style="color:#ffae00">TOP</span>，Oracle是用<span style="color:#ffae00">ROWNUM</span>，語法略有不同。</p>
+<p>搭配<span data-tip="SQL 子句，跳過指定筆數後再回傳資料，常搭配 LIMIT 做分頁" style="color:#ffae00">OFFSET</span>可以做<span data-tip="將大量資料分批顯示，透過頁碼或 LIMIT/OFFSET 實作" style="color:#fa6dff">「分頁」</span>，例如：<span data-tip="SQL 子句，限制查詢結果回傳的最大列數" style="color:#ffae00">LIMIT</span> 10 <span data-tip="SQL 子句，跳過指定筆數後再回傳資料，常搭配 LIMIT 做分頁" style="color:#ffae00">OFFSET</span> 20; 跳過前20筆、取接下來10筆，這就是第3頁（每頁10筆）的資料，網頁的分頁功能幾乎都是這樣實作的！</p>
+<p>完整的SQL語句執行順序要記清楚：<span data-tip="SQL 查詢子句，指定要從哪個資料表讀取資料" style="color:#ffae00">FROM</span> → <span data-tip="SQL 條件子句，篩選符合指定條件的資料列" style="color:#ffae00">WHERE</span> → <span data-tip="SQL 子句，將資料依指定欄位分組，通常搭配聚合函式使用" style="color:#ffae00">GROUP BY</span> → <span data-tip="SQL 子句，過濾 GROUP BY 後聚合結果，相當於 WHERE 用於分組" style="color:#ffae00">HAVING</span> → <span data-tip="SQL 最核心指令，從資料表讀取並回傳指定欄位的資料" style="color:#ffae00">SELECT</span> → <span data-tip="SQL 子句，依指定欄位排序查詢結果" style="color:#ffae00">ORDER BY</span> → <span data-tip="SQL 子句，限制查詢結果回傳的最大列數" style="color:#ffae00">LIMIT</span>，雖然我們寫的順序是SELECT在前，但資料庫實際執行時FROM和WHERE是最先處理的，理解這個順序能幫助你寫出更正確的查詢！</p>
 </section>
-            <section id="section4">
-                <h2>4. 聚合與分組</h2>
-                <p><span style="color:#fa6dff">「聚合函式（Aggregate Functions）」</span>可以對一群資料做統計計算，常用的有：<span style="color:#ffae00">COUNT()</span>（計算筆數）、<span style="color:#ffae00">SUM()</span>（加總）、<span style="color:#ffae00">AVG()</span>（平均）、<span style="color:#ffae00">MAX()</span>（最大值）、<span style="color:#ffae00">MIN()</span>（最小值），例如：<span style="color:#ffae00">SELECT</span> <span style="color:#ffae00">AVG</span>(score), <span style="color:#ffae00">MAX</span>(score), <span style="color:#ffae00">COUNT</span>(*) <span style="color:#ffae00">FROM</span> <span style="color:#00eeff">students</span>;。</p>
-                <p>COUNT(*)計算所有列數，COUNT(欄位)則<span style="color:#ffee00fa">不計算NULL值</span>，這個差異很重要！例如：<span style="color:#ffae00">SELECT</span> <span style="color:#ffae00">COUNT</span>(*) <span style="color:#ffae00">FROM</span> <span style="color:#00eeff">students</span>; 算所有學生數，<span style="color:#ffae00">SELECT</span> <span style="color:#ffae00">COUNT</span>(email) <span style="color:#ffae00">FROM</span> <span style="color:#00eeff">students</span>; 只算有填email的學生數。</p>
-                <p>聚合函式通常搭配<span style="color:#ffae00">GROUP BY</span>使用，讓資料依某欄位<span style="color:#ffee00fa">分組</span>後再各自計算。例如：<span style="color:#ffae00">SELECT</span> city, <span style="color:#ffae00">AVG</span>(score) <span style="color:#ffae00">FROM</span> <span style="color:#00eeff">students</span> <span style="color:#ffae00">GROUP BY</span> city; 就能算出每個城市的平均分數，非常實用！GROUP BY後面放的欄位通常也要出現在SELECT裡。</p>
-                <p>WHERE是篩選原始資料列，但如果要篩選<span style="color:#ffee00fa">分組後</span>的結果，要用<span style="color:#ffae00">HAVING</span>，例如：<span style="color:#ffae00">SELECT</span> city, <span style="color:#ffae00">COUNT</span>(*) <span style="color:#ffae00">AS</span> total <span style="color:#ffae00">FROM</span> <span style="color:#00eeff">students</span> <span style="color:#ffae00">GROUP BY</span> city <span style="color:#ffae00">HAVING</span> total &gt; 50; 只列出學生數超過50人的城市。WHERE和HAVING的差別是：WHERE先過濾再分組，HAVING分組後再過濾。</p>
+<section id="section4">
+<h2>4. 聚合與分組</h2>
+<p><span data-tip="SQL 對多列資料計算統計值的函式（SUM、AVG 等）" style="color:#fa6dff">「聚合函式（Aggregate Functions）」</span>可以對一群資料做統計計算，常用的有：<span data-tip="SQL 聚合函式，計算符合條件的資料列數量" style="color:#ffae00">COUNT()</span>（計算筆數）、<span data-tip="SQL 聚合函式，計算指定欄位所有數值的總和" style="color:#ffae00">SUM()</span>（加總）、<span data-tip="SQL 聚合函式，計算指定欄位所有數值的平均值" style="color:#ffae00">AVG()</span>（平均）、<span data-tip="SQL 聚合函式，回傳指定欄位的最大值" style="color:#ffae00">MAX()</span>（最大值）、<span data-tip="SQL 聚合函式，回傳指定欄位的最小值" style="color:#ffae00">MIN()</span>（最小值），例如：<span data-tip="SQL 最核心指令，從資料表讀取並回傳指定欄位的資料" style="color:#ffae00">SELECT</span> <span data-tip="SQL 聚合函式，計算指定欄位所有數值的平均值" style="color:#ffae00">AVG</span>(score), <span data-tip="SQL 聚合函式，回傳指定欄位的最大值" style="color:#ffae00">MAX</span>(score), <span data-tip="SQL 聚合函式，計算符合條件的資料列數量" style="color:#ffae00">COUNT</span>(*) <span data-tip="SQL 查詢子句，指定要從哪個資料表讀取資料" style="color:#ffae00">FROM</span> <span style="color:#00eeff">students</span>;。</p>
+<p>COUNT(*)計算所有列數，COUNT(欄位)則<span style="color:#ffee00fa">不計算NULL值</span>，這個差異很重要！例如：<span data-tip="SQL 最核心指令，從資料表讀取並回傳指定欄位的資料" style="color:#ffae00">SELECT</span> <span data-tip="SQL 聚合函式，計算符合條件的資料列數量" style="color:#ffae00">COUNT</span>(*) <span data-tip="SQL 查詢子句，指定要從哪個資料表讀取資料" style="color:#ffae00">FROM</span> <span style="color:#00eeff">students</span>; 算所有學生數，<span data-tip="SQL 最核心指令，從資料表讀取並回傳指定欄位的資料" style="color:#ffae00">SELECT</span> <span data-tip="SQL 聚合函式，計算符合條件的資料列數量" style="color:#ffae00">COUNT</span>(email) <span data-tip="SQL 查詢子句，指定要從哪個資料表讀取資料" style="color:#ffae00">FROM</span> <span style="color:#00eeff">students</span>; 只算有填email的學生數。</p>
+<p>聚合函式通常搭配<span data-tip="SQL 子句，將資料依指定欄位分組，通常搭配聚合函式使用" style="color:#ffae00">GROUP BY</span>使用，讓資料依某欄位<span style="color:#ffee00fa">分組</span>後再各自計算。例如：<span data-tip="SQL 最核心指令，從資料表讀取並回傳指定欄位的資料" style="color:#ffae00">SELECT</span> city, <span data-tip="SQL 聚合函式，計算指定欄位所有數值的平均值" style="color:#ffae00">AVG</span>(score) <span data-tip="SQL 查詢子句，指定要從哪個資料表讀取資料" style="color:#ffae00">FROM</span> <span style="color:#00eeff">students</span> <span data-tip="SQL 子句，將資料依指定欄位分組，通常搭配聚合函式使用" style="color:#ffae00">GROUP BY</span> city; 就能算出每個城市的平均分數，非常實用！GROUP BY後面放的欄位通常也要出現在SELECT裡。</p>
+<p>WHERE是篩選原始資料列，但如果要篩選<span style="color:#ffee00fa">分組後</span>的結果，要用<span data-tip="SQL 子句，過濾 GROUP BY 後聚合結果，相當於 WHERE 用於分組" style="color:#ffae00">HAVING</span>，例如：<span data-tip="SQL 最核心指令，從資料表讀取並回傳指定欄位的資料" style="color:#ffae00">SELECT</span> city, <span data-tip="SQL 聚合函式，計算符合條件的資料列數量" style="color:#ffae00">COUNT</span>(*) <span data-tip="SQL 別名關鍵字，為欄位或資料表指定臨時名稱" style="color:#ffae00">AS</span> total <span data-tip="SQL 查詢子句，指定要從哪個資料表讀取資料" style="color:#ffae00">FROM</span> <span style="color:#00eeff">students</span> <span data-tip="SQL 子句，將資料依指定欄位分組，通常搭配聚合函式使用" style="color:#ffae00">GROUP BY</span> city <span data-tip="SQL 子句，過濾 GROUP BY 後聚合結果，相當於 WHERE 用於分組" style="color:#ffae00">HAVING</span> total &gt; 50; 只列出學生數超過50人的城市。WHERE和HAVING的差別是：WHERE先過濾再分組，HAVING分組後再過濾。</p>
 </section>
-            <section id="section5">
-                <h2>5. 多表與異動</h2>
-                <p>真實資料庫通常有很多張表，要把相關資料合在一起查，就要用<span style="color:#ffae00">JOIN</span>。最常用的是<span style="color:#ffae00">INNER JOIN</span>（內連接），只回傳兩張表都有對應資料的列，語法是：<span style="color:#ffae00">SELECT</span> s.name, c.course_name <span style="color:#ffae00">FROM</span> students s <span style="color:#ffae00">INNER JOIN</span> courses c <span style="color:#ffae00">ON</span> s.course_id = c.id;，<span style="color:#ffae00">ON</span>後面指定兩表的<span style="color:#ffee00fa">關聯條件</span>。</p>
-                <p>另外還有<span style="color:#ffae00">LEFT JOIN</span>（左連接），保留左表所有列，右表沒有對應的就填NULL；<span style="color:#ffae00">RIGHT JOIN</span>則相反，保留右表所有列。例如：<span style="color:#ffae00">SELECT</span> s.name, c.course_name <span style="color:#ffae00">FROM</span> students s <span style="color:#ffae00">LEFT JOIN</span> courses c <span style="color:#ffae00">ON</span> s.course_id = c.id; 就算學生沒有選課，也還是會列出來（course_name那欄顯示NULL）。</p>
-                <p>資料的<span style="color:#fa6dff">「異動（DML）」</span>有三個核心指令：<span style="color:#ffae00">INSERT INTO</span>新增資料，語法是：<span style="color:#ffae00">INSERT INTO</span> students (name, age) <span style="color:#ffae00">VALUES</span> (<span style="color:#00eeff">'小明'</span>, 18);。<span style="color:#ffae00">UPDATE</span>修改資料：<span style="color:#ffae00">UPDATE</span> students <span style="color:#ffae00">SET</span> age = 19 <span style="color:#ffae00">WHERE</span> name = <span style="color:#00eeff">'小明'</span>;，<span style="color:#ffee00fa">千萬記得加WHERE</span>，不然會改到全部！</p>
-                <p><span style="color:#ffae00">DELETE FROM</span>刪除資料：<span style="color:#ffae00">DELETE FROM</span> students <span style="color:#ffae00">WHERE</span> name = <span style="color:#00eeff">'小明'</span>;，同樣<span style="color:#ffee00fa">一定要加WHERE</span>，否則整張表的資料都會被清空，這是學SQL最容易出悲劇的地方，要非常小心！</p>
-                <p>最後補充<span style="color:#fa6dff">「DDL」</span>的基礎：<span style="color:#ffae00">CREATE TABLE</span>建立新表格（定義欄位名稱和型態）、<span style="color:#ffae00">ALTER TABLE</span>修改表格結構（新增/刪除欄位）、<span style="color:#ffae00">DROP TABLE</span>刪除整張表（連資料都消失！）。掌握這些，你已經具備了操作關聯式資料庫的基本能力！</p>
+<section id="section5">
+<h2>5. 多表與異動</h2>
+<p>真實資料庫通常有很多張表，要把相關資料合在一起查，就要用<span data-tip="SQL 合併查詢，依條件將兩個資料表的資料合併顯示" style="color:#ffae00">JOIN</span>。最常用的是<span data-tip="SQL 合併查詢，只回傳兩個資料表中有對應記錄的列" style="color:#ffae00">INNER JOIN</span>（內連接），只回傳兩張表都有對應資料的列，語法是：<span data-tip="SQL 最核心指令，從資料表讀取並回傳指定欄位的資料" style="color:#ffae00">SELECT</span> s.name, c.course_name <span data-tip="SQL 查詢子句，指定要從哪個資料表讀取資料" style="color:#ffae00">FROM</span> students s <span data-tip="SQL 合併查詢，只回傳兩個資料表中有對應記錄的列" style="color:#ffae00">INNER JOIN</span> courses c <span data-tip="SQL JOIN 子句，指定兩資料表合併的條件欄位" style="color:#ffae00">ON</span> s.course_id = c.id;，<span data-tip="SQL JOIN 子句，指定兩資料表合併的條件欄位" style="color:#ffae00">ON</span>後面指定兩表的<span style="color:#ffee00fa">關聯條件</span>。</p>
+<p>另外還有<span data-tip="SQL 左合併查詢，回傳左表所有列，右表無對應則填 NULL" style="color:#ffae00">LEFT JOIN</span>（左連接），保留左表所有列，右表沒有對應的就填NULL；<span data-tip="SQL 右合併查詢，回傳右表所有列，左表無對應則填 NULL" style="color:#ffae00">RIGHT JOIN</span>則相反，保留右表所有列。例如：<span data-tip="SQL 最核心指令，從資料表讀取並回傳指定欄位的資料" style="color:#ffae00">SELECT</span> s.name, c.course_name <span data-tip="SQL 查詢子句，指定要從哪個資料表讀取資料" style="color:#ffae00">FROM</span> students s <span data-tip="SQL 左合併查詢，回傳左表所有列，右表無對應則填 NULL" style="color:#ffae00">LEFT JOIN</span> courses c <span data-tip="SQL JOIN 子句，指定兩資料表合併的條件欄位" style="color:#ffae00">ON</span> s.course_id = c.id; 就算學生沒有選課，也還是會列出來（course_name那欄顯示NULL）。</p>
+<p>資料的<span data-tip="資料庫 INSERT、UPDATE、DELETE 等修改資料的操作" style="color:#fa6dff">「異動（DML）」</span>有三個核心指令：<span data-tip="SQL 指令，向資料表新增一筆或多筆資料列" style="color:#ffae00">INSERT INTO</span>新增資料，語法是：<span data-tip="SQL 指令，向資料表新增一筆或多筆資料列" style="color:#ffae00">INSERT INTO</span> students (name, age) <span data-tip="SQL INSERT 子句，指定要新增的資料值" style="color:#ffae00">VALUES</span> (<span style="color:#00eeff">'小明'</span>, 18);。<span data-tip="SQL 指令，修改資料表中符合條件的欄位值" style="color:#ffae00">UPDATE</span>修改資料：<span data-tip="SQL 指令，修改資料表中符合條件的欄位值" style="color:#ffae00">UPDATE</span> students <span data-tip="SQL UPDATE 子句，指定要修改的欄位與新值" style="color:#ffae00">SET</span> age = 19 <span data-tip="SQL 條件子句，篩選符合指定條件的資料列" style="color:#ffae00">WHERE</span> name = <span style="color:#00eeff">'小明'</span>;，<span style="color:#ffee00fa">千萬記得加WHERE</span>，不然會改到全部！</p>
+<p><span data-tip="SQL 刪除語法，從指定資料表中移除符合條件的資料列" style="color:#ffae00">DELETE FROM</span>刪除資料：<span data-tip="SQL 刪除語法，從指定資料表中移除符合條件的資料列" style="color:#ffae00">DELETE FROM</span> students <span data-tip="SQL 條件子句，篩選符合指定條件的資料列" style="color:#ffae00">WHERE</span> name = <span style="color:#00eeff">'小明'</span>;，同樣<span style="color:#ffee00fa">一定要加WHERE</span>，否則整張表的資料都會被清空，這是學SQL最容易出悲劇的地方，要非常小心！</p>
+<p>最後補充<span data-tip="資料定義語言，包含 CREATE、ALTER、DROP 等資料表結構操作" style="color:#fa6dff">「DDL」</span>的基礎：<span data-tip="SQL 指令，建立新的資料表並定義欄位名稱與型態" style="color:#ffae00">CREATE TABLE</span>建立新表格（定義欄位名稱和型態）、<span data-tip="SQL 指令，修改現有資料表結構（新增欄位、改型態等）" style="color:#ffae00">ALTER TABLE</span>修改表格結構（新增/刪除欄位）、<span data-tip="SQL 指令，永久刪除整個資料表及其所有資料" style="color:#ffae00">DROP TABLE</span>刪除整張表（連資料都消失！）。掌握這些，你已經具備了操作關聯式資料庫的基本能力！</p>
 </section>
-        </main>
-        <div style="height: 60px;"></div> 
-        <p>最後這裡提供一個用GoogleAI(Gemini)NotebookLM製作的教學綱要簡報簡報，下載起來，方便需要時做迅速的統整和複習~</p>
-        <a href="C  _基礎與實踐藍圖.pdf" download class="download-btn">立即下載檔案</a>
-    <script>
-        const navLinks = document.querySelectorAll('.nav-link');
-        const sections = document.querySelectorAll('section');
-        window.addEventListener('scroll', () => {
-            let current = '';
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                const sectionHeight = section.clientHeight;
-                if (window.pageYOffset >= (sectionTop - 100)) {
-                    current = section.getAttribute('id');
-                }
-            });
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href').includes(current)) {
-                    link.classList.add('active');
-                }
-            });
-        });
-    </script>
-    </header>
-    <div id="gdbFloatWindow">
-        <div class="window-header" id="dragHandle">
-            <span class="window-title">GDB</span>
-            <span class="close-btn" onclick="toggleGdbWindow()">&times;</span>
-        </div>
-        <div class="window-content">
-            <iframe 
-                id="gdbFrame"
-                data-src="https://www.onlinegdb.com/"
-                src="https://www.onlinegdb.com/"
-                sandbox="allow-forms allow-scripts allow-same-origin allow-popups">
-            </iframe>
-        </div>
-    </div>
-    <script>
+<div style="margin-top: 40px; padding: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px;">
+<p style="color: var(--muted); margin-bottom: 16px;">📄 最後這裡提供一個用GoogleAI(Gemini)NotebookLM製作的教學綱要簡報簡報，下載起來，方便需要時做迅速的統整和複習~</p>
+<a class="download-btn" download="" href="C  _基礎與實踐藍圖.pdf">立即下載檔案</a>
+</div>
+</div>
+</div>
+<!-- GDB Float Window -->
+<div id="gdbFloatWindow">
+<div class="window-header" id="dragHandle">
+<span class="window-title">⌨ GDB Online</span>
+<span class="close-btn" onclick="toggleGdbWindow()">×</span>
+</div>
+<div class="window-content">
+<iframe id="gdbFrame" sandbox="allow-forms allow-scripts allow-same-origin allow-popups" src="https://www.onlinegdb.com/"></iframe>
+</div>
+</div>
+<script src="shared.js"></script>
+<script>
         const floatWindow = document.getElementById('gdbFloatWindow');
-        const iframe = document.getElementById('gdbFrame');
-        const dragHandle = document.getElementById('dragHandle');
+        const dragHandle  = document.getElementById('dragHandle');
         function toggleGdbWindow() {
-            if (floatWindow.style.display === 'flex') {
-                floatWindow.style.display = 'none';
-            } else {
-                floatWindow.style.display = 'flex';
-                if (iframe.getAttribute('src') === "") {
-                    iframe.setAttribute('src', iframe.getAttribute('data-src'));
-                }
-            }
+            floatWindow.style.display = floatWindow.style.display === 'flex' ? 'none' : 'flex';
         }
-        let isDragging = false;
-        let startX, startY, initialLeft, initialTop;
-        dragHandle.addEventListener('mousedown', function(e) {
+        let isDragging = false, startX, startY, initLeft, initTop;
+        dragHandle.addEventListener('mousedown', e => {
             isDragging = true;
-            startX = e.clientX;
-            startY = e.clientY;
-            const rect = floatWindow.getBoundingClientRect();
-            initialLeft = rect.left;
-            initialTop = rect.top;
+            startX = e.clientX; startY = e.clientY;
+            const r = floatWindow.getBoundingClientRect();
+            initLeft = r.left; initTop = r.top;
             floatWindow.classList.add('is-dragging');
         });
-        document.addEventListener('mousemove', function(e) {
-            if (isDragging) {
-                const dx = e.clientX - startX;
-                const dy = e.clientY - startY;
-                floatWindow.style.left = `${initialLeft + dx}px`;
-                floatWindow.style.top = `${initialTop + dy}px`;
-                floatWindow.style.right = 'auto'; 
-            }
+        document.addEventListener('mousemove', e => {
+            if (!isDragging) return;
+            floatWindow.style.left = `${initLeft + e.clientX - startX}px`;
+            floatWindow.style.top  = `${initTop  + e.clientY - startY}px`;
+            floatWindow.style.right = 'auto';
         });
-        document.addEventListener('mouseup', function() {
+        document.addEventListener('mouseup', () => {
             isDragging = false;
             floatWindow.classList.remove('is-dragging');
         });
     </script>
+<script src="tooltips.js"></script>
 </body>
 </html>

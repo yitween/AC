@@ -3,443 +3,480 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AC</title>
+    <title>AC — 程式設計學習平台</title>
     <link rel="icon" href="螢幕擷取畫面 2026-01-05 125529.png" sizes="48x48" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg: #111;
+            --surface: #1a1a1a;
+            --surface2: rgba(255,255,255,0.06);
+            --border: rgba(127,255,212,0.2);
+            --accent: #7fffd4;
+            --accent2: #f0614a;
+            --text: #e0e0e0;
+            --muted: #888;
+            --nav-h: 60px;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; scroll-padding-top: calc(var(--nav-h) + 16px); }
+
         body {
-            background-color: rgb(20, 20, 20); 
-            margin: 0;
-            font-family: "Microsoft JhengHei", sans-serif;
-            padding-top: 60px;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Noto Sans TC', sans-serif;
+            padding-top: var(--nav-h);
+            line-height: 1.6;
         }
-        header {
-            color: rgb(0, 131, 131);
-            padding: 20px;
-            text-align: center;
-        }
-        header img {
-            max-width: 100%;
-            height: auto;
-            display: block;
-            margin: 0 auto;
-        }
-        header p {
-            font-size: 1.2rem;
-            margin: 10px 0;
-            color: #ccc;
-        }
-        main {
-            padding: 40px 0;
-            text-align: center;
-            margin: 10px 0;
-        }
-        .scroll-container {
-            display: flex;             
-            overflow-x: auto;         
-            gap: 20px;               
-            padding: 20px 40px;       
-            scroll-snap-type: x mandatory; 
-            -webkit-overflow-scrolling: touch;
-            &::-webkit-scrollbar {
-                height: 8px;
-            }
-            &::-webkit-scrollbar-track {
-                background: #333;
-                border-radius: 4px;
-            }
-            &::-webkit-scrollbar-thumb {
-                background: aquamarine;
-                border-radius: 4px;
-            }
-        }
-        .content-box {
-            display: block;
-            text-decoration: none;
-            color: inherit;
-            cursor: pointer;
-            flex: 0 0 220px;          
-            scroll-snap-align: center;
-            background-color: rgba(255, 255, 255, 0.1); 
-            border: 1px solid rgba(127, 255, 212, 0.3); 
-            border-radius: 15px;       
-            padding: 20px;
-            text-align: center;
-            transition: transform 0.3s ease, background-color 0.3s;
-        }
-        .content-box:hover {
-            transform: translateY(-5px); 
-            background-color: rgba(255, 255, 255, 0.15);
-            box-shadow: 0 5px 15px rgba(127, 255, 212, 0.2);
-        }
-        .img-wrap {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .img-wrap img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain; 
-        }
-        .content-box h3 {
-            margin: 0 0 10px 0;
-            color: aquamarine;
-            font-size: 1.5rem;
-            text-transform: uppercase; 
-        }
-        .content-box p {
-            margin: 0;
-            font-size: 0.9rem;
-            color: #ddd;
-            line-height: 1.4;
-        }
-        main img {
-            max-width: 100%;
-            height: auto;
-            display: block;
-            margin: 0 auto;
-        }
-        html {
-            scroll-behavior: smooth;
-            scroll-padding-top: 70px;
-        }
+
+        /* ── NAVBAR ── */
         .navbar {
-            position: fixed;
-            top: 0;  
-            left: 0;
-            width: 100%;     
-            height: 60px;    
-            background-color: #333; 
-            color: white;
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2); 
-            z-index: 1000;   
-            box-sizing: border-box; 
+            position: fixed; top: 0; left: 0; width: 100%;
+            height: var(--nav-h);
+            background: rgba(17,17,17,0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center;
+            padding: 0 24px; gap: 16px;
+            z-index: 1000;
         }
-        .logo {
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin-right: auto; 
-        }
-        .logo img {
-            height: 40px;
-            width: auto;
-        }
+        .logo img { height: 36px; width: auto; }
         .nav-menu {
-            display: flex;
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            align-items: center;
-        }
-        .nav-menu li {
-            margin-left: 20px;
+            display: flex; list-style: none; gap: 4px;
+            margin-left: auto; align-items: center;
         }
         .nav-menu a {
-            text-decoration: none;
-            color: #ccc;
-            font-size: 1rem;
-            padding: 5px 10px;
-            border-radius: 4px;
-            transition: all 0.3s;
+            text-decoration: none; color: var(--muted);
+            font-size: 0.9rem; padding: 6px 12px;
+            border-radius: 6px;
+            transition: color 0.2s, background 0.2s;
         }
-        .nav-menu a:hover {
-            color: white;
-            background-color: rgba(255,255,255,0.1);
-        }
+        .nav-menu a:hover { color: var(--text); background: var(--surface2); }
+        .nav-menu a.active { color: var(--accent); background: rgba(127,255,212,0.1); }
         .gdb-btn {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
+            background: #1d4ed8; color: #fff;
+            border: none; border-radius: 6px;
+            padding: 7px 16px; font-size: 0.85rem;
+            font-family: 'JetBrains Mono', monospace; font-weight: 700;
+            cursor: pointer; letter-spacing: 0.05em;
+            transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+        }
+        .gdb-btn:hover { background: #2563eb; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(29,78,216,0.4); }
+        .gdb-btn:active { transform: translateY(0); }
+
+        /* ── HERO ── */
+        .hero {
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: 80px 24px 60px;
+            text-align: center; gap: 20px;
+            position: relative; overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(127,255,212,0.07), transparent);
+            pointer-events: none;
+        }
+        .hero img.hero-logo { max-width: 240px; width: 55%; position: relative; }
+        .hero-tagline {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
+            color: var(--muted); line-height: 1.5;
+        }
+        .hero-tagline span { color: var(--accent); }
+
+        /* ── SECTION BLOCK ── */
+        .section-block { padding: 60px 24px; max-width: 1100px; margin: 0 auto; }
+        .section-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem; letter-spacing: 0.15em;
+            color: var(--accent); text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .section-title {
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            font-weight: 700; color: var(--text);
+            margin-bottom: 32px;
+        }
+
+        /* ── MEME CARD ── */
+        .meme-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 16px; padding: 32px;
+            display: flex; flex-direction: column; align-items: center; gap: 20px;
+            max-width: 640px; margin: 0 auto;
+        }
+        .meme-card img { max-width: 100%; border-radius: 10px; }
+        .meme-card .quote {
+            font-size: 1.1rem; color: var(--accent);
+            font-style: italic; text-align: center;
+        }
+
+        /* ── SCROLL CARDS ── */
+        .cards-section { padding: 0 0 60px; }
+        .scroll-container {
+            display: flex; gap: 16px; overflow-x: auto;
+            padding: 8px 24px 20px;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+        }
+        .scroll-container::-webkit-scrollbar { height: 5px; }
+        .scroll-container::-webkit-scrollbar-track { background: #222; border-radius: 4px; }
+        .scroll-container::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; opacity: 0.5; }
+
+        .content-box {
+            flex: 0 0 200px; scroll-snap-align: start;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 14px; padding: 20px 16px;
+            text-align: center; text-decoration: none; color: inherit;
             cursor: pointer;
-            padding: 8px 15px; 
+            transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s, background 0.25s;
+            display: flex; flex-direction: column; align-items: center; gap: 12px;
+        }
+        .content-box:hover {
+            transform: translateY(-6px);
+            background: rgba(127,255,212,0.07);
+            border-color: var(--accent);
+            box-shadow: 0 8px 24px rgba(127,255,212,0.12);
+        }
+        .content-box:active { transform: translateY(-2px); }
+        .img-wrap { width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; }
+        .img-wrap img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .content-box h3 {
+            color: var(--accent); font-size: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .content-box p { font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
+
+        /* ── QUOTE BLOCK ── */
+        .quote-block {
+            background: var(--surface);
+            border-left: 3px solid var(--accent2);
+            border-radius: 0 12px 12px 0;
+            padding: 24px 28px; margin: 32px auto;
+            max-width: 800px;
+        }
+        .quote-block p {
+            font-size: 1rem; color: var(--text);
+            font-style: italic; line-height: 1.8;
+        }
+        .quote-block .attr {
+            margin-top: 12px; font-size: 0.85rem;
+            color: var(--muted); font-style: normal;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .huang-img {
+            display: block; max-width: 280px; margin: 0 auto;
+            border-radius: 12px; opacity: 0.9;
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 48px 24px; max-width: 900px; margin: 0 auto;
+        }
+        .footer-tagline {
+            font-size: 1.1rem; color: var(--muted);
+            font-style: italic; text-align: center; margin-bottom: 32px;
+        }
+        .footer-tagline span { color: var(--accent); }
+        .footer-info {
+            display: flex; align-items: center; gap: 20px;
+            flex-wrap: wrap; margin-bottom: 32px;
+        }
+        .footer-info img { width: 120px; opacity: 0.8; border-radius: 8px; }
+        .footer-info p { color: var(--muted); font-size: 0.9rem; line-height: 1.9; }
+        .contact-title {
+            text-align: center; color: var(--text);
+            font-size: 1rem; letter-spacing: 0.15em;
+            margin-bottom: 20px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .contact-qr {
+            display: flex; gap: 16px; flex-wrap: wrap; align-items: center;
+        }
+        .contact-qr img {
+            width: 130px; border-radius: 8px;
+            background: #ccc; padding: 4px;
+        }
+        .contact-qr a {
+            color: var(--accent); text-decoration: none;
+            font-family: 'JetBrains Mono', monospace;
             font-size: 0.9rem;
-            font-weight: bold;
-            transition: background 0.3s;
-            display: flex;
-            align-items: center;
+            transition: opacity 0.2s;
         }
-        .gdb-btn:hover {
-            background-color: #0056b3;
-            transform: scale(1.05); 
-        }
+        .contact-qr a:hover { opacity: 0.75; }
+
+        /* ── GDB FLOAT WINDOW ── */
         #gdbFloatWindow {
-            display: none;
-            position: fixed;
-            top: 100px;
-            right: 50px;
-            width: 600px;  
-            height: 500px; 
+            display: none; position: fixed;
+            top: 100px; right: 50px;
+            width: 600px; height: 500px;
             background: #1e1e1e;
-            border: 1px solid #444;
-            border-radius: 8px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            z-index: 2000; 
-            flex-direction: column;
-            overflow: hidden;
-            resize: both;      
-            overflow: hidden;  
-            min-width: 320px;  
-            min-height: 250px;
-            max-width: 95vw; 
-            max-height: 95vh;
+            border: 1px solid #444; border-radius: 10px;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.6);
+            z-index: 2000; flex-direction: column;
+            overflow: hidden; resize: both;
+            min-width: 320px; min-height: 250px;
+            max-width: 95vw; max-height: 95vh;
         }
         .window-header {
-            height: 40px;
-            background: #333;
-            display: flex;
-            align-items: center;
+            height: 40px; background: #2a2a2a;
+            display: flex; align-items: center;
             justify-content: space-between;
-            padding: 0 10px;
-            cursor: move;
+            padding: 0 14px; cursor: move;
             border-bottom: 1px solid #444;
-            user-select: none; 
-            flex-shrink: 0;
+            user-select: none; flex-shrink: 0;
         }
         .window-title {
-            color: #ddd;
-            font-weight: bold;
-            font-size: 0.9rem;
+            color: #ccc; font-weight: 700; font-size: 0.85rem;
+            font-family: 'JetBrains Mono', monospace;
         }
         .close-btn {
-            color: #bbb;
-            font-size: 24px;
-            font-weight: bold;
-            cursor: pointer;
-            line-height: 1;
+            color: #888; font-size: 22px; cursor: pointer;
+            line-height: 1; transition: color 0.2s;
         }
-        .close-btn:hover { color: #ff4d4d; }
-        .window-content {
-            flex: 1; 
-            background: #000;
-            position: relative;
-            height: calc(100% - 40px);
-        }
-        iframe { width: 100%; height: 100%; border: none; }
-        .is-dragging iframe {
-            pointer-events: none; 
-        }
-        header p {
-            font-size: 1.2rem;
-            margin: 10px 0;
-            color: #ccc;
-        }
-        header > img { 
-            max-width: 20%;
-            height: auto;
-            display: block;
-            margin: 0 auto;
+        .close-btn:hover { color: #f87171; }
+        .window-content { flex: 1; height: calc(100% - 40px); }
+        .window-content iframe { width: 100%; height: 100%; border: none; }
+        .is-dragging iframe { pointer-events: none; }
+
+        /* ── DIVIDER ── */
+        .divider {
+            border: none; border-top: 1px solid var(--border);
+            max-width: 900px; margin: 0 auto;
         }
     </style>
 </head>
 <body>
-    <header>
-        <nav class="navbar">
-        <div class="logo"><img src="AClogo-removebg-preview.png"></div>
+
+    <nav class="navbar">
+        <div class="logo"><img src="AClogo-removebg-preview.png" alt="AC Logo"></div>
         <ul class="nav-menu">
-            <li><a href="index.html" class="nav-link">首頁</a></li>
+            <li><a href="index.html" class="nav-link active">首頁</a></li>
             <li><a href="guide.html" class="nav-link">網站導覽</a></li>
             <li><a href="about.html" class="nav-link">關於我們</a></li>
             <li><a href="others.html" class="nav-link">其他</a></li>
-            <li>
-                <button class="gdb-btn" onclick="toggleGdbWindow()">
-                    GDB
-                </button>
-            </li>
+            <li><button class="gdb-btn" onclick="toggleGdbWindow()">GDB</button></li>
         </ul>
     </nav>
-        <img src="AClogo-removebg-preview.png" style="max-width: 300px;">
-        <div style="height: 50px;"></div>
-        <p style="font-size:2rem"><i>A free and safe website</i></p>
-        <p style="text-align:center;font-size:2rem"><i>helps you learn coding in all ranges!</i></p>
-        <div style="height: 50px;"></div>
+
+    <!-- HERO -->
+    <header class="hero">
+        <img src="AClogo-removebg-preview.png" alt="AC Logo" class="hero-logo">
+        <p class="hero-tagline">
+            <span>A free and safe website</span><br>
+            helps you learn coding in all ranges!
+        </p>
     </header>
+
     <main>
-        <div style="height: 50px;"></div>
-        <p style="font-size:2rem;text-align:center;color:crimson">What is coding?</p>
-        <div style="display: flex; justify-content: center;">
-            <img src="梗圖.png" alt="meme">
-        </div>
-        <p style="font-size:2rem;text-align:center;color:aquamarine"><I>一門與電腦溝通的「藝術」。</I></p>
-        <div style="height: 50px;"></div>
-        <p style="font-size:2rem;text-align:center;color:crimson">Why coding?</p>
-        <p style="font-size:2rem;text-align:center;color:aquamarine"><I>「在數位的世界裡，寫程式是唯一能讓你扮演『上帝』的方法。未來只有兩種人：告訴電腦做什麼的人，以及被電腦告訴該做什麼的人。別只當個玩家，當個創造者。花一小時寫程式，省下未來一千小時的重複工作。用指尖，改變世界。」</I></p>
-        <div style="display: flex; justify-content: center;">
-            <img src="黃仁勳.png" alt="Huang">
-        </div>
-        <p style="font-size:2rem;text-align:center;color:rgb(189, 170, 0)"><I><B>"Run, don't walk. Either you are running for food, or running from being food."</B></I></p>
-        <div style="height: 100px;"></div>
-        <center><p style="color:#ddd;font-size:2rem"><B><I>What are some simple and basic programming languages?</I></B></p></center>
-        <div style="height: 50px;"></div>
-        <div class="scroll-container">
-            <a href="cpp.html" class="content-box">
-                <div class="img-wrap"><img src="c++logo.png" alt="C++"></div>
-                <h3>C++</h3>
-                <p>C的延伸語言，效能極高，是UE的核心語言，也常用於競賽程式。</p>
-            </a>
-            <a href="python.html" class="content-box">
-                <div class="img-wrap"><img src="python_vertical_logo_icon_168039.webp" alt="Python"></div>
-                <h3>Python</h3>
-                <p>最簡易的語言，常用於計算或生成AI。</p>
-            </a>
-            <a href="js.html" class="content-box">
-                <div class="img-wrap"><img src="imgbin_a00831a712bb4f59eba35cb2c4c7a737.png" alt="JS"></div>
-                <h3>JavaScript</h3>
-                <p>常用於網頁互動與視覺化計算並輔助HTML。</p>
-            </a>
-            <a href="java.html" class="content-box">
-                <div class="img-wrap"><img src="Java_logo.png" alt="Java"></div>
-                <h3>Java</h3>
-                <p>跨平台物件導向語言，常用於大型企業後端系統與androidApp開發。</p>
-            </a>
-            <a href="html.html" class="content-box">
-                <div class="img-wrap"><img src="htmllogo-removebg-preview.png" alt="HTML"></div>
-                <h3>HTML</h3>
-                <p>最常見的網頁結構語言。</p>
-            </a>
-            <a href="css.html" class="content-box">
-                <div class="img-wrap"><img src="csslogo-removebg-preview.png" alt="CSS"></div>
-                <h3>CSS</h3>
-                <p>負責網頁的樣式與排版，常用於輔助HTML。</p>
-            </a>
-            <a href="cs.html" class="content-box">
-                <div class="img-wrap"><img src="Logo_C_sharp.svg-removebg-preview.png" alt="C#"></div>
-                <h3>C#</h3>
-                <p>微軟開發，語法優雅，是Unity遊戲引擎的主要開發語言。</p>
-            </a>
-            <a href="c.html" class="content-box">
-                <div class="img-wrap"><img src="C_Logo-removebg-preview.png" alt="C"></div>
-                <h3>C</h3>
-                <p>最早的高級語言，效能極高。</p>
-            </a>
-            <a href="linux.html" class="content-box">
-                <div class="img-wrap"><img src="linuxlogo.png" alt="linux"></div>
-                <h3>linux</h3>
-                <p>部署程式、競賽環境設定，都離不開linux終端機操作。</p>
-            </a>
-            <a href="sql.html" class="content-box">
-                <div class="img-wrap"><img src="SQLlogo.png" alt="SQL"></div>
-                <h3>SQL</h3>
-                <p>無論是寫網頁、寫 APP還是做AI，資料庫都是避不開的。</p>
-            </a>
-        </div>
-        <div style="height: 50px;"></div>
-        <center><p style="color:#ddd;font-size:2rem"><B><I>What can you do with those languages?</I></B></p></center>
-        <div style="height: 50px;"></div>
-        <div class="scroll-container">
-            <a href="competition.html" class="content-box">
-                <div class="img-wrap"><img src="competition.png" alt="Competition"></div>
-                <h3>Competition</h3>
-                <p>C++、Python常作為APCS、TOI等競賽的語言；競賽導向的學習常偏向對基礎邏輯和解題心法的訓練。</p>
-            </a>
-            <a href="ai.html" class="content-box">
-                <div class="img-wrap"><img src="AI.png" alt="AI"></div>
-                <h3>AI</h3>
-                <p>AI最常使用Python編寫，AI導向的學習會偏向大部分觀念和技巧的了解。</p>
-            </a>
-            <a href="website.html" class="content-box">
-                <div class="img-wrap"><img src="website.png" alt="Website"></div>
-                <h3>Website</h3>
-                <p>HTML、CSS、JS都是製作網站的語言，本網站也是用此三語言製作。</p>
-            </a>
-            <a href="b.html" class="content-box">
-                <div class="img-wrap"><img src="b.png" alt="Beckend"></div>
-                <h3>Backend</h3>
-                <p>後端結構大都以Java和linux為主，方便企業與私人做跨平台連結。</p>
-            </a>
-            <a href="system.html" class="content-box">
-                <div class="img-wrap"><img src="system.png" alt="System"></div>
-                <h3>System</h3>
-                <p>系統通常使用C語言和SQL，這是因為C語言最早出現且效能極高；而SQL負責資料庫貯存。</p>
-            </a>
-            <a href="game.html" class="content-box">
-                <div class="img-wrap"><img src="game.png" alt="Game"></div>
-                <h3>Game</h3>
-                <p>C++、C#是目前Unity、UE等遊戲引擎的主流語言，比起程式方塊具有更高的自有度。</p>
-            </a>
-            <a href="wc&d.html" class="content-box">
-                <div class="img-wrap"><img src="螢幕擷取畫面_2026-01-11_112317-removebg-preview.png" alt="Web_crawler_&_Debug"></div>
-                <h3>Web_crawler_&_Debug</h3>
-                <p>網路爬蟲(web crawler)是幫你自動上網、自動複製貼上資料；Debug(偵錯)是指把程式中語法邏輯錯誤的地方揪出。</p>
-            </a>
-            <div style="height: 50px;"></div>
-        </div>
+        <!-- WHAT IS CODING -->
+        <section class="section-block">
+            <p class="section-label">Introduction</p>
+            <h2 class="section-title">What is coding?</h2>
+            <div class="meme-card">
+                <img src="梗圖.png" alt="coding meme">
+                <p class="quote">一門與電腦溝通的「藝術」。</p>
+            </div>
+        </section>
+
+        <hr class="divider">
+
+        <!-- WHY CODING -->
+        <section class="section-block">
+            <p class="section-label">Motivation</p>
+            <h2 class="section-title">Why coding?</h2>
+            <div class="quote-block">
+                <p>在數位的世界裡，寫程式是唯一能讓你扮演「上帝」的方法。未來只有兩種人：告訴電腦做什麼的人，以及被電腦告訴該做什麼的人。別只當個玩家，當個創造者。花一小時寫程式，省下未來一千小時的重複工作。用指尖，改變世界。</p>
+            </div>
+            <img src="黃仁勳.png" alt="Jensen Huang" class="huang-img">
+            <div class="quote-block" style="border-left-color: #facc15; margin-top: 16px;">
+                <p>"Run, don't walk. Either you are running for food, or running from being food."</p>
+                <p class="attr">— Jensen Huang</p>
+            </div>
+        </section>
+
+        <hr class="divider">
+
+        <!-- LANGUAGES -->
+        <section class="cards-section">
+            <div class="section-block" style="padding-bottom: 16px;">
+                <p class="section-label">Learn</p>
+                <h2 class="section-title">What are some simple and basic programming languages?</h2>
+            </div>
+            <div class="scroll-container">
+                <a href="cpp.html" class="content-box">
+                    <div class="img-wrap"><img src="c++logo.png" alt="C++"></div>
+                    <h3>C++</h3>
+                    <p>C 的延伸，效能極高，是 UE 核心語言，也常用於競賽程式。</p>
+                </a>
+                <a href="python.html" class="content-box">
+                    <div class="img-wrap"><img src="python_vertical_logo_icon_168039.webp" alt="Python"></div>
+                    <h3>Python</h3>
+                    <p>最簡易的語言，常用於計算或生成 AI。</p>
+                </a>
+                <a href="js.html" class="content-box">
+                    <div class="img-wrap"><img src="imgbin_a00831a712bb4f59eba35cb2c4c7a737.png" alt="JS"></div>
+                    <h3>JavaScript</h3>
+                    <p>常用於網頁互動與視覺化計算，輔助 HTML。</p>
+                </a>
+                <a href="java.html" class="content-box">
+                    <div class="img-wrap"><img src="Java_logo.png" alt="Java"></div>
+                    <h3>Java</h3>
+                    <p>跨平台物件導向語言，常用於企業後端與 Android App。</p>
+                </a>
+                <a href="html.html" class="content-box">
+                    <div class="img-wrap"><img src="htmllogo-removebg-preview.png" alt="HTML"></div>
+                    <h3>HTML</h3>
+                    <p>最常見的網頁結構語言。</p>
+                </a>
+                <a href="css.html" class="content-box">
+                    <div class="img-wrap"><img src="csslogo-removebg-preview.png" alt="CSS"></div>
+                    <h3>CSS</h3>
+                    <p>負責網頁的樣式與排版，常輔助 HTML 使用。</p>
+                </a>
+                <a href="cs.html" class="content-box">
+                    <div class="img-wrap"><img src="Logo_C_sharp.svg-removebg-preview.png" alt="C#"></div>
+                    <h3>C#</h3>
+                    <p>微軟開發，語法優雅，是 Unity 遊戲引擎的主要語言。</p>
+                </a>
+                <a href="c.html" class="content-box">
+                    <div class="img-wrap"><img src="C_Logo-removebg-preview.png" alt="C"></div>
+                    <h3>C</h3>
+                    <p>最早的高級語言，效能極高。</p>
+                </a>
+                <a href="linux.html" class="content-box">
+                    <div class="img-wrap"><img src="linuxlogo.png" alt="Linux"></div>
+                    <h3>Linux</h3>
+                    <p>部署程式、競賽環境設定，都離不開 Linux 終端機操作。</p>
+                </a>
+                <a href="sql.html" class="content-box">
+                    <div class="img-wrap"><img src="SQLlogo.png" alt="SQL"></div>
+                    <h3>SQL</h3>
+                    <p>無論寫網頁、App 還是做 AI，資料庫都是避不開的。</p>
+                </a>
+            </div>
+        </section>
+
+        <hr class="divider">
+
+        <!-- APPLICATIONS -->
+        <section class="cards-section">
+            <div class="section-block" style="padding-bottom: 16px;">
+                <p class="section-label">Apply</p>
+                <h2 class="section-title">What can you do with those languages?</h2>
+            </div>
+            <div class="scroll-container">
+                <a href="competition.html" class="content-box">
+                    <div class="img-wrap"><img src="competition.png" alt="Competition"></div>
+                    <h3>Competition</h3>
+                    <p>C++、Python 常作為 APCS、TOI 等競賽語言，偏重基礎邏輯與解題心法。</p>
+                </a>
+                <a href="ai.html" class="content-box">
+                    <div class="img-wrap"><img src="AI.png" alt="AI"></div>
+                    <h3>AI</h3>
+                    <p>AI 最常使用 Python，學習會偏向觀念與技巧的全面了解。</p>
+                </a>
+                <a href="website.html" class="content-box">
+                    <div class="img-wrap"><img src="website.png" alt="Website"></div>
+                    <h3>Website</h3>
+                    <p>HTML、CSS、JS 是製作網站的三大語言，本站也是如此。</p>
+                </a>
+                <a href="b.html" class="content-box">
+                    <div class="img-wrap"><img src="b.png" alt="Backend"></div>
+                    <h3>Backend</h3>
+                    <p>後端大都以 Java 和 Linux 為主，方便跨平台連結。</p>
+                </a>
+                <a href="system.html" class="content-box">
+                    <div class="img-wrap"><img src="system.png" alt="System"></div>
+                    <h3>System</h3>
+                    <p>系統通常使用 C 和 SQL，C 效能極高，SQL 負責資料庫儲存。</p>
+                </a>
+                <a href="game.html" class="content-box">
+                    <div class="img-wrap"><img src="game.png" alt="Game"></div>
+                    <h3>Game</h3>
+                    <p>C++、C# 是 Unity、UE 等引擎的主流語言，自由度更高。</p>
+                </a>
+                <a href="wc&d.html" class="content-box">
+                    <div class="img-wrap"><img src="螢幕擷取畫面_2026-01-11_112317-removebg-preview.png" alt="Web Crawler & Debug"></div>
+                    <h3>Crawler & Debug</h3>
+                    <p>網路爬蟲自動蒐集資料；Debug 協助找出語法與邏輯錯誤。</p>
+                </a>
+            </div>
+        </section>
     </main>
+
+    <!-- FOOTER -->
     <footer>
-        <h1>
-            <p style="text-align: center;color:#ddd;font-size:2rem"><I>"Wish you always AC(all corrected) in coding with us!"</I></p>
-            <div style="display: flex; align-items: center;">
-                <img src="logo.png" alt="描述" style="width: 200px; margin-right: 20px;">
-                <p style="color:#ddd">協作者：臺北市私立再興高級中學程式設計社<br>　　　　第五屆社長：林宜霆<br>　　　　社員：殷宏宇</p>
-            </div>
-        </h1>
-        <h2>
-            <p style="text-align: center;color:#ddd;font-size:2rem"><I> CONTACT US </I></p>
-            <div style="display: flex; align-items: center;">
-                <img src="fb.png" alt="FB_QRCode" style="width: 200px; margin-right: 20px;background-color:#ccc">
-                <img src="ig.png" alt="IG_QRCode" style="width: 200px; margin-right: 20px;background-color:#ccc">
-                <img src="網站.png" alt="Website_QRCode" style="width: 200px; margin-right: 20px;background-color:#ccc">
-                <a href="https://www.instagram.com/thcca_5th/?next=%2Fp%2FDJbHqzKRbLd%2F">@thcca_5th</a>
-            </div>
-        </h2>
+        <p class="footer-tagline">"Wish you always <span>AC</span> (all corrected) in coding with us!"</p>
+        <div class="footer-info">
+            <img src="logo.png" alt="Logo">
+            <p>
+                協作者：臺北市私立再興高級中學程式設計社<br>
+                第五屆社長：林宜霆<br>
+                社員：殷宏宇
+            </p>
+        </div>
+        <p class="contact-title">CONTACT US</p>
+        <div class="contact-qr">
+            <img src="fb.png" alt="FB QRCode">
+            <img src="ig.png" alt="IG QRCode">
+            <img src="網站.png" alt="Website QRCode">
+            <a href="https://www.instagram.com/thcca_5th/" target="_blank" rel="noopener">@thcca_5th</a>
+        </div>
     </footer>
+
+    <!-- GDB FLOAT WINDOW -->
     <div id="gdbFloatWindow">
         <div class="window-header" id="dragHandle">
-            <span class="window-title">GDB</span>
+            <span class="window-title">⌨ GDB Online</span>
             <span class="close-btn" onclick="toggleGdbWindow()">&times;</span>
         </div>
         <div class="window-content">
-            <iframe 
-                id="gdbFrame"
-                data-src="https://www.onlinegdb.com/"
-                src="https://www.onlinegdb.com/"
-                sandbox="allow-forms allow-scripts allow-same-origin allow-popups">
-            </iframe>
+            <iframe id="gdbFrame" src="https://www.onlinegdb.com/"
+                sandbox="allow-forms allow-scripts allow-same-origin allow-popups"></iframe>
         </div>
     </div>
+
     <script>
+        // GDB float window toggle + drag
         const floatWindow = document.getElementById('gdbFloatWindow');
-        const iframe = document.getElementById('gdbFrame');
-        const dragHandle = document.getElementById('dragHandle');
+        const dragHandle  = document.getElementById('dragHandle');
+
         function toggleGdbWindow() {
-            if (floatWindow.style.display === 'flex') {
-                floatWindow.style.display = 'none';
-            } else {
-                floatWindow.style.display = 'flex';
-                if (iframe.getAttribute('src') === "") {
-                    iframe.setAttribute('src', iframe.getAttribute('data-src'));
-                }
-            }
+            floatWindow.style.display = floatWindow.style.display === 'flex' ? 'none' : 'flex';
         }
-        let isDragging = false;
-        let startX, startY, initialLeft, initialTop;
-        dragHandle.addEventListener('mousedown', function(e) {
+
+        let isDragging = false, startX, startY, initLeft, initTop;
+        dragHandle.addEventListener('mousedown', e => {
             isDragging = true;
-            startX = e.clientX;
-            startY = e.clientY;
-            const rect = floatWindow.getBoundingClientRect();
-            initialLeft = rect.left;
-            initialTop = rect.top;
+            startX = e.clientX; startY = e.clientY;
+            const r = floatWindow.getBoundingClientRect();
+            initLeft = r.left; initTop = r.top;
             floatWindow.classList.add('is-dragging');
         });
-        document.addEventListener('mousemove', function(e) {
-            if (isDragging) {
-                const dx = e.clientX - startX;
-                const dy = e.clientY - startY;
-                floatWindow.style.left = `${initialLeft + dx}px`;
-                floatWindow.style.top = `${initialTop + dy}px`;
-                floatWindow.style.right = 'auto'; 
-            }
+        document.addEventListener('mousemove', e => {
+            if (!isDragging) return;
+            floatWindow.style.left = `${initLeft + e.clientX - startX}px`;
+            floatWindow.style.top  = `${initTop  + e.clientY - startY}px`;
+            floatWindow.style.right = 'auto';
         });
-        document.addEventListener('mouseup', function() {
+        document.addEventListener('mouseup', () => {
             isDragging = false;
             floatWindow.classList.remove('is-dragging');
+        });
+
+        // Active nav highlight
+        const path = location.pathname.split('/').pop() || 'index.html';
+        document.querySelectorAll('.nav-link').forEach(a => {
+            a.classList.toggle('active', a.getAttribute('href') === path);
         });
     </script>
 </body>

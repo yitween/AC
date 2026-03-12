@@ -1,286 +1,260 @@
 <!DOCTYPE html>
+
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AC_PYTHON</title>
-    <link rel="icon" href="python_vertical_logo_icon_168039.webp" sizes="48x48" type="image/png">
-    <style>
-        body {
-            background-color: rgb(20, 20, 20);
-            color: white;
-            font-family: "Microsoft JhengHei", sans-serif;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AC — PYTHON</title>
+<link href="螢幕擷取畫面 2026-01-05 125529.png" rel="icon" sizes="48x48" type="image/png"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="shared.css" rel="stylesheet"/>
+<style>
+        /* ── GDB FLOAT WINDOW ── */
+        #gdbFloatWindow {
+            display: none; position: fixed;
+            top: 100px; right: 50px;
+            width: 600px; height: 500px;
+            background: #1e1e1e;
+            border: 1px solid #444; border-radius: 10px;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.6);
+            z-index: 2000; flex-direction: column;
+            overflow: hidden; resize: both;
+            min-width: 320px; min-height: 250px;
+            max-width: 95vw; max-height: 95vh;
         }
-        .back-button {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            text-decoration: none;
-            color: aquamarine;
-            border: 1px solid aquamarine;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: all 0.3s;
-            z-index: 1000;
+        .window-header {
+            height: 40px; background: #2a2a2a;
+            display: flex; align-items: center;
+            justify-content: space-between;
+            padding: 0 14px; cursor: move;
+            border-bottom: 1px solid #444;
+            user-select: none; flex-shrink: 0;
         }
-        .back-button:hover {
-            background-color: aquamarine;
-            color: black;
+        .window-title {
+            color: #ccc; font-weight: 700; font-size: 0.85rem;
+            font-family: 'JetBrains Mono', monospace;
         }
-        .content {
-            max-width: 800px;
-            text-align: center;
-            margin-top: 50px;
+        .close-btn {
+            color: #888; font-size: 22px; cursor: pointer;
+            line-height: 1; transition: color 0.2s;
         }
-        h1 { color: aquamarine; font-size: 3rem; margin-bottom: 10px; }
-        p { font-size: 1.2rem; line-height: 1.6; color: #ddd; }
-        .big-logo {
-            width: 150px;
-            height: 150px;
-            object-fit: contain;
-            margin-bottom: 20px;
+        .close-btn:hover { color: #f87171; }
+        .window-content { flex: 1; height: calc(100% - 40px); }
+        .window-content iframe { width: 100%; height: 100%; border: none; }
+        .is-dragging iframe { pointer-events: none; }
+        /* ── PAGE HERO ── */
+        .page-hero {
+            display: flex; align-items: center; gap: 20px;
+            margin-bottom: 24px;
         }
-        html {
-            scroll-behavior: smooth;
+        .page-hero img {
+            width: 72px; height: 72px; object-fit: contain;
+            border-radius: 12px; background: rgba(255,255,255,0.04);
+            padding: 8px; border: 1px solid var(--border);
+            box-shadow: none; margin: 0;
         }
-        .sidebar {
-            width: 200px;
-            height: 100vh;
-            position: fixed; 
-            top: 0;
-            left: 0;
-            background-color: #faa11cd0;
-            padding: 20px;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            overflow-y: auto;
+        .page-hero h1 {
+            font-size: clamp(1.8rem, 4vw, 2.4rem);
+            color: var(--accent); font-weight: 700; margin: 0;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 0.03em;
         }
-        .sidebar ul {
-            list-style: none;
-            padding: 0;
+        /* ── DOWNLOAD BUTTON ── */
+        .download-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            margin-top: 32px; padding: 12px 24px;
+            background: #1d4ed8; color: #fff;
+            text-decoration: none; border-radius: 8px;
+            font-weight: 700; font-size: 0.9rem;
+            transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
         }
-        .sidebar li {
-            margin-bottom: 15px;
+        .download-btn::before { content: '⬇'; }
+        .download-btn:hover {
+            background: #2563eb; transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(29,78,216,0.35);
         }
-        .sidebar a {
-            text-decoration: none;
-            color: #333;
-            display: block;
-            padding: 8px 12px;
-            border-left: 4px solid transparent; 
-            transition: all 0.3s;
+        .download-btn:active { transform: translateY(0); }
+        /* ── GDB INLINE BTN ── */
+        .gdb-inline {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 16px; background: transparent;
+            color: var(--accent); border: 1px solid var(--accent);
+            border-radius: 6px; cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700; font-size: 0.85rem;
+            transition: background 0.2s, color 0.2s, transform 0.15s;
+            margin-left: 8px;
         }
-        .sidebar a:hover {
-            background-color: #faa11cd0;
+        .gdb-inline:hover {
+            background: var(--accent); color: #111;
+            transform: translateY(-1px);
         }
-        .sidebar a.active {
-            color: #007bff;    
-            font-weight: bold;
-            border-left: 4px solid #007bff;
-            background-color: #faa11cd0;
-        }
-        .content {
-            margin-left: 240px;
-            padding: 40px;
-            max-width: 800px;
-        }
-        section {
-            min-height: 80vh; 
-            padding-top: 20px;
-            border-bottom: 1px solid #faa11cd0;
-        }
-        h2 {
-            margin-top: 0;
-        }
-        .nav-menu {
-            display: flex;
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            align-items: center;
-        }
-        .nav-menu li {
-            margin-left: 20px;
-        }
-        .nav-menu a {
-            text-decoration: none;
-            color: #ccc;
-            font-size: 1rem;
-            padding: 5px 10px;
-            border-radius: 4px;
-            transition: all 0.3s;
-        }
-        .nav-menu a:hover {
-            color: white;
-            background-color: rgba(255,255,255,0.1);
-        }
+        .gdb-inline:active { transform: translateY(0); }
     </style>
-    <ul class="nav-menu">
-        <li>
-            <button class="gdb-btn" onclick="toggleGdbWindow()">
-                GDB
-            </button>
-        </li>
-    </ul>
-</head>
+<style>
+/* ── TOOLTIP ── */
+[data-tip] {
+    position: relative;
+    cursor: help;
+    text-decoration: underline dotted currentColor;
+    text-underline-offset: 3px;
+}
+[data-tip]::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e1e2e;
+    color: #e0e0e0;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    white-space: normal;
+    width: max-content;
+    max-width: 260px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(127,255,212,0.25);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    transform: translateX(-50%) translateY(4px);
+    z-index: 9999;
+}
+[data-tip]:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+/* arrow */
+[data-tip]::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 2px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: rgba(127,255,212,0.25);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.18s ease;
+    z-index: 9999;
+}
+[data-tip]:hover::before { opacity: 1; }
+</style></head>
 <body>
-    <a href="index.html" class="back-button">← 回首頁</a>
-    <nav class="sidebar">
-        <div style="height: 30px;"></div>
-        <h3>章節目錄</h3>
-        <ul>
-            <li><a href="#section1" class="nav-link">1. 基礎與運算</a></li>
-            <li><a href="#section2" class="nav-link">2. 資料結構</a></li>
-            <li><a href="#section3" class="nav-link">3. 流程控制</a></li>
-            <li><a href="#section4" class="nav-link">4. 函式</a></li>
-            <li><a href="#section5" class="nav-link">5. 進階應用</a></li>
-        </ul>
-    </nav>
-    <header>
-        <div class="content">
-        <img src="python_vertical_logo_icon_168309.webp" class="big-logo">
-        <h1>python</h1>
-        <button class="gdb-btn" onclick="toggleGdbWindow()">
-            GDB
-        </button>
-        <hr style="border-color: #333; margin: 20px 0;">
-        <div style="height: 50px;"></div>
-        <center>
-            <p style="color:#ddd;font-size:2rem"><B><I>Try Code Here!</I></B></p>
-        </center>
-        <div style="height: 30px;"></div>
-        <div style="max-width: 90%; margin: 0 auto; box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);">
-            <iframe 
-                src="https://www.onlinegdb.com/" 
-                width="100%" 
-                height="600px" 
-                frameborder="0" 
-                style="border-radius: 10px; border: 1px solid #333;"
-                allowfullscreen>
-            </iframe>
-        </div>
-        <div style="height: 30px;"></div>
-        <main class="content">
-            <section id="section1">
-                <h2>1. 基礎與運算</h2>
-                <p>Python是目前最熱門的程式語言之一，語法簡潔、學習曲線平緩，在資料科學、人工智慧、網頁後端、自動化腳本等領域都大量使用。Python是<span style="color:#fa6dff">「直譯式語言」</span>，不需要編譯，直接執行，也是<span style="color:#ffae00">動態型別語言</span>，宣告變數不用指定型態。</p>
-                <p>Python的<span style="color:#ffee00fa">輸出</span>用<span style="color:#ffae00">print()</span>，例如 <span style="color:#ffae00">print</span>(<span style="color:#00eeff">"Hello World"</span>)。<span style="color:#ffee00fa">輸入</span>用<span style="color:#ffae00">input()</span>，回傳值是字串，例如 name = <span style="color:#ffae00">input</span>(<span style="color:#00eeff">"請輸入姓名："</span>)，若要轉成數字用<span style="color:#ffae00">int()</span>或<span style="color:#ffae00">float()</span>包住。</p>
-                <p>Python最方便的是<span style="color:#fa6dff">「f-string」</span>，在字串前加<span style="color:#ffae00">f</span>，然後用<span style="color:#00eeff">{變數}</span>直接嵌入值，例如：<span style="color:#ffae00">print</span>(<span style="color:#ffae00">f</span><span style="color:#00eeff">"我叫{name}，今年{age}歲"</span>)，超直觀！Python的字串可以用單引號或雙引號，效果相同。</p>
-                <p>Python的<span style="color:#fa6dff">「運算子」</span>和其他語言大致相同，但有幾個特別的：<span style="color:#ffae00">**</span>是次方（例：2**10 = 1024）、<span style="color:#ffae00">//</span>是整數除法（捨去小數）、<span style="color:#ffae00">%</span>是取餘數。邏輯運算子不用符號，直接用英文：<span style="color:#ffae00">and</span>、<span style="color:#ffae00">or</span>、<span style="color:#ffae00">not</span>，更接近自然語言。</p>
-                <p>Python最大的特色之一是<span style="color:#ffee00fa">縮排即區塊</span>，不用大括號，程式碼靠縮排（通常4個空格）來判斷哪些程式碼屬於同一區塊。這讓Python程式碼天生就整齊易讀，但縮排錯誤會直接報錯，要養成好習慣！另外，Python不需要每行加分號。</p>
+<nav class="top-nav">
+<a class="back" href="index.html">← 回首頁</a>
+<ul class="nav-menu">
+<li><a href="index.html">首頁</a></li>
+<li><a href="guide.html">網站導覽</a></li>
+<li><a href="about.html">關於我們</a></li>
+<li><a href="others.html">其他</a></li>
+<li><button class="gdb-inline" onclick="toggleGdbWindow()">⌨ GDB</button></li>
+</ul>
+</nav>
+<div class="layout">
+<nav class="sidebar">
+<h3>章節目錄</h3>
+<ul>
+<li><a href="#section1">1. 基礎與運算</a></li>
+<li><a href="#section2">2. 資料結構</a></li>
+<li><a href="#section3">3. 流程控制</a></li>
+<li><a href="#section4">4. 函式</a></li>
+<li><a href="#section5">5. 進階應用</a></li>
+</ul>
+</nav>
+<div class="main-content">
+<div class="page-hero">
+<img alt="python" src="python.pdf.png"/>
+<h1>python</h1>
+</div>
+<hr class="page-divider"/>
+<section id="section1">
+<h2>1. 基礎與運算</h2>
+<p>Python是目前最熱門的程式語言之一，語法簡潔、學習曲線平緩，在資料科學、人工智慧、網頁後端、自動化腳本等領域都大量使用。Python是<span data-tip="程式碼逐行解析執行而非預先編譯（Python、JavaScript）" style="color:#fa6dff">「直譯式語言」</span>，不需要編譯，直接執行，也是<span data-tip="變數型態在執行期決定，不需事先宣告（如 Python、JS）" style="color:#ffae00">動態型別語言</span>，宣告變數不用指定型態。</p>
+<p>Python的<span style="color:#ffee00fa">輸出</span>用<span data-tip="Python 內建函式，將資料輸出到標準輸出（終端機）" style="color:#ffae00">print()</span>，例如 <span data-tip="輸出函式關鍵字，將訊息顯示到終端機" style="color:#ffae00">print</span>(<span style="color:#00eeff">"Hello World"</span>)。<span style="color:#ffee00fa">輸入</span>用<span data-tip="Python 內建函式，暫停程式並等待使用者鍵盤輸入" style="color:#ffae00">input()</span>，回傳值是字串，例如 name = <span data-tip="HTML 表單輸入元素，或 Python 讀取使用者輸入的函式" style="color:#ffae00">input</span>(<span style="color:#00eeff">"請輸入姓名："</span>)，若要轉成數字用<span style="color:#ffae00">int()</span>或<span style="color:#ffae00">float()</span>包住。</p>
+<p>Python最方便的是<span data-tip="Python 格式化字串，在字串前加 f 並以 {} 嵌入運算式" style="color:#fa6dff">「f-string」</span>，在字串前加<span style="color:#ffae00">f</span>，然後用<span style="color:#00eeff">{變數}</span>直接嵌入值，例如：<span data-tip="輸出函式關鍵字，將訊息顯示到終端機" style="color:#ffae00">print</span>(<span style="color:#ffae00">f</span><span style="color:#00eeff">"我叫{name}，今年{age}歲"</span>)，超直觀！Python的字串可以用單引號或雙引號，效果相同。</p>
+<p>Python的<span data-tip="執行特定操作的符號（+、-、==、&amp;&amp;等）" style="color:#fa6dff">「運算子」</span>和其他語言大致相同，但有幾個特別的：<span style="color:#ffae00">**</span>是次方（例：2**10 = 1024）、<span style="color:#ffae00">//</span>是整數除法（捨去小數）、<span style="color:#ffae00">%</span>是取餘數。邏輯運算子不用符號，直接用英文：<span data-tip="Python/SQL 邏輯運算子，兩側條件都為真才回傳真" style="color:#ffae00">and</span>、<span data-tip="Python/SQL 邏輯運算子，任一條件為真即回傳真" style="color:#ffae00">or</span>、<span data-tip="Python/SQL 邏輯運算子，反轉布林值" style="color:#ffae00">not</span>，更接近自然語言。</p>
+<p>Python最大的特色之一是<span style="color:#ffee00fa">縮排即區塊</span>，不用大括號，程式碼靠縮排（通常4個空格）來判斷哪些程式碼屬於同一區塊。這讓Python程式碼天生就整齊易讀，但縮排錯誤會直接報錯，要養成好習慣！另外，Python不需要每行加分號。</p>
 </section>
-            <section id="section2">
-                <h2>2. 資料結構</h2>
-                <p>Python有幾個超好用的內建<span style="color:#fa6dff">「資料結構」</span>，掌握這些，Python的威力才算發揮出來。首先是<span style="color:#ffae00">list（串列）</span>，類似其他語言的陣列，但可以混放不同型態，用方括號宣告：<span style="color:#ffae00">fruits</span> = [<span style="color:#00eeff">'apple', 'banana', 'cherry'</span>]，索引從0開始，可以用負數索引（-1是最後一個）。</p>
-                <p>list的常用方法：<span style="color:#ffae00">.append(x)</span>在尾端加一個元素、<span style="color:#ffae00">.insert(i, x)</span>在位置i插入、<span style="color:#ffae00">.remove(x)</span>移除第一個值為x的元素、<span style="color:#ffae00">.pop()</span>移除並回傳最後一個、<span style="color:#ffae00">len()</span>取得長度。Python的<span style="color:#fa6dff">「切片（Slice）」</span>也非常強大：<span style="color:#ffae00">fruits[1:3]</span>取索引1到2（不含3），<span style="color:#ffae00">fruits[::-1]</span>整個反轉，超方便！</p>
-                <p>第二個是<span style="color:#ffae00">dict（字典）</span>，以<span style="color:#ffee00fa">鍵值對（key-value）</span>儲存資料，用大括號宣告：<span style="color:#ffae00">student</span> = {<span style="color:#00eeff">'name': '小明', 'age': 18</span>}，存取用<span style="color:#ffae00">student['name']</span>或更安全的<span style="color:#ffae00">student.get('name')</span>（找不到時回傳None而非報錯），常用方法有<span style="color:#ffae00">.keys()</span>、<span style="color:#ffae00">.values()</span>、<span style="color:#ffae00">.items()</span>。</p>
-                <p>第三個是<span style="color:#ffae00">tuple（元組）</span>，用小括號宣告，和list的差別是<span style="color:#ffee00fa">不可修改（immutable）</span>，例如：<span style="color:#ffae00">point</span> = (<span style="color:#00eeff">3, 5</span>)，適合存放不應該被改動的資料。第四個是<span style="color:#ffae00">set（集合）</span>，用大括號但沒有鍵值，<span style="color:#ffee00fa">自動去除重複</span>，支援數學的聯集<span style="color:#ffae00">|</span>、交集<span style="color:#ffae00">&amp;</span>、差集<span style="color:#ffae00">-</span>運算，非常適合去重和比較兩組資料。</p>
+<section id="section2">
+<h2>2. 資料結構</h2>
+<p>Python有幾個超好用的內建<span data-tip="有效組織與儲存資料的方式（陣列、鏈結串列、樹等）" style="color:#fa6dff">「資料結構」</span>，掌握這些，Python的威力才算發揮出來。首先是<span data-tip="Python 有序可變序列，以中括號 [] 表示" style="color:#ffae00">list（串列）</span>，類似其他語言的陣列，但可以混放不同型態，用方括號宣告：<span style="color:#ffae00">fruits</span> = [<span style="color:#00eeff">'apple', 'banana', 'cherry'</span>]，索引從0開始，可以用負數索引（-1是最後一個）。</p>
+<p>list的常用方法：<span data-tip="Python 串列方法，在末尾新增一個元素 x" style="color:#ffae00">.append(x)</span>在尾端加一個元素、<span data-tip="Python 串列方法，在索引 i 位置插入元素 x" style="color:#ffae00">.insert(i, x)</span>在位置i插入、<span data-tip="Python 串列方法，移除第一個值為 x 的元素" style="color:#ffae00">.remove(x)</span>移除第一個值為x的元素、<span data-tip="串列/堆疊方法，移除並回傳最後一個元素" style="color:#ffae00">.pop()</span>移除並回傳最後一個、<span data-tip="Python 內建函式，回傳序列或集合的元素數量" style="color:#ffae00">len()</span>取得長度。Python的<span data-tip="取序列中指定範圍子序列的語法（Python: a[start:stop]）" style="color:#fa6dff">「切片（Slice）」</span>也非常強大：<span style="color:#ffae00">fruits[1:3]</span>取索引1到2（不含3），<span style="color:#ffae00">fruits[::-1]</span>整個反轉，超方便！</p>
+<p>第二個是<span data-tip="Python 鍵值對資料結構，以任意不可變物件為鍵快速查詢" style="color:#ffae00">dict（字典）</span>，以<span style="color:#ffee00fa">鍵值對（key-value）</span>儲存資料，用大括號宣告：<span style="color:#ffae00">student</span> = {<span style="color:#00eeff">'name': '小明', 'age': 18</span>}，存取用<span style="color:#ffae00">student['name']</span>或更安全的<span style="color:#ffae00">student.get('name')</span>（找不到時回傳None而非報錯），常用方法有<span data-tip="Python 字典方法，回傳所有鍵的可迭代物件" style="color:#ffae00">.keys()</span>、<span data-tip="Python 字典方法，回傳所有值的可迭代物件" style="color:#ffae00">.values()</span>、<span data-tip="Python 字典方法，回傳所有鍵值對的可迭代物件" style="color:#ffae00">.items()</span>。</p>
+<p>第三個是<span data-tip="Python 不可變的有序序列，以小括號 () 表示" style="color:#ffae00">tuple（元組）</span>，用小括號宣告，和list的差別是<span style="color:#ffee00fa">不可修改（immutable）</span>，例如：<span style="color:#ffae00">point</span> = (<span style="color:#00eeff">3, 5</span>)，適合存放不應該被改動的資料。第四個是<span data-tip="無序不重複元素的集合型態，常用於去重與集合運算" style="color:#ffae00">set（集合）</span>，用大括號但沒有鍵值，<span style="color:#ffee00fa">自動去除重複</span>，支援數學的聯集<span style="color:#ffae00">|</span>、交集<span style="color:#ffae00">&amp;</span>、差集<span style="color:#ffae00">-</span>運算，非常適合去重和比較兩組資料。</p>
 </section>
-            <section id="section3">
-                <h2>3. 流程控制</h2>
-                <p>Python的<span style="color:#fa6dff">「條件判斷」</span>用<span style="color:#ffae00">if...elif...else</span>，注意是<span style="color:#ffae00">elif</span>而不是else if（這是Python特有的縮寫），條件後面加冒號<span style="color:#ffae00">:</span>，例如：<span style="color:#ffae00">if</span> score &gt;= 90: ... <span style="color:#ffae00">elif</span> score &gt;= 80: ... <span style="color:#ffae00">else</span>: ...。</p>
-                <p>Python也有三元運算子，語法很像英文：<span style="color:#ffae00">值A if 條件 else 值B</span>，例如：result = <span style="color:#00eeff">"通過"</span> <span style="color:#ffae00">if</span> score &gt;= 60 <span style="color:#ffae00">else</span> <span style="color:#00eeff">"不通過"</span>，一行搞定簡單判斷。</p>
-                <p>迴圈方面，<span style="color:#ffae00">for</span>迴圈是Python最常用的，語法是：<span style="color:#ffae00">for</span> item <span style="color:#ffae00">in</span> 可迭代物件: ...，例如：<span style="color:#ffae00">for</span> fruit <span style="color:#ffae00">in</span> fruits: <span style="color:#ffae00">print</span>(fruit)，直接把list每個元素拿出來用，不用管索引。要跑固定次數用<span style="color:#ffae00">range()</span>：<span style="color:#ffae00">for</span> i <span style="color:#ffae00">in</span> <span style="color:#ffae00">range</span>(10): 跑0到9；<span style="color:#ffae00">range</span>(1, 11): 跑1到10；<span style="color:#ffae00">range</span>(0, 10, 2): 每次跳2。</p>
-                <p>如果同時要索引和值，用<span style="color:#ffae00">enumerate()</span>：<span style="color:#ffae00">for</span> i, fruit <span style="color:#ffae00">in</span> <span style="color:#ffae00">enumerate</span>(fruits): ...；如果要同時遍歷兩個list，用<span style="color:#ffae00">zip()</span>：<span style="color:#ffae00">for</span> a, b <span style="color:#ffae00">in</span> <span style="color:#ffae00">zip</span>(listA, listB): ...，這些都是Python特有的優雅語法。</p>
-                <p><span style="color:#ffae00">while</span>迴圈語法和其他語言類似：<span style="color:#ffae00">while</span> 條件: ...，同樣有<span style="color:#ffae00">break</span>跳出和<span style="color:#ffae00">continue</span>跳過。Python還有個特別的<span style="color:#fa6dff">「串列生成式（List Comprehension）」</span>，可以用一行建立list：<span style="color:#ffae00">squares</span> = [x**2 <span style="color:#ffae00">for</span> x <span style="color:#ffae00">in</span> <span style="color:#ffae00">range</span>(10)]，生成0到9的平方數list，非常Pythonic！</p>
+<section id="section3">
+<h2>3. 流程控制</h2>
+<p>Python的<span data-tip="根據條件選擇不同執行路徑的程式控制結構" style="color:#fa6dff">「條件判斷」</span>用<span style="color:#ffae00">if...elif...else</span>，注意是<span data-tip="Python 條件判斷的 else if 縮寫，接在 if 之後判斷下一條件" style="color:#ffae00">elif</span>而不是else if（這是Python特有的縮寫），條件後面加冒號<span style="color:#ffae00">:</span>，例如：<span data-tip="條件判斷關鍵字，條件成立時執行指定區塊" style="color:#ffae00">if</span> score &gt;= 90: ... <span data-tip="Python 條件判斷的 else if 縮寫，接在 if 之後判斷下一條件" style="color:#ffae00">elif</span> score &gt;= 80: ... <span data-tip="條件判斷關鍵字，當 if 條件不成立時執行的區塊" style="color:#ffae00">else</span>: ...。</p>
+<p>Python也有三元運算子，語法很像英文：<span style="color:#ffae00">值A if 條件 else 值B</span>，例如：result = <span style="color:#00eeff">"通過"</span> <span data-tip="條件判斷關鍵字，條件成立時執行指定區塊" style="color:#ffae00">if</span> score &gt;= 60 <span data-tip="條件判斷關鍵字，當 if 條件不成立時執行的區塊" style="color:#ffae00">else</span> <span style="color:#00eeff">"不通過"</span>，一行搞定簡單判斷。</p>
+<p>迴圈方面，<span data-tip="計數迴圈語法，重複執行指定次數或遍歷集合" style="color:#ffae00">for</span>迴圈是Python最常用的，語法是：<span data-tip="計數迴圈語法，重複執行指定次數或遍歷集合" style="color:#ffae00">for</span> item <span data-tip="Python 成員運算子，判斷元素是否在集合中" style="color:#ffae00">in</span> 可迭代物件: ...，例如：<span data-tip="計數迴圈語法，重複執行指定次數或遍歷集合" style="color:#ffae00">for</span> fruit <span data-tip="Python 成員運算子，判斷元素是否在集合中" style="color:#ffae00">in</span> fruits: <span data-tip="輸出函式關鍵字，將訊息顯示到終端機" style="color:#ffae00">print</span>(fruit)，直接把list每個元素拿出來用，不用管索引。要跑固定次數用<span data-tip="Python 內建函式，產生從 start 到 stop 的整數序列" style="color:#ffae00">range()</span>：<span data-tip="計數迴圈語法，重複執行指定次數或遍歷集合" style="color:#ffae00">for</span> i <span data-tip="Python 成員運算子，判斷元素是否在集合中" style="color:#ffae00">in</span> <span data-tip="Python 函式，產生指定範圍的整數序列" style="color:#ffae00">range</span>(10): 跑0到9；<span data-tip="Python 函式，產生指定範圍的整數序列" style="color:#ffae00">range</span>(1, 11): 跑1到10；<span data-tip="Python 函式，產生指定範圍的整數序列" style="color:#ffae00">range</span>(0, 10, 2): 每次跳2。</p>
+<p>如果同時要索引和值，用<span data-tip="Python 內建函式，迭代時同時取得索引和元素值" style="color:#ffae00">enumerate()</span>：<span data-tip="計數迴圈語法，重複執行指定次數或遍歷集合" style="color:#ffae00">for</span> i, fruit <span data-tip="Python 成員運算子，判斷元素是否在集合中" style="color:#ffae00">in</span> <span data-tip="Python 函式，回傳帶有索引的可迭代物件" style="color:#ffae00">enumerate</span>(fruits): ...；如果要同時遍歷兩個list，用<span data-tip="Python 內建函式，同時遍歷多個序列並配對元素" style="color:#ffae00">zip()</span>：<span data-tip="計數迴圈語法，重複執行指定次數或遍歷集合" style="color:#ffae00">for</span> a, b <span data-tip="Python 成員運算子，判斷元素是否在集合中" style="color:#ffae00">in</span> <span data-tip="Python 函式，將多個可迭代物件並排組合成元組序列" style="color:#ffae00">zip</span>(listA, listB): ...，這些都是Python特有的優雅語法。</p>
+<p><span data-tip="條件迴圈語法，條件為真時持續重複執行" style="color:#ffae00">while</span>迴圈語法和其他語言類似：<span data-tip="條件迴圈語法，條件為真時持續重複執行" style="color:#ffae00">while</span> 條件: ...，同樣有<span data-tip="跳出當前迴圈或 switch 語句，繼續執行後續程式碼" style="color:#ffae00">break</span>跳出和<span data-tip="跳過本次迴圈剩餘程式碼，直接進入下一次迭代" style="color:#ffae00">continue</span>跳過。Python還有個特別的<span data-tip="Python 一行語法，依條件生成新串列" style="color:#fa6dff">「串列生成式（List Comprehension）」</span>，可以用一行建立list：<span style="color:#ffae00">squares</span> = [x**2 <span data-tip="計數迴圈語法，重複執行指定次數或遍歷集合" style="color:#ffae00">for</span> x <span data-tip="Python 成員運算子，判斷元素是否在集合中" style="color:#ffae00">in</span> <span data-tip="Python 函式，產生指定範圍的整數序列" style="color:#ffae00">range</span>(10)]，生成0到9的平方數list，非常Pythonic！</p>
 </section>
-            <section id="section4">
-                <h2>4. 函式</h2>
-                <p>Python用<span style="color:#ffae00">def</span>定義函式，語法是：<span style="color:#ffae00">def</span> <span style="color:#00eeff">函式名稱</span>(參數): ...，例如：<span style="color:#ffae00">def</span> <span style="color:#00eeff">add</span>(a, b): <span style="color:#ffae00">return</span> a + b，呼叫時寫 <span style="color:#00eeff">add</span>(3, 5)。Python函式可以回傳多個值（用逗號分隔，實際上回傳的是tuple），例如：<span style="color:#ffae00">return</span> x, y。</p>
-                <p>Python支援<span style="color:#fa6dff">「預設參數」</span>，在定義時給預設值，呼叫時可以省略：<span style="color:#ffae00">def</span> <span style="color:#00eeff">greet</span>(name, msg=<span style="color:#00eeff">"你好"</span>): ...，這樣<span style="color:#00eeff">greet</span>(<span style="color:#00eeff">"小明"</span>)也不會報錯。還有<span style="color:#fa6dff">「關鍵字引數」</span>，呼叫時指定參數名稱：<span style="color:#00eeff">greet</span>(msg=<span style="color:#00eeff">"嗨"</span>, name=<span style="color:#00eeff">"小明"</span>)，順序不重要，更清晰。</p>
-                <p><span style="color:#ffae00">*args</span>和<span style="color:#ffae00">**kwargs</span>是Python特有的彈性參數語法：<span style="color:#ffae00">*args</span>接收任意數量的位置引數（以tuple接收），<span style="color:#ffae00">**kwargs</span>接收任意數量的關鍵字引數（以dict接收），例如：<span style="color:#ffae00">def</span> <span style="color:#00eeff">func</span>(*args, **kwargs): ...，可以接受任何呼叫方式，寫通用工具函式很好用。</p>
-                <p>Python有個非常強大的<span style="color:#fa6dff">「Lambda函式」</span>，語法是：<span style="color:#ffae00">lambda</span> 參數: 運算式，例如：<span style="color:#ffae00">square</span> = <span style="color:#ffae00">lambda</span> x: x**2，呼叫 square(5) 回傳25，適合需要一個簡單函式但不想正式def的場合，常搭配<span style="color:#ffae00">map()</span>、<span style="color:#ffae00">filter()</span>等高階函式使用。</p>
-                <p>最後介紹<span style="color:#fa6dff">「模組（Module）」</span>，Python的強大之處在於龐大的生態系，用<span style="color:#ffae00">import</span>引入模組：<span style="color:#ffae00">import</span> math 後就能用 math.sqrt()、math.pi 等；<span style="color:#ffae00">from</span> math <span style="color:#ffae00">import</span> sqrt 則直接引入sqrt，不用加前綴。常用標準函式庫：<span style="color:#00eeff">os</span>（檔案系統）、<span style="color:#00eeff">random</span>（亂數）、<span style="color:#00eeff">datetime</span>（時間）、<span style="color:#00eeff">json</span>（JSON處理）。</p>
+<section id="section4">
+<h2>4. 函式</h2>
+<p>Python用<span data-tip="Python 函式定義關鍵字，宣告一個可重複呼叫的函式" style="color:#ffae00">def</span>定義函式，語法是：<span data-tip="Python 函式定義關鍵字，宣告一個可重複呼叫的函式" style="color:#ffae00">def</span> <span style="color:#00eeff">函式名稱</span>(參數): ...，例如：<span data-tip="Python 函式定義關鍵字，宣告一個可重複呼叫的函式" style="color:#ffae00">def</span> <span style="color:#00eeff">add</span>(a, b): <span data-tip="函式回傳值的關鍵字，結束函式執行並傳回結果" style="color:#ffae00">return</span> a + b，呼叫時寫 <span style="color:#00eeff">add</span>(3, 5)。Python函式可以回傳多個值（用逗號分隔，實際上回傳的是tuple），例如：<span data-tip="函式回傳值的關鍵字，結束函式執行並傳回結果" style="color:#ffae00">return</span> x, y。</p>
+<p>Python支援<span data-tip="函式定義中設有預設值的參數，呼叫時可省略" style="color:#fa6dff">「預設參數」</span>，在定義時給預設值，呼叫時可以省略：<span data-tip="Python 函式定義關鍵字，宣告一個可重複呼叫的函式" style="color:#ffae00">def</span> <span style="color:#00eeff">greet</span>(name, msg=<span style="color:#00eeff">"你好"</span>): ...，這樣<span style="color:#00eeff">greet</span>(<span style="color:#00eeff">"小明"</span>)也不會報錯。還有<span data-tip="Python 函式呼叫時以名稱指定的引數，不依位置順序" style="color:#fa6dff">「關鍵字引數」</span>，呼叫時指定參數名稱：<span style="color:#00eeff">greet</span>(msg=<span style="color:#00eeff">"嗨"</span>, name=<span style="color:#00eeff">"小明"</span>)，順序不重要，更清晰。</p>
+<p><span data-tip="Python 函式參數，接收任意數量的位置引數為元組" style="color:#ffae00">*args</span>和<span data-tip="Python 函式參數，接收任意數量的關鍵字引數為字典" style="color:#ffae00">**kwargs</span>是Python特有的彈性參數語法：<span data-tip="Python 函式參數，接收任意數量的位置引數為元組" style="color:#ffae00">*args</span>接收任意數量的位置引數（以tuple接收），<span data-tip="Python 函式參數，接收任意數量的關鍵字引數為字典" style="color:#ffae00">**kwargs</span>接收任意數量的關鍵字引數（以dict接收），例如：<span data-tip="Python 函式定義關鍵字，宣告一個可重複呼叫的函式" style="color:#ffae00">def</span> <span style="color:#00eeff">func</span>(*args, **kwargs): ...，可以接受任何呼叫方式，寫通用工具函式很好用。</p>
+<p>Python有個非常強大的<span data-tip="Python 單行匿名函式，語法：lambda 參數: 回傳值" style="color:#fa6dff">「Lambda函式」</span>，語法是：<span data-tip="匿名函式定義關鍵字，產生無名稱的簡短函式" style="color:#ffae00">lambda</span> 參數: 運算式，例如：<span style="color:#ffae00">square</span> = <span data-tip="匿名函式定義關鍵字，產生無名稱的簡短函式" style="color:#ffae00">lambda</span> x: x**2，呼叫 square(5) 回傳25，適合需要一個簡單函式但不想正式def的場合，常搭配<span data-tip="Python/JavaScript 高階函式，對可迭代物件每個元素套用函式" style="color:#ffae00">map()</span>、<span data-tip="高階函式，依條件篩選可迭代物件中符合的元素" style="color:#ffae00">filter()</span>等高階函式使用。</p>
+<p>最後介紹<span data-tip="獨立的程式碼單元，可被其他程式 import 使用" style="color:#fa6dff">「模組（Module）」</span>，Python的強大之處在於龐大的生態系，用<span data-tip="匯入模組或套件的關鍵字，引入外部功能" style="color:#ffae00">import</span>引入模組：<span data-tip="匯入模組或套件的關鍵字，引入外部功能" style="color:#ffae00">import</span> math 後就能用 math.sqrt()、math.pi 等；<span data-tip="Python import 語句或 SQL FROM 子句" style="color:#ffae00">from</span> math <span data-tip="匯入模組或套件的關鍵字，引入外部功能" style="color:#ffae00">import</span> sqrt 則直接引入sqrt，不用加前綴。常用標準函式庫：<span style="color:#00eeff">os</span>（檔案系統）、<span style="color:#00eeff">random</span>（亂數）、<span style="color:#00eeff">datetime</span>（時間）、<span style="color:#00eeff">json</span>（JSON處理）。</p>
 </section>
-            <section id="section5">
-                <h2>5. 進階應用</h2>
-                <p>Python支援完整的<span style="color:#fa6dff">「物件導向（OOP）」</span>，用<span style="color:#ffae00">class</span>定義類別，語法是：<span style="color:#ffae00">class</span> <span style="color:#00eeff">Dog</span>: ...，建構子固定命名為<span style="color:#ffae00">__init__</span>，第一個參數固定是<span style="color:#ffae00">self</span>（代表物件本身），例如：<span style="color:#ffae00">def</span> <span style="color:#ffae00">__init__</span>(self, name): self.name = name。建立物件：myDog = <span style="color:#00eeff">Dog</span>(<span style="color:#00eeff">"旺財"</span>)。繼承語法：<span style="color:#ffae00">class</span> <span style="color:#00eeff">子類別</span>(<span style="color:#00eeff">父類別</span>): ...。</p>
-                <p>Python有很多<span style="color:#fa6dff">「魔術方法（Dunder Methods）」</span>，讓自訂類別支援內建運算子，例如：<span style="color:#ffae00">__str__</span>定義print時的顯示方式、<span style="color:#ffae00">__len__</span>讓len()可用、<span style="color:#ffae00">__add__</span>讓+運算子可用，這讓Python的OOP非常靈活。</p>
-                <p>Python的<span style="color:#fa6dff">「例外處理」</span>用<span style="color:#ffae00">try...except...finally</span>，語法是：<span style="color:#ffae00">try</span>: ... <span style="color:#ffae00">except</span> <span style="color:#00eeff">ValueError</span> <span style="color:#ffae00">as</span> e: <span style="color:#ffae00">print</span>(e) <span style="color:#ffae00">finally</span>: ...，可以針對不同型態的例外分別處理，用<span style="color:#ffae00">raise</span>手動拋出例外。</p>
-                <p>Python的<span style="color:#fa6dff">「檔案讀寫」</span>用<span style="color:#ffae00">open()</span>，推薦用<span style="color:#ffae00">with</span>語法，用完自動關閉：<span style="color:#ffae00">with</span> <span style="color:#ffae00">open</span>(<span style="color:#00eeff">'file.txt'</span>, <span style="color:#00eeff">'r'</span>, encoding=<span style="color:#00eeff">'utf-8'</span>) <span style="color:#ffae00">as</span> f: content = f.read()，模式有<span style="color:#ffae00">'r'</span>（讀）、<span style="color:#ffae00">'w'</span>（寫，覆蓋）、<span style="color:#ffae00">'a'</span>（附加）。</p>
-                <p>最後，Python最強大的是第三方套件生態系，用<span style="color:#ffae00">pip install 套件名</span>安裝，例如：<span style="color:#00eeff">numpy</span>（科學計算）、<span style="color:#00eeff">pandas</span>（資料分析）、<span style="color:#00eeff">matplotlib</span>（繪圖）、<span style="color:#00eeff">requests</span>（HTTP請求）、<span style="color:#00eeff">flask/django</span>（網頁框架）。掌握Python基礎後，選一個你有興趣的方向深入，你會發現Python的世界無邊無際！</p>
+<section id="section5">
+<h2>5. 進階應用</h2>
+<p>Python支援完整的<span data-tip="以物件為中心、強調封裝繼承多型的程式設計範式" style="color:#fa6dff">「物件導向（OOP）」</span>，用<span data-tip="類別定義關鍵字，封裝屬性和方法的物件導向基本單元" style="color:#ffae00">class</span>定義類別，語法是：<span data-tip="類別定義關鍵字，封裝屬性和方法的物件導向基本單元" style="color:#ffae00">class</span> <span style="color:#00eeff">Dog</span>: ...，建構子固定命名為<span data-tip="Python 類別建構子，建立物件時自動呼叫進行初始化" style="color:#ffae00">__init__</span>，第一個參數固定是<span data-tip="Python 方法的第一個參數，指向物件本身的參考" style="color:#ffae00">self</span>（代表物件本身），例如：<span data-tip="Python 函式定義關鍵字，宣告一個可重複呼叫的函式" style="color:#ffae00">def</span> <span data-tip="Python 類別建構子，建立物件時自動呼叫進行初始化" style="color:#ffae00">__init__</span>(self, name): self.name = name。建立物件：myDog = <span style="color:#00eeff">Dog</span>(<span style="color:#00eeff">"旺財"</span>)。繼承語法：<span data-tip="類別定義關鍵字，封裝屬性和方法的物件導向基本單元" style="color:#ffae00">class</span> <span style="color:#00eeff">子類別</span>(<span style="color:#00eeff">父類別</span>): ...。</p>
+<p>Python有很多<span data-tip="Python 雙底線方法（__init__ 等），定義物件的特殊行為" style="color:#fa6dff">「魔術方法（Dunder Methods）」</span>，讓自訂類別支援內建運算子，例如：<span data-tip="Python 魔術方法，定義物件轉換為字串時的顯示格式" style="color:#ffae00">__str__</span>定義print時的顯示方式、<span data-tip="Python 魔術方法，定義 len() 函式對物件的行為" style="color:#ffae00">__len__</span>讓len()可用、<span data-tip="Python 魔術方法，定義物件的 + 運算子行為" style="color:#ffae00">__add__</span>讓+運算子可用，這讓Python的OOP非常靈活。</p>
+<p>Python的<span data-tip="捕捉並妥善處理程式執行時錯誤的機制" style="color:#fa6dff">「例外處理」</span>用<span style="color:#ffae00">try...except...finally</span>，語法是：<span data-tip="例外處理關鍵字，包裹可能發生錯誤的程式碼" style="color:#ffae00">try</span>: ... <span data-tip="Python 例外捕捉關鍵字，處理 try 區塊中發生的例外" style="color:#ffae00">except</span> <span style="color:#00eeff">ValueError</span> <span data-tip="Python/C# 型態轉換或別名關鍵字" style="color:#ffae00">as</span> e: <span data-tip="輸出函式關鍵字，將訊息顯示到終端機" style="color:#ffae00">print</span>(e) <span data-tip="例外處理關鍵字，無論是否發生例外都一定會執行的區塊" style="color:#ffae00">finally</span>: ...，可以針對不同型態的例外分別處理，用<span data-tip="Python 主動拋出例外的關鍵字" style="color:#ffae00">raise</span>手動拋出例外。</p>
+<p>Python的<span data-tip="程式讀取或寫入磁碟上檔案的操作" style="color:#fa6dff">「檔案讀寫」</span>用<span data-tip="Python 內建函式，開啟檔案並回傳檔案物件" style="color:#ffae00">open()</span>，推薦用<span data-tip="Python 上下文管理語法，自動處理資源的開啟與關閉" style="color:#ffae00">with</span>語法，用完自動關閉：<span data-tip="Python 上下文管理語法，自動處理資源的開啟與關閉" style="color:#ffae00">with</span> <span style="color:#ffae00">open</span>(<span style="color:#00eeff">'file.txt'</span>, <span style="color:#00eeff">'r'</span>, encoding=<span style="color:#00eeff">'utf-8'</span>) <span data-tip="Python/C# 型態轉換或別名關鍵字" style="color:#ffae00">as</span> f: content = f.read()，模式有<span style="color:#ffae00">'r'</span>（讀）、<span style="color:#ffae00">'w'</span>（寫，覆蓋）、<span style="color:#ffae00">'a'</span>（附加）。</p>
+<p>最後，Python最強大的是第三方套件生態系，用<span style="color:#ffae00">pip install 套件名</span>安裝，例如：<span style="color:#00eeff">numpy</span>（科學計算）、<span style="color:#00eeff">pandas</span>（資料分析）、<span style="color:#00eeff">matplotlib</span>（繪圖）、<span style="color:#00eeff">requests</span>（HTTP請求）、<span style="color:#00eeff">flask/django</span>（網頁框架）。掌握Python基礎後，選一個你有興趣的方向深入，你會發現Python的世界無邊無際！</p>
 </section>
-        </main>
-        <div style="height: 60px;"></div> 
-        <p>最後這裡提供一個用GoogleAI(Gemini)NotebookLM製作的教學綱要簡報簡報，下載起來，方便需要時做迅速的統整和複習~</p>
-        <a href="python_2026_Performance_Revolution.pdf" download class="download-btn">立即下載檔案</a>
-    <script>
-        const navLinks = document.querySelectorAll('.nav-link');
-        const sections = document.querySelectorAll('section');
-        window.addEventListener('scroll', () => {
-            let current = '';
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                const sectionHeight = section.clientHeight;
-                if (window.pageYOffset >= (sectionTop - 100)) {
-                    current = section.getAttribute('id');
-                }
-            });
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href').includes(current)) {
-                    link.classList.add('active');
-                }
-            });
-        });
-    </script>
-    </header>
-    <div id="gdbFloatWindow">
-        <div class="window-header" id="dragHandle">
-            <span class="window-title">GDB</span>
-            <span class="close-btn" onclick="toggleGdbWindow()">&times;</span>
-        </div>
-        <div class="window-content">
-            <iframe 
-                id="gdbFrame"
-                data-src="https://www.onlinegdb.com/"
-                src="https://www.onlinegdb.com/"
-                sandbox="allow-forms allow-scripts allow-same-origin allow-popups">
-            </iframe>
-        </div>
-    </div>
-    <script>
+<div style="margin-top: 40px; padding: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px;">
+<p style="color: var(--muted); margin-bottom: 16px;">📄 最後這裡提供一個用GoogleAI(Gemini)NotebookLM製作的教學綱要簡報簡報，下載起來，方便需要時做迅速的統整和複習~</p>
+<a class="download-btn" download="" href="python_2026_Performance_Revolution.pdf">立即下載檔案</a>
+</div>
+</div>
+</div>
+<!-- GDB Float Window -->
+<div id="gdbFloatWindow">
+<div class="window-header" id="dragHandle">
+<span class="window-title">⌨ GDB Online</span>
+<span class="close-btn" onclick="toggleGdbWindow()">×</span>
+</div>
+<div class="window-content">
+<iframe id="gdbFrame" sandbox="allow-forms allow-scripts allow-same-origin allow-popups" src="https://www.onlinegdb.com/"></iframe>
+</div>
+</div>
+<script src="shared.js"></script>
+<script>
         const floatWindow = document.getElementById('gdbFloatWindow');
-        const iframe = document.getElementById('gdbFrame');
-        const dragHandle = document.getElementById('dragHandle');
+        const dragHandle  = document.getElementById('dragHandle');
         function toggleGdbWindow() {
-            if (floatWindow.style.display === 'flex') {
-                floatWindow.style.display = 'none';
-            } else {
-                floatWindow.style.display = 'flex';
-                if (iframe.getAttribute('src') === "") {
-                    iframe.setAttribute('src', iframe.getAttribute('data-src'));
-                }
-            }
+            floatWindow.style.display = floatWindow.style.display === 'flex' ? 'none' : 'flex';
         }
-        let isDragging = false;
-        let startX, startY, initialLeft, initialTop;
-        dragHandle.addEventListener('mousedown', function(e) {
+        let isDragging = false, startX, startY, initLeft, initTop;
+        dragHandle.addEventListener('mousedown', e => {
             isDragging = true;
-            startX = e.clientX;
-            startY = e.clientY;
-            const rect = floatWindow.getBoundingClientRect();
-            initialLeft = rect.left;
-            initialTop = rect.top;
+            startX = e.clientX; startY = e.clientY;
+            const r = floatWindow.getBoundingClientRect();
+            initLeft = r.left; initTop = r.top;
             floatWindow.classList.add('is-dragging');
         });
-        document.addEventListener('mousemove', function(e) {
-            if (isDragging) {
-                const dx = e.clientX - startX;
-                const dy = e.clientY - startY;
-                floatWindow.style.left = `${initialLeft + dx}px`;
-                floatWindow.style.top = `${initialTop + dy}px`;
-                floatWindow.style.right = 'auto'; 
-            }
+        document.addEventListener('mousemove', e => {
+            if (!isDragging) return;
+            floatWindow.style.left = `${initLeft + e.clientX - startX}px`;
+            floatWindow.style.top  = `${initTop  + e.clientY - startY}px`;
+            floatWindow.style.right = 'auto';
         });
-        document.addEventListener('mouseup', function() {
+        document.addEventListener('mouseup', () => {
             isDragging = false;
             floatWindow.classList.remove('is-dragging');
         });
     </script>
+<script src="tooltips.js"></script>
 </body>
 </html>

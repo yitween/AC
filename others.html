@@ -3,178 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AC_OTHERS</title>
+    <title>AC — 其他</title>
     <link rel="icon" href="螢幕擷取畫面 2026-01-05 125529.png" sizes="48x48" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="shared.css">
     <style>
-        body {
-            background-color: rgb(20, 20, 20);
-            color: white;
-            font-family: "Microsoft JhengHei", sans-serif;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        /* coming-soon card */
+        .coming-soon {
+            display: inline-flex; align-items: center; gap: 10px;
+            background: rgba(250,161,28,0.1);
+            border: 1px dashed rgba(250,161,28,0.4);
+            border-radius: 8px; padding: 14px 20px;
+            color: #faa11c; font-size: 0.95rem;
+            margin-top: 8px;
         }
-        .back-button {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            text-decoration: none;
-            color: aquamarine;
-            border: 1px solid aquamarine;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: all 0.3s;
-            z-index: 1000;
-        }
-        .back-button:hover {
-            background-color: aquamarine;
-            color: black;
-        }
-        .content {
-            max-width: 800px;
-            text-align: center;
-            margin-top: 50px;
-        }
-        h1 { color: aquamarine; font-size: 3rem; margin-bottom: 10px; }
-        p { font-size: 1.2rem; line-height: 1.6; color: #ddd; }
-        .big-logo {
-            width: 150px;
-            height: 150px;
-            object-fit: contain;
-            margin-bottom: 20px;
-        }
-        html {
-            scroll-behavior: smooth;
-        }
-        .sidebar {
-            width: 200px;
-            height: 100vh;
-            position: fixed; 
-            top: 0;
-            left: 0;
-            background-color: #faa11cd0;
-            padding: 20px;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            overflow-y: auto;
-        }
-        .sidebar ul {
-            list-style: none;
-            padding: 0;
-        }
-        .sidebar li {
-            margin-bottom: 15px;
-        }
-        .sidebar a {
-            text-decoration: none;
-            color: #333;
-            display: block;
-            padding: 8px 12px;
-            border-left: 4px solid transparent; 
-            transition: all 0.3s;
-        }
-        .sidebar a:hover {
-            background-color: #faa11cd0;
-        }
-        .sidebar a.active {
-            color: #007bff;    
-            font-weight: bold;
-            border-left: 4px solid #007bff;
-            background-color: #faa11cd0;
-        }
-        .content {
-            margin-left: 240px;
-            padding: 40px;
-            max-width: 800px;
-        }
-        section {
-            min-height: 80vh; 
-            padding-top: 20px;
-            border-bottom: 1px solid #faa11cd0;
-        }
-        h2 {
-            margin-top: 0;
-        }
-        .nav-menu {
-            display: flex;
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-        .nav-menu li {
-            margin-left: 20px;
-        }
-        .nav-menu a {
-            text-decoration: none;
-            color: #ccc;
-            font-size: 1rem;
-            padding: 5px 10px;
-            border-radius: 4px;
-            transition: all 0.3s;
-        }
-        .nav-menu a:hover {
-            color: white;
-            background-color: rgba(255,255,255,0.1);
-        }
-        .nav-menu a.active {
-            color: #fff;
-            background-color: #007bff; 
-            font-weight: bold;
-        }
+        .coming-soon::before { content: '🚧'; font-size: 1.2rem; }
     </style>
 </head>
 <body>
-    <ul class="nav-menu">
-            <li><a href="index.html" class="nav-link">首頁</a></li>
-            <li><a href="guide.html" class="nav-link">網站導覽</a></li>
-            <li><a href="about.html" class="nav-link">關於我們</a></li>
-            <li><a href="others.html" class="nav-link">其他</a></li>
-        </ul>
-    <a href="index.html" class="back-button">← 回首頁</a>
-    <nav class="sidebar">
-        <div style="height: 30px;"></div>
-        <h3>章節目錄</h3>
-        <ul>
-            <li><a href="#section1" class="nav-link">1. 輔助題庫</a></li>
-            <li><a href="#section2" class="nav-link">2. 線上課程</a></li>
+
+    <nav class="top-nav">
+        <a href="index.html" class="back">← 回首頁</a>
+        <ul class="nav-menu">
+            <li><a href="index.html">首頁</a></li>
+            <li><a href="guide.html">網站導覽</a></li>
+            <li><a href="about.html">關於我們</a></li>
+            <li><a href="others.html">其他</a></li>
         </ul>
     </nav>
-    <header>
-        <div class="content">
-        <h1>其他</h1>
-        <hr style="border-color: #333; margin: 20px 0;">
-        <div style="height: 30px;"></div>
-        <main class="content">
+
+    <div class="layout">
+        <nav class="sidebar">
+            <h3>章節目錄</h3>
+            <ul>
+                <li><a href="#section1">1. 輔助題庫</a></li>
+                <li><a href="#section2">2. 線上課程</a></li>
+            </ul>
+        </nav>
+
+        <div class="main-content">
+            <h1 class="page-title">其他</h1>
+            <hr class="page-divider">
+
             <section id="section1">
                 <h2>1. 輔助題庫</h2>
-                <p>敬請期待</p>
+                <div class="coming-soon">敬請期待，內容建置中</div>
             </section>
+
             <section id="section2">
                 <h2>2. 線上課程</h2>
-                <p>敬請期待</p>
+                <div class="coming-soon">敬請期待，內容建置中</div>
             </section>
-        </main>
-    <script>
-        const navLinks = document.querySelectorAll('.nav-link');
-        const sections = document.querySelectorAll('section');
-        window.addEventListener('scroll', () => {
-            let current = '';
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                const sectionHeight = section.clientHeight;
-                if (window.pageYOffset >= (sectionTop - 100)) {
-                    current = section.getAttribute('id');
-                }
-            });
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href').includes(current)) {
-                    link.classList.add('active');
-                }
-            });
-        });
-    </script>
-    </header>
+        </div>
+    </div>
+
+    <script src="shared.js"></script>
 </body>
 </html>

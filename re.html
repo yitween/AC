@@ -1,198 +1,257 @@
 <!DOCTYPE html>
+
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AC_REAR_END</title>
-    <link rel="icon" href="螢幕擷取畫面 2026-01-05 125529.png" sizes="48x48" type="image/png">
-    <style>
-        body {
-            background-color: rgb(20, 20, 20);
-            color: white;
-            font-family: "Microsoft JhengHei", sans-serif;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AC — REAR_END</title>
+<link href="螢幕擷取畫面 2026-01-05 125529.png" rel="icon" sizes="48x48" type="image/png"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="shared.css" rel="stylesheet"/>
+<style>
+        /* ── GDB FLOAT WINDOW ── */
+        #gdbFloatWindow {
+            display: none; position: fixed;
+            top: 100px; right: 50px;
+            width: 600px; height: 500px;
+            background: #1e1e1e;
+            border: 1px solid #444; border-radius: 10px;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.6);
+            z-index: 2000; flex-direction: column;
+            overflow: hidden; resize: both;
+            min-width: 320px; min-height: 250px;
+            max-width: 95vw; max-height: 95vh;
         }
-        .back-button {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            text-decoration: none;
-            color: aquamarine;
-            border: 1px solid aquamarine;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: all 0.3s;
-            z-index: 1000;
+        .window-header {
+            height: 40px; background: #2a2a2a;
+            display: flex; align-items: center;
+            justify-content: space-between;
+            padding: 0 14px; cursor: move;
+            border-bottom: 1px solid #444;
+            user-select: none; flex-shrink: 0;
         }
-        .back-button:hover {
-            background-color: aquamarine;
-            color: black;
+        .window-title {
+            color: #ccc; font-weight: 700; font-size: 0.85rem;
+            font-family: 'JetBrains Mono', monospace;
         }
-        .content {
-            max-width: 800px;
-            text-align: center;
-            margin-top: 50px;
+        .close-btn {
+            color: #888; font-size: 22px; cursor: pointer;
+            line-height: 1; transition: color 0.2s;
         }
-        h1 { color: aquamarine; font-size: 3rem; margin-bottom: 10px; }
-        p { font-size: 1.2rem; line-height: 1.6; color: #ddd; }
-        .big-logo {
-            width: 150px;
-            height: 150px;
-            object-fit: contain;
-            margin-bottom: 20px;
+        .close-btn:hover { color: #f87171; }
+        .window-content { flex: 1; height: calc(100% - 40px); }
+        .window-content iframe { width: 100%; height: 100%; border: none; }
+        .is-dragging iframe { pointer-events: none; }
+        /* ── PAGE HERO ── */
+        .page-hero {
+            display: flex; align-items: center; gap: 20px;
+            margin-bottom: 24px;
         }
-        html {
-            scroll-behavior: smooth;
+        .page-hero img {
+            width: 72px; height: 72px; object-fit: contain;
+            border-radius: 12px; background: rgba(255,255,255,0.04);
+            padding: 8px; border: 1px solid var(--border);
+            box-shadow: none; margin: 0;
         }
-        .sidebar {
-            width: 200px;
-            height: 100vh;
-            position: fixed; 
-            top: 0;
-            left: 0;
-            background-color: #faa11cd0;
-            padding: 20px;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            overflow-y: auto;
+        .page-hero h1 {
+            font-size: clamp(1.8rem, 4vw, 2.4rem);
+            color: var(--accent); font-weight: 700; margin: 0;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 0.03em;
         }
-        .sidebar ul {
-            list-style: none;
-            padding: 0;
+        /* ── DOWNLOAD BUTTON ── */
+        .download-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            margin-top: 32px; padding: 12px 24px;
+            background: #1d4ed8; color: #fff;
+            text-decoration: none; border-radius: 8px;
+            font-weight: 700; font-size: 0.9rem;
+            transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
         }
-        .sidebar li {
-            margin-bottom: 15px;
+        .download-btn::before { content: '⬇'; }
+        .download-btn:hover {
+            background: #2563eb; transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(29,78,216,0.35);
         }
-        .sidebar a {
-            text-decoration: none;
-            color: #333;
-            display: block;
-            padding: 8px 12px;
-            border-left: 4px solid transparent; 
-            transition: all 0.3s;
+        .download-btn:active { transform: translateY(0); }
+        /* ── GDB INLINE BTN ── */
+        .gdb-inline {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 16px; background: transparent;
+            color: var(--accent); border: 1px solid var(--accent);
+            border-radius: 6px; cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700; font-size: 0.85rem;
+            transition: background 0.2s, color 0.2s, transform 0.15s;
+            margin-left: 8px;
         }
-        .sidebar a:hover {
-            background-color: #faa11cd0;
+        .gdb-inline:hover {
+            background: var(--accent); color: #111;
+            transform: translateY(-1px);
         }
-        .sidebar a.active {
-            color: #007bff;    
-            font-weight: bold;
-            border-left: 4px solid #007bff;
-            background-color: #faa11cd0;
-        }
-        .content {
-            margin-left: 240px;
-            padding: 40px;
-            max-width: 800px;
-        }
-        section {
-            min-height: 80vh; 
-            padding-top: 20px;
-            border-bottom: 1px solid #faa11cd0;
-        }
-        h2 {
-            margin-top: 0;
-        }
+        .gdb-inline:active { transform: translateY(0); }
     </style>
-</head>
+<style>
+/* ── TOOLTIP ── */
+[data-tip] {
+    position: relative;
+    cursor: help;
+    text-decoration: underline dotted currentColor;
+    text-underline-offset: 3px;
+}
+[data-tip]::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e1e2e;
+    color: #e0e0e0;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    white-space: normal;
+    width: max-content;
+    max-width: 260px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(127,255,212,0.25);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    transform: translateX(-50%) translateY(4px);
+    z-index: 9999;
+}
+[data-tip]:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+/* arrow */
+[data-tip]::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 2px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: rgba(127,255,212,0.25);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.18s ease;
+    z-index: 9999;
+}
+[data-tip]:hover::before { opacity: 1; }
+</style></head>
 <body>
-    <a href="index.html" class="back-button">← 回首頁</a>
-    <nav class="sidebar">
-        <div style="height: 30px;"></div>
-        <h3>章節目錄</h3>
-        <ul>
-            <li><a href="#section1" class="nav-link">1. Rust — 記憶體安全的系統語言</a></li>
-            <li><a href="#section2" class="nav-link">2. Go — 簡潔高效的雲端語言</a></li>
-            <li><a href="#section3" class="nav-link">3. Kotlin — 現代 Android 開發</a></li>
-            <li><a href="#section4" class="nav-link">4. Swift — Apple 生態系的現代語言</a></li>
-            <li><a href="#section5" class="nav-link">5. Ruby — 優雅的腳本語言</a></li>
-        </ul>
-    </nav>
-    <header>
-        <div class="content">
-        <img src="re.png" class="big-logo">
-        <h1>REAR_END</h1>
-        <hr style="border-color: #333; margin: 20px 0;">
-        <div style="height: 50px;"></div>
-        <center>
-            <p style="color:#ddd;font-size:2rem"><B><I>Try Code Here!</I></B></p>
-        </center>
-        <div style="height: 30px;"></div>
-        <div style="max-width: 90%; margin: 0 auto; box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);">
-            <iframe 
-                src="https://www.onlinegdb.com/" 
-                width="100%" 
-                height="600px" 
-                frameborder="0" 
-                style="border-radius: 10px; border: 1px solid #333;"
-                allowfullscreen>
-            </iframe>
-        <div style="height: 50px;"></div>
-        <main class="content">
-            <section id="section1">
-                <h2>1. Rust — 記憶體安全的系統語言</h2>
-                <p><span style="color:#fa6dff">「Rust」</span>是Mozilla於2010年開發的系統程式語言，目標是同時擁有C/C++的效能和記憶體控制力，又避免C/C++常見的記憶體安全問題（緩衝區溢位、懸空指標、資料競爭）。Rust連續多年在Stack Overflow開發者調查中被選為「最受喜愛的程式語言」，是近年最受矚目的新興語言。</p>
-                <p>Rust的核心概念是<span style="color:#ffae00">所有權（Ownership）</span>：每個值只有一個擁有者，擁有者離開scope時值自動被釋放，不需要垃圾回收器（GC），也不需要手動free。<span style="color:#ffae00">借用（Borrowing）</span>規則：可以有多個不可變參考（&T），或剛好一個可變參考（&mut T），不能同時兩者存在——這讓編譯器在編譯期就能防止資料競爭。</p>
-                <p>Rust的語法現代化：<span style="color:#ffae00">let x = 5;</span>（不可變，預設）；<span style="color:#ffae00">let mut y = 5;</span>（可變）；函式：<span style="color:#ffae00">fn add(a: i32, b: i32) -&gt; i32 { a + b }</span>（最後一行運算式自動回傳，不需要return）；強大的模式匹配：<span style="color:#ffae00">match value { 1 =&gt; "one", 2 =&gt; "two", _ =&gt; "other" }</span>；<span style="color:#ffae00">Option&lt;T&gt;</span>和<span style="color:#ffae00">Result&lt;T, E&gt;</span>強制處理「可能沒有值」和「可能出錯」的情況，消滅null pointer例外。</p>
-                <p>Rust的應用領域：<span style="color:#ffee00fa">系統程式設計</span>（作業系統、驅動程式）；<span style="color:#ffee00fa">WebAssembly</span>（跑在瀏覽器裡的高效能程式）；<span style="color:#ffee00fa">網路服務</span>（Actix-web框架效能跑分常年名列前茅）；Linux核心已開始接受Rust程式碼（繼C之後第二個被接受的語言）；<span style="color:#ffae00">Cloudflare、Discord、Dropbox</span>都在用Rust重寫效能關鍵部分。</p>
-                <p>學習Rust的資源：官方書《<span style="color:#ffae00">The Rust Programming Language</span>》（rustbook，免費線上版）是最好的入門教材；<span style="color:#ffae00">Rustlings</span>是互動式練習，適合動手學習；<span style="color:#ffae00">cargo</span>是Rust的套件管理器和建置工具，<span style="color:#ffae00">cargo new project</span>建立新專案，<span style="color:#ffae00">cargo run</span>編譯執行，體驗非常流暢。Rust學習曲線陡峭，但掌握後對底層理解會大幅提升！</p>
+<nav class="top-nav">
+<a class="back" href="index.html">← 回首頁</a>
+<ul class="nav-menu">
+<li><a href="index.html">首頁</a></li>
+<li><a href="guide.html">網站導覽</a></li>
+<li><a href="about.html">關於我們</a></li>
+<li><a href="others.html">其他</a></li>
+<li><button class="gdb-inline" onclick="toggleGdbWindow()">⌨ GDB</button></li>
+</ul>
+</nav>
+<div class="layout">
+<nav class="sidebar">
+<h3>章節目錄</h3>
+<ul>
+<li><a href="#section1">1. Rust — 記憶體安全的系統語言</a></li>
+<li><a href="#section2">2. Go — 簡潔高效的雲端語言</a></li>
+<li><a href="#section3">3. Kotlin — 現代 Android 開發</a></li>
+<li><a href="#section4">4. Swift — Apple 生態系的現代語言</a></li>
+<li><a href="#section5">5. Ruby — 優雅的腳本語言</a></li>
+</ul>
+</nav>
+<div class="main-content">
+<div class="page-hero">
+<img alt="REAR_END" src="re.png"/>
+<h1>REAR_END</h1>
+</div>
+<hr class="page-divider"/>
+<section id="section1">
+<h2>1. Rust — 記憶體安全的系統語言</h2>
+<p><span data-tip="系統程式語言，以記憶體安全和高效能著稱，無需垃圾回收" style="color:#fa6dff">「Rust」</span>是Mozilla於2010年開發的系統程式語言，目標是同時擁有C/C++的效能和記憶體控制力，又避免C/C++常見的記憶體安全問題（緩衝區溢位、懸空指標、資料競爭）。Rust連續多年在Stack Overflow開發者調查中被選為「最受喜愛的程式語言」，是近年最受矚目的新興語言。</p>
+<p>Rust的核心概念是<span data-tip="Rust 記憶體管理機制，每個值只有一個擁有者" style="color:#ffae00">所有權（Ownership）</span>：每個值只有一個擁有者，擁有者離開scope時值自動被釋放，不需要垃圾回收器（GC），也不需要手動free。<span data-tip="Rust 語言概念，臨時借用值的參考而不轉移所有權" style="color:#ffae00">借用（Borrowing）</span>規則：可以有多個不可變參考（&amp;T），或剛好一個可變參考（&amp;mut T），不能同時兩者存在——這讓編譯器在編譯期就能防止資料競爭。</p>
+<p>Rust的語法現代化：<span style="color:#ffae00">let x = 5;</span>（不可變，預設）；<span style="color:#ffae00">let mut y = 5;</span>（可變）；函式：<span style="color:#ffae00">fn add(a: i32, b: i32) -&gt; i32 { a + b }</span>（最後一行運算式自動回傳，不需要return）；強大的模式匹配：<span style="color:#ffae00">match value { 1 =&gt; "one", 2 =&gt; "two", _ =&gt; "other" }</span>；<span style="color:#ffae00">Option&lt;T&gt;</span>和<span style="color:#ffae00">Result&lt;T, E&gt;</span>強制處理「可能沒有值」和「可能出錯」的情況，消滅null pointer例外。</p>
+<p>Rust的應用領域：<span style="color:#ffee00fa">系統程式設計</span>（作業系統、驅動程式）；<span style="color:#ffee00fa">WebAssembly</span>（跑在瀏覽器裡的高效能程式）；<span style="color:#ffee00fa">網路服務</span>（Actix-web框架效能跑分常年名列前茅）；Linux核心已開始接受Rust程式碼（繼C之後第二個被接受的語言）；<span style="color:#ffae00">Cloudflare、Discord、Dropbox</span>都在用Rust重寫效能關鍵部分。</p>
+<p>學習Rust的資源：官方書《<span style="color:#ffae00">The Rust Programming Language</span>》（rustbook，免費線上版）是最好的入門教材；<span style="color:#ffae00">Rustlings</span>是互動式練習，適合動手學習；<span data-tip="Rust 的套件管理器與建置工具" style="color:#ffae00">cargo</span>是Rust的套件管理器和建置工具，<span style="color:#ffae00">cargo new project</span>建立新專案，<span style="color:#ffae00">cargo run</span>編譯執行，體驗非常流暢。Rust學習曲線陡峭，但掌握後對底層理解會大幅提升！</p>
 </section>
-            <section id="section2">
-                <h2>2. Go — 簡潔高效的雲端語言</h2>
-                <p><span style="color:#fa6dff">「Go（Golang）」</span>是Google於2009年開發的語言，設計目標是：像C一樣快、像Python一樣易寫、內建原生的並發支援。Go語法極其簡潔——沒有繼承、沒有泛型（1.18才加入）、沒有例外（exception）——這種「少即是多」的設計哲學讓程式碼風格統一，維護容易。Go是Kubernetes、Docker、Prometheus等雲端基礎設施的主要語言。</p>
-                <p>Go的特色語法：<span style="color:#ffae00">:=</span>（短變數宣告，自動推斷型態）；函式可以回傳多個值：<span style="color:#ffae00">func divide(a, b float64) (float64, error)</span>；Go用回傳值處理錯誤，慣例是最後一個回傳值是error：<span style="color:#ffae00">result, err := divide(10, 2); if err != nil { ... }</span>，這和Rust的Result不同但同樣強制處理錯誤。<span style="color:#ffae00">defer</span>關鍵字讓函式結束時才執行（常用來關閉資源）。</p>
-                <p>Go最強大的特性是<span style="color:#fa6dff">「Goroutine 與 Channel」</span>——Go原生的並發機制。Goroutine是極輕量的並發單元（比Thread輕很多），用<span style="color:#ffae00">go func()</span>就能啟動，可以輕鬆跑幾萬個；Channel是Goroutine之間溝通的管道：<span style="color:#ffae00">ch := make(chan int)</span>建立，<span style="color:#ffae00">ch &lt;- 42</span>送資料，<span style="color:#ffae00">&lt;-ch</span>收資料，Go的設計哲學是「<span style="color:#ffee00fa">不要用共享記憶體來溝通，用溝通來共享記憶體</span>」。</p>
-                <p>Go的工具鏈：<span style="color:#ffae00">go build</span>編譯成單一靜態執行檔（不依賴外部函式庫，部署超簡單）；<span style="color:#ffae00">go fmt</span>自動格式化程式碼（全語言統一風格，不用爭論縮排）；<span style="color:#ffae00">go test</span>執行測試；<span style="color:#ffae00">go mod</span>管理套件依賴。常用框架：<span style="color:#ffae00">Gin</span>（Web框架）、<span style="color:#ffae00">GORM</span>（ORM）。</p>
-                <p>Go的適用場景：<span style="color:#ffee00fa">高並發後端服務</span>（API Server、微服務）；<span style="color:#ffee00fa">雲端基礎設施工具</span>（CLI工具、DevOps工具）；<span style="color:#ffee00fa">網路程式</span>（代理、負載平衡）。如果你會Python做後端，學Go能讓你做出效能高10倍以上的後端；如果你會C++，Go讓你用更簡潔的語法做伺服器開發。Google、Uber、Twitch的核心後端都大量使用Go。</p>
+<section id="section2">
+<h2>2. Go — 簡潔高效的雲端語言</h2>
+<p><span data-tip="Google 開發的靜態型別語言，以高效並發與簡潔語法著稱" style="color:#fa6dff">「Go（Golang）」</span>是Google於2009年開發的語言，設計目標是：像C一樣快、像Python一樣易寫、內建原生的並發支援。Go語法極其簡潔——沒有繼承、沒有泛型（1.18才加入）、沒有例外（exception）——這種「少即是多」的設計哲學讓程式碼風格統一，維護容易。Go是Kubernetes、Docker、Prometheus等雲端基礎設施的主要語言。</p>
+<p>Go的特色語法：<span style="color:#ffae00">:=</span>（短變數宣告，自動推斷型態）；函式可以回傳多個值：<span style="color:#ffae00">func divide(a, b float64) (float64, error)</span>；Go用回傳值處理錯誤，慣例是最後一個回傳值是error：<span style="color:#ffae00">result, err := divide(10, 2); if err != nil { ... }</span>，這和Rust的Result不同但同樣強制處理錯誤。<span data-tip="Go 關鍵字，延遲函式執行到外層函式返回前" style="color:#ffae00">defer</span>關鍵字讓函式結束時才執行（常用來關閉資源）。</p>
+<p>Go最強大的特性是<span data-tip="Go 語言的輕量級並發原語，goroutine 執行任務，channel 傳遞資料" style="color:#fa6dff">「Goroutine 與 Channel」</span>——Go原生的並發機制。Goroutine是極輕量的並發單元（比Thread輕很多），用<span data-tip="Go 語法，啟動一個新的 goroutine 並發執行" style="color:#ffae00">go func()</span>就能啟動，可以輕鬆跑幾萬個；Channel是Goroutine之間溝通的管道：<span style="color:#ffae00">ch := make(chan int)</span>建立，<span style="color:#ffae00">ch &lt;- 42</span>送資料，<span data-tip="Go 語言語法，從 channel ch 接收資料" style="color:#ffae00">&lt;-ch</span>收資料，Go的設計哲學是「<span style="color:#ffee00fa">不要用共享記憶體來溝通，用溝通來共享記憶體</span>」。</p>
+<p>Go的工具鏈：<span data-tip="Go 指令，編譯當前套件並產生可執行檔" style="color:#ffae00">go build</span>編譯成單一靜態執行檔（不依賴外部函式庫，部署超簡單）；<span style="color:#ffae00">go fmt</span>自動格式化程式碼（全語言統一風格，不用爭論縮排）；<span data-tip="Go 內建測試指令，執行所有測試函式" style="color:#ffae00">go test</span>執行測試；<span data-tip="Go 模組管理指令，初始化或管理專案依賴" style="color:#ffae00">go mod</span>管理套件依賴。常用框架：<span data-tip="Go 語言高效能 Web 框架，路由速度快且 API 設計簡潔" style="color:#ffae00">Gin</span>（Web框架）、<span data-tip="Go 語言 ORM 框架，用物件方式操作資料庫而不需手寫 SQL" style="color:#ffae00">GORM</span>（ORM）。</p>
+<p>Go的適用場景：<span style="color:#ffee00fa">高並發後端服務</span>（API Server、微服務）；<span style="color:#ffee00fa">雲端基礎設施工具</span>（CLI工具、DevOps工具）；<span style="color:#ffee00fa">網路程式</span>（代理、負載平衡）。如果你會Python做後端，學Go能讓你做出效能高10倍以上的後端；如果你會C++，Go讓你用更簡潔的語法做伺服器開發。Google、Uber、Twitch的核心後端都大量使用Go。</p>
 </section>
-            <section id="section3">
-                <h2>3. Kotlin — 現代 Android 開發</h2>
-                <p><span style="color:#fa6dff">「Kotlin」</span>是JetBrains（IntelliJ IDEA的開發商）於2011年推出的語言，2017年被Google宣布為Android開發的官方語言，目前新的Android App幾乎都用Kotlin開發。Kotlin完全相容Java（可以和Java程式碼互相呼叫），語法更現代簡潔，消除了Java很多繁瑣的部分。</p>
-                <p>Kotlin vs Java的改進：<span style="color:#ffae00">Null Safety</span>——Kotlin的型態系統區分可為null（<span style="color:#ffae00">String?</span>）和不可為null（<span style="color:#ffae00">String</span>），編譯期就防止NullPointerException（Java最常見的崩潰原因）；<span style="color:#ffae00">資料類別（data class）</span>：<span style="color:#ffae00">data class User(val name: String, val age: Int)</span>一行就自動產生equals()、hashCode()、toString()、copy()，Java需要幾十行；<span style="color:#ffae00">擴展函式</span>讓你為既有class加方法，不用繼承。</p>
-                <p>Kotlin的語法特色：<span style="color:#ffae00">val</span>（不可變，類似Java的final）/ <span style="color:#ffae00">var</span>（可變）；字串模板：<span style="color:#ffae00">"Hello $name"</span>；<span style="color:#ffae00">when</span>（強化版switch）；<span style="color:#ffae00">?.（安全呼叫）</span>和<span style="color:#ffae00">?:（Elvis運算子）</span>優雅處理null：<span style="color:#ffae00">user?.name ?: "訪客"</span>；<span style="color:#ffae00">Lambda</span>和高階函式（map、filter、reduce）語法更優雅。</p>
-                <p>Android開發用Kotlin：搭配<span style="color:#ffae00">Jetpack Compose</span>（現代宣告式UI框架，類似React的概念）可以用純Kotlin描述UI；<span style="color:#ffae00">Coroutines</span>（協程）是Kotlin的非同步方案，比Java的Thread或Callback Hell優雅很多；<span style="color:#ffae00">Android Studio</span>是官方IDE（基於IntelliJ），對Kotlin有完整支援。</p>
-                <p>Kotlin Multiplatform（KMP）是未來的方向：讓你用Kotlin同時開發Android和iOS的共用業務邏輯（甚至Web），只有UI層分開寫，是解決跨平台開發的新解法。Kotlin也可以做後端（<span style="color:#ffae00">Ktor框架</span>）和前端（<span style="color:#ffae00">Kotlin/JS</span>）。如果你有興趣做App開發，Kotlin是現在最值得學習的選擇！</p>
+<section id="section3">
+<h2>3. Kotlin — 現代 Android 開發</h2>
+<p><span data-tip="JVM 語言，是 Android 官方首選開發語言，語法簡潔安全" style="color:#fa6dff">「Kotlin」</span>是JetBrains（IntelliJ IDEA的開發商）於2011年推出的語言，2017年被Google宣布為Android開發的官方語言，目前新的Android App幾乎都用Kotlin開發。Kotlin完全相容Java（可以和Java程式碼互相呼叫），語法更現代簡潔，消除了Java很多繁瑣的部分。</p>
+<p>Kotlin vs Java的改進：<span data-tip="Kotlin 語言特性，在編譯期防止 NullPointerException" style="color:#ffae00">Null Safety</span>——Kotlin的型態系統區分可為null（<span style="color:#ffae00">String?</span>）和不可為null（<span data-tip="字串型態，儲存文字資料的不可變序列" style="color:#ffae00">String</span>），編譯期就防止NullPointerException（Java最常見的崩潰原因）；<span data-tip="Kotlin 自動生成 equals、toString 等方法的資料容器類別" style="color:#ffae00">資料類別（data class）</span>：<span style="color:#ffae00">data class User(val name: String, val age: Int)</span>一行就自動產生equals()、hashCode()、toString()、copy()，Java需要幾十行；<span data-tip="Kotlin 為現有類別新增方法而不需繼承的語法" style="color:#ffae00">擴展函式</span>讓你為既有class加方法，不用繼承。</p>
+<p>Kotlin的語法特色：<span data-tip="Kotlin 不可變變數宣告，類似 Java 的 final" style="color:#ffae00">val</span>（不可變，類似Java的final）/ <span data-tip="可重新賦值的變數宣告關鍵字" style="color:#ffae00">var</span>（可變）；字串模板：<span style="color:#ffae00">"Hello $name"</span>；<span data-tip="Kotlin 條件表達式，類似 Java 的 switch 但更強大" style="color:#ffae00">when</span>（強化版switch）；<span data-tip="Kotlin/Swift 運算子，若物件為 null 則回傳 null 而非崩潰" style="color:#ffae00">?.（安全呼叫）</span>和<span data-tip="Kotlin 運算子，若左側為 null 則使用右側預設值" style="color:#ffae00">?:（Elvis運算子）</span>優雅處理null：<span style="color:#ffae00">user?.name ?: "訪客"</span>；<span data-tip="匿名函式，可捕捉外部變數的簡短函式定義方式" style="color:#ffae00">Lambda</span>和高階函式（map、filter、reduce）語法更優雅。</p>
+<p>Android開發用Kotlin：搭配<span data-tip="Android 現代 UI 工具包，用 Kotlin 以宣告式方式建構介面" style="color:#ffae00">Jetpack Compose</span>（現代宣告式UI框架，類似React的概念）可以用純Kotlin描述UI；<span data-tip="Unity 協程，允許函式分多個影格執行，常用於延遲與動畫" style="color:#ffae00">Coroutines</span>（協程）是Kotlin的非同步方案，比Java的Thread或Callback Hell優雅很多；<span data-tip="Google 官方 Android 應用程式開發整合環境" style="color:#ffae00">Android Studio</span>是官方IDE（基於IntelliJ），對Kotlin有完整支援。</p>
+<p>Kotlin Multiplatform（KMP）是未來的方向：讓你用Kotlin同時開發Android和iOS的共用業務邏輯（甚至Web），只有UI層分開寫，是解決跨平台開發的新解法。Kotlin也可以做後端（<span data-tip="JetBrains 開發的 Kotlin 非同步 Web 框架" style="color:#ffae00">Ktor框架</span>）和前端（<span style="color:#ffae00">Kotlin/JS</span>）。如果你有興趣做App開發，Kotlin是現在最值得學習的選擇！</p>
 </section>
-            <section id="section4">
-                <h2>4. Swift — Apple 生態系的現代語言</h2>
-                <p><span style="color:#fa6dff">「Swift」</span>是Apple於2014年發布的程式語言，用來取代Objective-C開發iOS、macOS、watchOS、tvOS應用程式。Swift語法現代、安全、效能接近C++，深受開發者喜愛，也是Stack Overflow滿意度評分很高的語言之一。如果你想開發iPhone/Mac App，Swift是唯一的主流選擇。</p>
-                <p>Swift的語法特色：<span style="color:#ffae00">let</span>（常數）/ <span style="color:#ffae00">var</span>（變數）；型態推斷（不用寫型態，Swift自動推斷）；<span style="color:#ffae00">Optional（可選型態）</span>——用<span style="color:#ffae00">?</span>表示可能是nil，強制安全處理；<span style="color:#ffae00">Optional Binding</span>：<span style="color:#ffae00">if let name = optionalName { ... }</span>安全解包；<span style="color:#ffae00">guard let</span>提早返回（keep the happy path on the left）；字串插值：<span style="color:#ffae00">"Hello \(name)"</span>。</p>
-                <p>Swift的強大特性：<span style="color:#ffae00">Struct vs Class</span>——Swift推薦優先用Struct（值型態，複製而非共享，更安全）；<span style="color:#ffae00">Protocol</span>（類似介面但更強大，可以有預設實作）；<span style="color:#ffae00">extension</span>為任何型態新增方法；<span style="color:#ffae00">Enum</span>可以有關聯值（<span style="color:#ffae00">case .success(Data)</span> / <span style="color:#ffae00">case .failure(Error)</span>），類似Rust的Result；<span style="color:#ffae00">async/await</span>現代化非同步語法。</p>
-                <p>iOS開發框架：<span style="color:#ffae00">UIKit</span>（傳統，命令式UI，歷史悠久）；<span style="color:#ffae00">SwiftUI</span>（現代，宣告式UI，2019年推出，Apple全力推動，類似React的思維）。開發工具：<span style="color:#ffae00">Xcode</span>（Apple官方IDE，只能在Mac上執行）。上架App Store需要Apple開發者帳號（年費$99）。</p>
-                <p>Swift的未來：Apple積極推動Swift開源化，<span style="color:#ffae00">Swift on Server</span>（用Vapor框架做後端）讓Swift可以跑在Linux上；<span style="color:#ffae00">Swift for TensorFlow</span>曾是機器學習的實驗性方向；最重要的是<span style="color:#ffae00">Apple Vision Pro</span>的visionOS App開發也用Swift+SwiftUI。若有Mac可以使用，學Swift做iOS開發是進入蘋果生態系的大門，App Store的變現機會也比Android多！</p>
+<section id="section4">
+<h2>4. Swift — Apple 生態系的現代語言</h2>
+<p><span data-tip="Apple 開發的現代程式語言，用於 iOS/macOS 應用程式開發" style="color:#fa6dff">「Swift」</span>是Apple於2014年發布的程式語言，用來取代Objective-C開發iOS、macOS、watchOS、tvOS應用程式。Swift語法現代、安全、效能接近C++，深受開發者喜愛，也是Stack Overflow滿意度評分很高的語言之一。如果你想開發iPhone/Mac App，Swift是唯一的主流選擇。</p>
+<p>Swift的語法特色：<span data-tip="宣告可重新賦值變數的關鍵字（Swift/Kotlin/JS）" style="color:#ffae00">let</span>（常數）/ <span data-tip="可重新賦值的變數宣告關鍵字" style="color:#ffae00">var</span>（變數）；型態推斷（不用寫型態，Swift自動推斷）；<span style="color:#ffae00">Optional（可選型態）</span>——用<span style="color:#ffae00">?</span>表示可能是nil，強制安全處理；<span style="color:#ffae00">Optional Binding</span>：<span style="color:#ffae00">if let name = optionalName { ... }</span>安全解包；<span data-tip="Swift 提前退出語法，若條件不成立則立即離開當前作用域" style="color:#ffae00">guard let</span>提早返回（keep the happy path on the left）；字串插值：<span style="color:#ffae00">"Hello \(name)"</span>。</p>
+<p>Swift的強大特性：<span style="color:#ffae00">Struct vs Class</span>——Swift推薦優先用Struct（值型態，複製而非共享，更安全）；<span data-tip="Swift 協議，定義方法與屬性的規範，類似 Java 的 interface" style="color:#ffae00">Protocol</span>（類似介面但更強大，可以有預設實作）；<span data-tip="Swift 擴充語法，為現有型別新增方法而不需修改原始碼" style="color:#ffae00">extension</span>為任何型態新增方法；<span data-tip="列舉型態，定義一組具名常數，讓程式碼更具可讀性" style="color:#ffae00">Enum</span>可以有關聯值（<span style="color:#ffae00">case .success(Data)</span> / <span style="color:#ffae00">case .failure(Error)</span>），類似Rust的Result；<span data-tip="非同步程式語法糖，讓非同步程式碼看起來像同步程式碼" style="color:#ffae00">async/await</span>現代化非同步語法。</p>
+<p>iOS開發框架：<span data-tip="Apple 傳統 iOS UI 框架，以命令式方式建構使用者介面" style="color:#ffae00">UIKit</span>（傳統，命令式UI，歷史悠久）；<span data-tip="Apple 宣告式 UI 框架，用 Swift 快速建構跨平台 Apple 介面" style="color:#ffae00">SwiftUI</span>（現代，宣告式UI，2019年推出，Apple全力推動，類似React的思維）。開發工具：<span data-tip="Apple 官方 IDE，用於開發 iOS、macOS、watchOS 等應用程式" style="color:#ffae00">Xcode</span>（Apple官方IDE，只能在Mac上執行）。上架App Store需要Apple開發者帳號（年費$99）。</p>
+<p>Swift的未來：Apple積極推動Swift開源化，<span style="color:#ffae00">Swift on Server</span>（用Vapor框架做後端）讓Swift可以跑在Linux上；<span style="color:#ffae00">Swift for TensorFlow</span>曾是機器學習的實驗性方向；最重要的是<span style="color:#ffae00">Apple Vision Pro</span>的visionOS App開發也用Swift+SwiftUI。若有Mac可以使用，學Swift做iOS開發是進入蘋果生態系的大門，App Store的變現機會也比Android多！</p>
 </section>
-            <section id="section5">
-                <h2>5. Ruby — 優雅的腳本語言</h2>
-                <p><span style="color:#fa6dff">「Ruby」</span>是日本程式設計師松本行弘（Matz）於1995年開發的語言，設計哲學是「讓程式設計師快樂」——語法讀起來幾乎像英文，非常直觀優雅。Ruby因為<span style="color:#ffae00">Ruby on Rails</span>框架而在2000年代爆紅，Twitter、GitHub、Shopify、Airbnb的早期版本都是用Rails建立的。</p>
-                <p>Ruby的語法哲學：<span style="color:#ffee00fa">一切都是物件</span>——連數字也是物件（<span style="color:#ffae00">5.times { puts "Hello" }</span>）；<span style="color:#ffae00">Block</span>（程式碼區塊）是Ruby的核心：<span style="color:#ffae00">do...end</span>或<span style="color:#ffae00">{ }</span>包住程式碼傳給方法；常用的<span style="color:#ffae00">each</span>：<span style="color:#ffae00">[1,2,3].each { |n| puts n }</span>；<span style="color:#ffae00">map</span>、<span style="color:#ffae00">select</span>（filter）、<span style="color:#ffae00">reduce</span>都用Block；<span style="color:#ffae00">Symbol</span>（<span style="color:#ffae00">:name</span>）是輕量的字串，常用作Hash的key。</p>
-                <p>Ruby的特色：不需要分號、不需要括號（很多情況）；<span style="color:#ffae00">if</span>/<span style="color:#ffae00">unless</span>可以放在行尾：<span style="color:#ffae00">puts "大人" if age &gt;= 18</span>；<span style="color:#ffae00">Mixin</span>（<span style="color:#ffae00">include Module</span>）是Ruby替代多重繼承的機制；<span style="color:#ffae00">Open Class</span>讓你可以重新開啟任何class（甚至String、Integer）加方法，非常靈活（也非常危險，要謹慎）。</p>
-                <p><span style="color:#ffae00">Ruby on Rails</span>（通稱Rails）是Ruby最重要的Web框架，遵循<span style="color:#fa6dff">「慣例優於設定（Convention over Configuration）」</span>——只要遵循Rails的命名慣例，很多事情自動搞定。指令<span style="color:#ffae00">rails generate scaffold Post title:string body:text</span>就能自動產生Model、View、Controller、資料庫migration和CRUD路由，開發速度極快，非常適合快速原型開發（MVP）。</p>
-                <p>Ruby的現況：Ruby的市佔率比鼎盛期下降，但仍有穩定的使用族群，特別在新創公司和Web開發社群。<span style="color:#ffae00">Shopify</span>（全球最大電商平台之一）是Rails最大的用戶之一，也在積極貢獻Rails生態系。Ruby 3.x效能大幅提升，JIT編譯讓速度接近其他語言。如果你喜歡優雅的語法和快速的Web開發，Ruby和Rails值得一試——很多開發者說第一次用Rails是他們最愉快的程式設計體驗！🔴</p>
+<section id="section5">
+<h2>5. Ruby — 優雅的腳本語言</h2>
+<p><span data-tip="物件導向腳本語言，以優雅語法著稱，常用於 Rails 網頁開發" style="color:#fa6dff">「Ruby」</span>是日本程式設計師松本行弘（Matz）於1995年開發的語言，設計哲學是「讓程式設計師快樂」——語法讀起來幾乎像英文，非常直觀優雅。Ruby因為<span data-tip="Ruby 全端 Web 框架，奉行慣例優於設定原則，開發速度快" style="color:#ffae00">Ruby on Rails</span>框架而在2000年代爆紅，Twitter、GitHub、Shopify、Airbnb的早期版本都是用Rails建立的。</p>
+<p>Ruby的語法哲學：<span style="color:#ffee00fa">一切都是物件</span>——連數字也是物件（<span style="color:#ffae00">5.times { puts "Hello" }</span>）；<span style="color:#ffae00">Block</span>（程式碼區塊）是Ruby的核心：<span style="color:#ffae00">do...end</span>或<span style="color:#ffae00">{ }</span>包住程式碼傳給方法；常用的<span style="color:#ffae00">each</span>：<span style="color:#ffae00">[1,2,3].each { |n| puts n }</span>；<span data-tip="鍵值對資料結構，或高階函式對每個元素套用轉換" style="color:#ffae00">map</span>、<span data-tip="SQL SELECT 指令或 HTML 下拉選單標籤" style="color:#ffae00">select</span>（filter）、<span data-tip="高階函式，將序列所有元素累積運算為單一值" style="color:#ffae00">reduce</span>都用Block；<span data-tip="JavaScript 唯一且不可變的原始型別，常用作物件屬性的唯一鍵" style="color:#ffae00">Symbol</span>（<span style="color:#ffae00">:name</span>）是輕量的字串，常用作Hash的key。</p>
+<p>Ruby的特色：不需要分號、不需要括號（很多情況）；<span data-tip="條件判斷關鍵字，條件成立時執行指定區塊" style="color:#ffae00">if</span>/<span data-tip="Ruby 條件關鍵字，條件為假時執行，相當於 if not" style="color:#ffae00">unless</span>可以放在行尾：<span style="color:#ffae00">puts "大人" if age &gt;= 18</span>；<span data-tip="物件導向設計模式，將可重用功能混入類別而不使用繼承" style="color:#ffae00">Mixin</span>（<span style="color:#ffae00">include Module</span>）是Ruby替代多重繼承的機制；<span style="color:#ffae00">Open Class</span>讓你可以重新開啟任何class（甚至String、Integer）加方法，非常靈活（也非常危險，要謹慎）。</p>
+<p><span data-tip="Ruby 全端 Web 框架，奉行慣例優於設定原則，開發速度快" style="color:#ffae00">Ruby on Rails</span>（通稱Rails）是Ruby最重要的Web框架，遵循<span data-tip="Rails 設計哲學，遵循命名規範自動省略大量設定" style="color:#fa6dff">「慣例優於設定（Convention over Configuration）」</span>——只要遵循Rails的命名慣例，很多事情自動搞定。指令<span style="color:#ffae00">rails generate scaffold Post title:string body:text</span>就能自動產生Model、View、Controller、資料庫migration和CRUD路由，開發速度極快，非常適合快速原型開發（MVP）。</p>
+<p>Ruby的現況：Ruby的市佔率比鼎盛期下降，但仍有穩定的使用族群，特別在新創公司和Web開發社群。<span style="color:#ffae00">Shopify</span>（全球最大電商平台之一）是Rails最大的用戶之一，也在積極貢獻Rails生態系。Ruby 3.x效能大幅提升，JIT編譯讓速度接近其他語言。如果你喜歡優雅的語法和快速的Web開發，Ruby和Rails值得一試——很多開發者說第一次用Rails是他們最愉快的程式設計體驗！🔴</p>
 </section>
-        </main>
-    <script>
-        const navLinks = document.querySelectorAll('.nav-link');
-        const sections = document.querySelectorAll('section');
-        window.addEventListener('scroll', () => {
-            let current = '';
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                const sectionHeight = section.clientHeight;
-                if (window.pageYOffset >= (sectionTop - 100)) {
-                    current = section.getAttribute('id');
-                }
-            });
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href').includes(current)) {
-                    link.classList.add('active');
-                }
-            });
+</div>
+</div>
+<!-- GDB Float Window -->
+<div id="gdbFloatWindow">
+<div class="window-header" id="dragHandle">
+<span class="window-title">⌨ GDB Online</span>
+<span class="close-btn" onclick="toggleGdbWindow()">×</span>
+</div>
+<div class="window-content">
+<iframe id="gdbFrame" sandbox="allow-forms allow-scripts allow-same-origin allow-popups" src="https://www.onlinegdb.com/"></iframe>
+</div>
+</div>
+<script src="shared.js"></script>
+<script>
+        const floatWindow = document.getElementById('gdbFloatWindow');
+        const dragHandle  = document.getElementById('dragHandle');
+        function toggleGdbWindow() {
+            floatWindow.style.display = floatWindow.style.display === 'flex' ? 'none' : 'flex';
+        }
+        let isDragging = false, startX, startY, initLeft, initTop;
+        dragHandle.addEventListener('mousedown', e => {
+            isDragging = true;
+            startX = e.clientX; startY = e.clientY;
+            const r = floatWindow.getBoundingClientRect();
+            initLeft = r.left; initTop = r.top;
+            floatWindow.classList.add('is-dragging');
+        });
+        document.addEventListener('mousemove', e => {
+            if (!isDragging) return;
+            floatWindow.style.left = `${initLeft + e.clientX - startX}px`;
+            floatWindow.style.top  = `${initTop  + e.clientY - startY}px`;
+            floatWindow.style.right = 'auto';
+        });
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+            floatWindow.classList.remove('is-dragging');
         });
     </script>
-    </header>
+<script src="tooltips.js"></script>
 </body>
 </html>

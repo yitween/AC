@@ -1,283 +1,257 @@
 <!DOCTYPE html>
+
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AC_JS</title>
-    <link rel="icon" href="螢幕擷取畫面 2026-01-05 125529.png" sizes="48x48" type="image/png">
-    <style>
-        body {
-            background-color: rgb(20, 20, 20);
-            color: white;
-            font-family: "Microsoft JhengHei", sans-serif;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AC — JS</title>
+<link href="螢幕擷取畫面 2026-01-05 125529.png" rel="icon" sizes="48x48" type="image/png"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="shared.css" rel="stylesheet"/>
+<style>
+        /* ── GDB FLOAT WINDOW ── */
+        #gdbFloatWindow {
+            display: none; position: fixed;
+            top: 100px; right: 50px;
+            width: 600px; height: 500px;
+            background: #1e1e1e;
+            border: 1px solid #444; border-radius: 10px;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.6);
+            z-index: 2000; flex-direction: column;
+            overflow: hidden; resize: both;
+            min-width: 320px; min-height: 250px;
+            max-width: 95vw; max-height: 95vh;
         }
-        .back-button {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            text-decoration: none;
-            color: aquamarine;
-            border: 1px solid aquamarine;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: all 0.3s;
-            z-index: 1000;
+        .window-header {
+            height: 40px; background: #2a2a2a;
+            display: flex; align-items: center;
+            justify-content: space-between;
+            padding: 0 14px; cursor: move;
+            border-bottom: 1px solid #444;
+            user-select: none; flex-shrink: 0;
         }
-        .back-button:hover {
-            background-color: aquamarine;
-            color: black;
+        .window-title {
+            color: #ccc; font-weight: 700; font-size: 0.85rem;
+            font-family: 'JetBrains Mono', monospace;
         }
-        .content {
-            max-width: 800px;
-            text-align: center;
-            margin-top: 50px;
+        .close-btn {
+            color: #888; font-size: 22px; cursor: pointer;
+            line-height: 1; transition: color 0.2s;
         }
-        h1 { color: aquamarine; font-size: 3rem; margin-bottom: 10px; }
-        p { font-size: 1.2rem; line-height: 1.6; color: #ddd; }
-        .big-logo {
-            width: 150px;
-            height: 150px;
-            object-fit: contain;
-            margin-bottom: 20px;
+        .close-btn:hover { color: #f87171; }
+        .window-content { flex: 1; height: calc(100% - 40px); }
+        .window-content iframe { width: 100%; height: 100%; border: none; }
+        .is-dragging iframe { pointer-events: none; }
+        /* ── PAGE HERO ── */
+        .page-hero {
+            display: flex; align-items: center; gap: 20px;
+            margin-bottom: 24px;
         }
-        html {
-            scroll-behavior: smooth;
+        .page-hero img {
+            width: 72px; height: 72px; object-fit: contain;
+            border-radius: 12px; background: rgba(255,255,255,0.04);
+            padding: 8px; border: 1px solid var(--border);
+            box-shadow: none; margin: 0;
         }
-        .sidebar {
-            width: 200px;
-            height: 100vh;
-            position: fixed; 
-            top: 0;
-            left: 0;
-            background-color: #faa11cd0;
-            padding: 20px;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            overflow-y: auto;
+        .page-hero h1 {
+            font-size: clamp(1.8rem, 4vw, 2.4rem);
+            color: var(--accent); font-weight: 700; margin: 0;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 0.03em;
         }
-        .sidebar ul {
-            list-style: none;
-            padding: 0;
+        /* ── DOWNLOAD BUTTON ── */
+        .download-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            margin-top: 32px; padding: 12px 24px;
+            background: #1d4ed8; color: #fff;
+            text-decoration: none; border-radius: 8px;
+            font-weight: 700; font-size: 0.9rem;
+            transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
         }
-        .sidebar li {
-            margin-bottom: 15px;
+        .download-btn::before { content: '⬇'; }
+        .download-btn:hover {
+            background: #2563eb; transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(29,78,216,0.35);
         }
-        .sidebar a {
-            text-decoration: none;
-            color: #333;
-            display: block;
-            padding: 8px 12px;
-            border-left: 4px solid transparent; 
-            transition: all 0.3s;
+        .download-btn:active { transform: translateY(0); }
+        /* ── GDB INLINE BTN ── */
+        .gdb-inline {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 16px; background: transparent;
+            color: var(--accent); border: 1px solid var(--accent);
+            border-radius: 6px; cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700; font-size: 0.85rem;
+            transition: background 0.2s, color 0.2s, transform 0.15s;
+            margin-left: 8px;
         }
-        .sidebar a:hover {
-            background-color: #faa11cd0;
+        .gdb-inline:hover {
+            background: var(--accent); color: #111;
+            transform: translateY(-1px);
         }
-        .sidebar a.active {
-            color: #007bff;    
-            font-weight: bold;
-            border-left: 4px solid #007bff;
-            background-color: #faa11cd0;
-        }
-        .content {
-            margin-left: 240px;
-            padding: 40px;
-            max-width: 800px;
-        }
-        section {
-            min-height: 80vh; 
-            padding-top: 20px;
-            border-bottom: 1px solid #faa11cd0;
-        }
-        h2 {
-            margin-top: 0;
-        }
-        .nav-menu {
-            display: flex;
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            align-items: center;
-        }
-        .nav-menu li {
-            margin-left: 20px;
-        }
-        .nav-menu a {
-            text-decoration: none;
-            color: #ccc;
-            font-size: 1rem;
-            padding: 5px 10px;
-            border-radius: 4px;
-            transition: all 0.3s;
-        }
-        .nav-menu a:hover {
-            color: white;
-            background-color: rgba(255,255,255,0.1);
-        }
+        .gdb-inline:active { transform: translateY(0); }
     </style>
-    <ul class="nav-menu">
-        <li>
-            <button class="gdb-btn" onclick="toggleGdbWindow()">
-                GDB
-            </button>
-        </li>
-    </ul>
-</head>
+<style>
+/* ── TOOLTIP ── */
+[data-tip] {
+    position: relative;
+    cursor: help;
+    text-decoration: underline dotted currentColor;
+    text-underline-offset: 3px;
+}
+[data-tip]::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e1e2e;
+    color: #e0e0e0;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    white-space: normal;
+    width: max-content;
+    max-width: 260px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(127,255,212,0.25);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    transform: translateX(-50%) translateY(4px);
+    z-index: 9999;
+}
+[data-tip]:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+/* arrow */
+[data-tip]::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 2px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: rgba(127,255,212,0.25);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.18s ease;
+    z-index: 9999;
+}
+[data-tip]:hover::before { opacity: 1; }
+</style></head>
 <body>
-    <a href="index.html" class="back-button">← 回首頁</a>
-    <nav class="sidebar">
-        <div style="height: 30px;"></div>
-        <h3>章節目錄</h3>
-        <ul>
-            <li><a href="#section1" class="nav-link">1. 輸出與運算</a></li>
-            <li><a href="#section2" class="nav-link">2. 變數與物件</a></li>
-            <li><a href="#section3" class="nav-link">3. 流程控制</a></li>
-            <li><a href="#section4" class="nav-link">4. 函式</a></li>
-            <li><a href="#section5" class="nav-link">5. 網頁互動與非同步</a></li>
-        </ul>
-    </nav>
-    <header>
-        <div class="content">
-        <img src="JS.png" class="big-logo">
-        <h1>JAVASCRIPT</h1>
-        <button class="gdb-btn" onclick="toggleGdbWindow()">
-            GDB
-        </button>
-        <hr style="border-color: #333; margin: 20px 0;">
-        <div style="height: 50px;"></div>
-        <center>
-            <p style="color:#ddd;font-size:2rem"><B><I>Try Code Here!</I></B></p>
-        </center>
-        <div style="height: 30px;"></div>
-        <div style="max-width: 90%; margin: 0 auto; box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);">
-            <iframe 
-                src="https://www.onlinegdb.com/" 
-                width="100%" 
-                height="600px" 
-                frameborder="0" 
-                style="border-radius: 10px; border: 1px solid #333;"
-                allowfullscreen>
-            </iframe>
-        </div>
-        <div style="height: 30px;"></div>
-        <main class="content">
-            <section id="section1">
-                <h2>1. 輸出與運算</h2>
-                <p>JavaScript（JS）是唯一能在<span style="color:#fa6dff">「瀏覽器」</span>內原生執行的程式語言，幾乎所有網頁的互動效果都是JS做的。搭配Node.js也可以跑在伺服器端，是全端開發的必學語言。JS是<span style="color:#ffae00">動態型別語言</span>，不需要宣告型態。</p>
-                <p>JS的<span style="color:#ffee00fa">輸出</span>有幾種方式：<span style="color:#ffae00">console.log()</span>在瀏覽器的開發者工具Console顯示（最常用）；<span style="color:#ffae00">alert()</span>跳出對話框；<span style="color:#ffae00">document.write()</span>直接寫入網頁（實務上很少用）。開啟Chrome開發者工具用F12，Console分頁就能測試JS。</p>
-                <p>JS的<span style="color:#fa6dff">「運算子」</span>和其他語言大致相同，但有個特別重要的：<span style="color:#ffae00">==</span>（寬鬆相等，會自動轉型）和<span style="color:#ffae00">===</span>（嚴格相等，型態也要一樣）。例如：<span style="color:#00eeff">"5" == 5</span> 是true，但 <span style="color:#00eeff">"5" === 5</span> 是false。<span style="color:#ffee00fa">強烈建議永遠用===</span>，==的自動轉型很容易造成難找的bug！</p>
-                <p>JS也有<span style="color:#ffae00">**</span>（次方）、<span style="color:#ffae00">%</span>（取餘數）、<span style="color:#ffae00">++</span>/<span style="color:#ffae00">--</span>（加減1）。字串可以用<span style="color:#ffae00">+</span>串接，例如：<span style="color:#00eeff">"Hello" + " " + "World"</span>；更推薦用<span style="color:#fa6dff">「模板字串（Template Literal）」</span>，用反引號（`）包住，<span style="color:#ffae00">${}</span>嵌入變數，例如：<span style="color:#ffae00">`我叫${name}，今年${age}歲`</span>，和Python的f-string概念相同。</p>
+<nav class="top-nav">
+<a class="back" href="index.html">← 回首頁</a>
+<ul class="nav-menu">
+<li><a href="index.html">首頁</a></li>
+<li><a href="guide.html">網站導覽</a></li>
+<li><a href="about.html">關於我們</a></li>
+<li><a href="others.html">其他</a></li>
+<li><button class="gdb-inline" onclick="toggleGdbWindow()">⌨ GDB</button></li>
+</ul>
+</nav>
+<div class="layout">
+<nav class="sidebar">
+<h3>章節目錄</h3>
+<ul>
+<li><a href="#section1">1. 輸出與運算</a></li>
+<li><a href="#section2">2. 變數與物件</a></li>
+<li><a href="#section3">3. 流程控制</a></li>
+<li><a href="#section4">4. 函式</a></li>
+<li><a href="#section5">5. 網頁互動與非同步</a></li>
+</ul>
+</nav>
+<div class="main-content">
+<div class="page-hero">
+<img alt="JAVASCRIPT" src="JS.png"/>
+<h1>JAVASCRIPT</h1>
+</div>
+<hr class="page-divider"/>
+<section id="section1">
+<h2>1. 輸出與運算</h2>
+<p>JavaScript（JS）是唯一能在<span style="color:#fa6dff">「瀏覽器」</span>內原生執行的程式語言，幾乎所有網頁的互動效果都是JS做的。搭配Node.js也可以跑在伺服器端，是全端開發的必學語言。JS是<span data-tip="變數型態在執行期決定，不需事先宣告（如 Python、JS）" style="color:#ffae00">動態型別語言</span>，不需要宣告型態。</p>
+<p>JS的<span style="color:#ffee00fa">輸出</span>有幾種方式：<span data-tip="JavaScript 方法，在瀏覽器主控台輸出除錯訊息" style="color:#ffae00">console.log()</span>在瀏覽器的開發者工具Console顯示（最常用）；<span data-tip="JavaScript 函式，彈出瀏覽器警示對話框顯示訊息" style="color:#ffae00">alert()</span>跳出對話框；<span style="color:#ffae00">document.write()</span>直接寫入網頁（實務上很少用）。開啟Chrome開發者工具用F12，Console分頁就能測試JS。</p>
+<p>JS的<span data-tip="執行特定操作的符號（+、-、==、&amp;&amp;等）" style="color:#fa6dff">「運算子」</span>和其他語言大致相同，但有個特別重要的：<span style="color:#ffae00">==</span>（寬鬆相等，會自動轉型）和<span style="color:#ffae00">===</span>（嚴格相等，型態也要一樣）。例如：<span style="color:#00eeff">"5" == 5</span> 是true，但 <span style="color:#00eeff">"5" === 5</span> 是false。<span style="color:#ffee00fa">強烈建議永遠用===</span>，==的自動轉型很容易造成難找的bug！</p>
+<p>JS也有<span style="color:#ffae00">**</span>（次方）、<span style="color:#ffae00">%</span>（取餘數）、<span style="color:#ffae00">++</span>/<span style="color:#ffae00">--</span>（加減1）。字串可以用<span style="color:#ffae00">+</span>串接，例如：<span style="color:#00eeff">"Hello" + " " + "World"</span>；更推薦用<span data-tip="JavaScript 反引號字串，可用 ${} 嵌入運算式" style="color:#fa6dff">「模板字串（Template Literal）」</span>，用反引號（`）包住，<span style="color:#ffae00">${}</span>嵌入變數，例如：<span style="color:#ffae00">`我叫${name}，今年${age}歲`</span>，和Python的f-string概念相同。</p>
 </section>
-            <section id="section2">
-                <h2>2. 變數與物件</h2>
-                <p>JS宣告變數有三種關鍵字：<span style="color:#ffae00">var</span>（舊式，有作用域問題，現在不建議用）、<span style="color:#ffae00">let</span>（現代寫法，可重新賦值）、<span style="color:#ffae00">const</span>（常數，宣告後不可重新賦值）。現代JS建議<span style="color:#ffee00fa">預設用const，需要改變時才用let，不要用var</span>。</p>
-                <p>JS的<span style="color:#fa6dff">「陣列（Array）」</span>和Python的list類似，混放型態、動態大小，用方括號宣告：<span style="color:#ffae00">const</span> fruits = [<span style="color:#00eeff">'apple', 'banana'</span>]。常用方法：<span style="color:#ffae00">.push(x)</span>加到尾端、<span style="color:#ffae00">.pop()</span>移除最後、<span style="color:#ffae00">.shift()</span>移除第一個、<span style="color:#ffae00">.unshift(x)</span>加到最前、<span style="color:#ffae00">.splice()</span>插入或移除、<span style="color:#ffae00">.slice()</span>切片、<span style="color:#ffae00">.length</span>長度。</p>
-                <p>JS最核心的資料結構是<span style="color:#fa6dff">「物件（Object）」</span>，用大括號宣告鍵值對：<span style="color:#ffae00">const</span> student = {<span style="color:#00eeff">name: '小明', age: 18</span>}，存取用<span style="color:#ffae00">student.name</span>或<span style="color:#ffae00">student['name']</span>。物件可以包含函式（這時叫<span style="color:#ffae00">方法</span>），是JS最重要的概念之一，幾乎所有JS程式都在操作物件。</p>
-                <p>JS有個獨特的概念：<span style="color:#fa6dff">「解構賦值（Destructuring）」</span>，可以快速從物件或陣列取出值：<span style="color:#ffae00">const</span> {name, age} = student; 就等於分別宣告name和age；<span style="color:#ffae00">const</span> [first, second] = fruits;。還有<span style="color:#fa6dff">「展開運算子（Spread Operator）」</span><span style="color:#ffae00">...</span>，可以展開陣列或物件，例如合併：<span style="color:#ffae00">const</span> merged = {...obj1, ...obj2};。</p>
+<section id="section2">
+<h2>2. 變數與物件</h2>
+<p>JS宣告變數有三種關鍵字：<span data-tip="可重新賦值的變數宣告關鍵字" style="color:#ffae00">var</span>（舊式，有作用域問題，現在不建議用）、<span data-tip="宣告可重新賦值變數的關鍵字（Swift/Kotlin/JS）" style="color:#ffae00">let</span>（現代寫法，可重新賦值）、<span data-tip="常數宣告關鍵字，宣告後不可重新賦值" style="color:#ffae00">const</span>（常數，宣告後不可重新賦值）。現代JS建議<span style="color:#ffee00fa">預設用const，需要改變時才用let，不要用var</span>。</p>
+<p>JS的<span data-tip="固定大小、連續記憶體的同型態元素序列" style="color:#fa6dff">「陣列（Array）」</span>和Python的list類似，混放型態、動態大小，用方括號宣告：<span data-tip="常數宣告關鍵字，宣告後不可重新賦值" style="color:#ffae00">const</span> fruits = [<span style="color:#00eeff">'apple', 'banana'</span>]。常用方法：<span data-tip="JavaScript 陣列方法，在末尾新增元素 x" style="color:#ffae00">.push(x)</span>加到尾端、<span data-tip="串列/堆疊方法，移除並回傳最後一個元素" style="color:#ffae00">.pop()</span>移除最後、<span data-tip="JavaScript 陣列方法，移除並回傳第一個元素" style="color:#ffae00">.shift()</span>移除第一個、<span data-tip="JavaScript 陣列方法，在開頭插入元素 x" style="color:#ffae00">.unshift(x)</span>加到最前、<span data-tip="JavaScript 陣列方法，新增、移除或替換指定位置的元素" style="color:#ffae00">.splice()</span>插入或移除、<span data-tip="陣列/字串方法，擷取指定範圍的子陣列或子字串" style="color:#ffae00">.slice()</span>切片、<span data-tip="JavaScript 屬性，回傳陣列或字串的元素數量" style="color:#ffae00">.length</span>長度。</p>
+<p>JS最核心的資料結構是<span data-tip="類別的實例，包含屬性（資料）和方法（行為）" style="color:#fa6dff">「物件（Object）」</span>，用大括號宣告鍵值對：<span data-tip="常數宣告關鍵字，宣告後不可重新賦值" style="color:#ffae00">const</span> student = {<span style="color:#00eeff">name: '小明', age: 18</span>}，存取用<span style="color:#ffae00">student.name</span>或<span style="color:#ffae00">student['name']</span>。物件可以包含函式（這時叫<span data-tip="物件的成員函式，定義物件可執行的行為" style="color:#ffae00">方法</span>），是JS最重要的概念之一，幾乎所有JS程式都在操作物件。</p>
+<p>JS有個獨特的概念：<span data-tip="從陣列或物件中快速提取值到多個變數的語法" style="color:#fa6dff">「解構賦值（Destructuring）」</span>，可以快速從物件或陣列取出值：<span data-tip="常數宣告關鍵字，宣告後不可重新賦值" style="color:#ffae00">const</span> {name, age} = student; 就等於分別宣告name和age；<span data-tip="常數宣告關鍵字，宣告後不可重新賦值" style="color:#ffae00">const</span> [first, second] = fruits;。還有<span data-tip="JavaScript ... 語法，將陣列或物件展開" style="color:#fa6dff">「展開運算子（Spread Operator）」</span><span style="color:#ffae00">...</span>，可以展開陣列或物件，例如合併：<span data-tip="常數宣告關鍵字，宣告後不可重新賦值" style="color:#ffae00">const</span> merged = {...obj1, ...obj2};。</p>
 </section>
-            <section id="section3">
-                <h2>3. 流程控制</h2>
-                <p>JS的<span style="color:#fa6dff">「條件判斷」</span>和C/C++語法相同：<span style="color:#ffae00">if...else if...else</span>，條件式記得用<span style="color:#ffae00">===</span>而不是==。三元運算子：條件 <span style="color:#ffae00">?</span> 成立值 <span style="color:#ffae00">:</span> 不成立值，例如：<span style="color:#ffae00">const</span> label = score &gt;= 60 <span style="color:#ffae00">?</span> <span style="color:#00eeff">"通過"</span> <span style="color:#ffae00">:</span> <span style="color:#00eeff">"不通過"</span>;。</p>
-                <p>JS的<span style="color:#ffae00">switch</span>語法和C相同，一樣要記得加<span style="color:#ffae00">break</span>。特別介紹<span style="color:#fa6dff">「短路求值（Short-circuit）」</span>，JS的&&和||除了邏輯判斷，還常用來做條件賦值：<span style="color:#ffae00">const</span> name = user && user.name;（user存在才取name，否則是undefined）；<span style="color:#ffae00">const</span> val = input || <span style="color:#00eeff">"預設值"</span>;（input為假值時用預設值）。</p>
-                <p>迴圈方面，<span style="color:#ffae00">for</span>、<span style="color:#ffae00">while</span>、<span style="color:#ffae00">do...while</span>語法和C相同。遍歷陣列最常用<span style="color:#ffae00">forEach()</span>：fruits.<span style="color:#ffae00">forEach</span>(fruit =&gt; <span style="color:#ffae00">console.log</span>(fruit));，或<span style="color:#ffae00">for...of</span>迴圈：<span style="color:#ffae00">for</span>(<span style="color:#ffae00">const</span> fruit <span style="color:#ffae00">of</span> fruits){...}；遍歷物件的鍵用<span style="color:#ffae00">for...in</span>：<span style="color:#ffae00">for</span>(<span style="color:#ffae00">const</span> key <span style="color:#ffae00">in</span> obj){...}。</p>
-                <p>陣列的函式式操作是現代JS的主流寫法：<span style="color:#ffae00">.map()</span>對每個元素做轉換並回傳新陣列；<span style="color:#ffae00">.filter()</span>篩選符合條件的元素；<span style="color:#ffae00">.reduce()</span>把所有元素累積成一個值；<span style="color:#ffae00">.find()</span>找第一個符合的元素。例如：<span style="color:#ffae00">const</span> doubled = numbers.<span style="color:#ffae00">map</span>(n =&gt; n * 2)，超簡潔！</p>
+<section id="section3">
+<h2>3. 流程控制</h2>
+<p>JS的<span data-tip="根據條件選擇不同執行路徑的程式控制結構" style="color:#fa6dff">「條件判斷」</span>和C/C++語法相同：<span style="color:#ffae00">if...else if...else</span>，條件式記得用<span style="color:#ffae00">===</span>而不是==。三元運算子：條件 <span style="color:#ffae00">?</span> 成立值 <span style="color:#ffae00">:</span> 不成立值，例如：<span data-tip="常數宣告關鍵字，宣告後不可重新賦值" style="color:#ffae00">const</span> label = score &gt;= 60 <span style="color:#ffae00">?</span> <span style="color:#00eeff">"通過"</span> <span style="color:#ffae00">:</span> <span style="color:#00eeff">"不通過"</span>;。</p>
+<p>JS的<span data-tip="多分支條件語句，依變數值選擇對應的 case 執行" style="color:#ffae00">switch</span>語法和C相同，一樣要記得加<span data-tip="跳出當前迴圈或 switch 語句，繼續執行後續程式碼" style="color:#ffae00">break</span>。特別介紹<span data-tip="邏輯運算子在確定結果後不再計算後續條件" style="color:#fa6dff">「短路求值（Short-circuit）」</span>，JS的&amp;&amp;和||除了邏輯判斷，還常用來做條件賦值：<span data-tip="常數宣告關鍵字，宣告後不可重新賦值" style="color:#ffae00">const</span> name = user &amp;&amp; user.name;（user存在才取name，否則是undefined）；<span data-tip="常數宣告關鍵字，宣告後不可重新賦值" style="color:#ffae00">const</span> val = input || <span style="color:#00eeff">"預設值"</span>;（input為假值時用預設值）。</p>
+<p>迴圈方面，<span data-tip="計數迴圈語法，重複執行指定次數或遍歷集合" style="color:#ffae00">for</span>、<span data-tip="條件迴圈語法，條件為真時持續重複執行" style="color:#ffae00">while</span>、<span data-tip="先執行一次再判斷條件的迴圈，確保至少執行一次" style="color:#ffae00">do...while</span>語法和C相同。遍歷陣列最常用<span data-tip="JavaScript 陣列方法，對每個元素執行一次回呼函式" style="color:#ffae00">forEach()</span>：fruits.<span data-tip="陣列方法，對每個元素執行一次指定的函式" style="color:#ffae00">forEach</span>(fruit =&gt; <span data-tip="JavaScript 方法，在瀏覽器主控台輸出除錯訊息" style="color:#ffae00">console.log</span>(fruit));，或<span data-tip="JavaScript 迴圈，遍歷可迭代物件（陣列、字串等）的值" style="color:#ffae00">for...of</span>迴圈：<span data-tip="計數迴圈語法，重複執行指定次數或遍歷集合" style="color:#ffae00">for</span>(<span data-tip="常數宣告關鍵字，宣告後不可重新賦值" style="color:#ffae00">const</span> fruit <span style="color:#ffae00">of</span> fruits){...}；遍歷物件的鍵用<span data-tip="JavaScript 迴圈，遍歷物件的可列舉屬性" style="color:#ffae00">for...in</span>：<span data-tip="計數迴圈語法，重複執行指定次數或遍歷集合" style="color:#ffae00">for</span>(<span data-tip="常數宣告關鍵字，宣告後不可重新賦值" style="color:#ffae00">const</span> key <span data-tip="Python 成員運算子，判斷元素是否在集合中" style="color:#ffae00">in</span> obj){...}。</p>
+<p>陣列的函式式操作是現代JS的主流寫法：<span data-tip="陣列方法，對每個元素套用函式並回傳新陣列" style="color:#ffae00">.map()</span>對每個元素做轉換並回傳新陣列；<span data-tip="陣列/集合方法，依條件篩選出符合的元素" style="color:#ffae00">.filter()</span>篩選符合條件的元素；<span data-tip="陣列方法，將所有元素累積運算為單一值" style="color:#ffae00">.reduce()</span>把所有元素累積成一個值；<span data-tip="字串或 BeautifulSoup 方法，搜尋並回傳第一個符合的結果" style="color:#ffae00">.find()</span>找第一個符合的元素。例如：<span data-tip="常數宣告關鍵字，宣告後不可重新賦值" style="color:#ffae00">const</span> doubled = numbers.<span data-tip="鍵值對資料結構，或高階函式對每個元素套用轉換" style="color:#ffae00">map</span>(n =&gt; n * 2)，超簡潔！</p>
 </section>
-            <section id="section4">
-                <h2>4. 函式</h2>
-                <p>JS的函式有三種寫法：<span style="color:#ffae00">function 宣告</span>（可以在宣告前呼叫，有「提升」效果）、<span style="color:#ffae00">function 表達式</span>（賦值給變數）、<span style="color:#fa6dff">「箭頭函式（Arrow Function）」</span>（最現代的寫法，語法是 <span style="color:#ffae00">(參數) =&gt; 回傳值</span>）。例如：<span style="color:#ffae00">const</span> add = (a, b) <span style="color:#ffae00">=&gt;</span> a + b;，如果函式體超過一行，要加大括號和return。</p>
-                <p>JS函式是<span style="color:#fa6dff">「第一公民（First-class）」</span>，可以把函式當參數傳入另一個函式（叫<span style="color:#ffae00">Callback函式</span>），也可以從函式回傳函式，這是JS函式式編程的基礎。例如：<span style="color:#ffae00">setTimeout</span>(() =&gt; <span style="color:#ffae00">console.log</span>(<span style="color:#00eeff">"3秒後"</span>), 3000);，這個箭頭函式就是callback。</p>
-                <p>JS的<span style="color:#fa6dff">「作用域（Scope）」</span>規則要注意：let和const有<span style="color:#ffee00fa">區塊作用域</span>（大括號內有效），var有函式作用域（整個函式內有效）。<span style="color:#fa6dff">「閉包（Closure）」</span>是JS的重要概念，內層函式可以存取外層函式的變數，即使外層函式已經執行完畢，這讓JS可以做到很多強大的設計模式。</p>
-                <p>現代JS（ES6+）的<span style="color:#fa6dff">「模組系統」</span>讓程式碼可以分檔案管理：用<span style="color:#ffae00">export</span>匯出函式或變數，用<span style="color:#ffae00">import</span>引入，例如：<span style="color:#ffae00">import</span> {add} <span style="color:#ffae00">from</span> <span style="color:#00eeff">'./math.js'</span>;。這是現代前端框架（React、Vue）的基礎，學會模組化思考非常重要。</p>
+<section id="section4">
+<h2>4. 函式</h2>
+<p>JS的函式有三種寫法：<span data-tip="JavaScript 函式宣告語法，建立具名函式" style="color:#ffae00">function 宣告</span>（可以在宣告前呼叫，有「提升」效果）、<span data-tip="JavaScript 函式表達式，將函式賦值給變數" style="color:#ffae00">function 表達式</span>（賦值給變數）、<span data-tip="JavaScript ES6 簡潔函式語法，以 =&gt; 代替 function" style="color:#fa6dff">「箭頭函式（Arrow Function）」</span>（最現代的寫法，語法是 <span style="color:#ffae00">(參數) =&gt; 回傳值</span>）。例如：<span data-tip="常數宣告關鍵字，宣告後不可重新賦值" style="color:#ffae00">const</span> add = (a, b) <span style="color:#ffae00">=&gt;</span> a + b;，如果函式體超過一行，要加大括號和return。</p>
+<p>JS函式是<span data-tip="函式可作為變數、參數、回傳值使用的特性" style="color:#fa6dff">「第一公民（First-class）」</span>，可以把函式當參數傳入另一個函式（叫<span data-tip="作為引數傳給其他函式，在非同步操作完成後被呼叫的函式" style="color:#ffae00">Callback函式</span>），也可以從函式回傳函式，這是JS函式式編程的基礎。例如：<span data-tip="JavaScript 函式，延遲指定毫秒後執行一次回呼函式" style="color:#ffae00">setTimeout</span>(() =&gt; <span data-tip="JavaScript 方法，在瀏覽器主控台輸出除錯訊息" style="color:#ffae00">console.log</span>(<span style="color:#00eeff">"3秒後"</span>), 3000);，這個箭頭函式就是callback。</p>
+<p>JS的<span data-tip="變數可被存取的程式碼範圍，分全域與區域" style="color:#fa6dff">「作用域（Scope）」</span>規則要注意：let和const有<span style="color:#ffee00fa">區塊作用域</span>（大括號內有效），var有函式作用域（整個函式內有效）。<span data-tip="函式可捕捉並記憶其定義時外部作用域的變數" style="color:#fa6dff">「閉包（Closure）」</span>是JS的重要概念，內層函式可以存取外層函式的變數，即使外層函式已經執行完畢，這讓JS可以做到很多強大的設計模式。</p>
+<p>現代JS（ES6+）的<span style="color:#fa6dff">「模組系統」</span>讓程式碼可以分檔案管理：用<span data-tip="Shell 指令，將變數設為環境變數供子行程使用" style="color:#ffae00">export</span>匯出函式或變數，用<span data-tip="匯入模組或套件的關鍵字，引入外部功能" style="color:#ffae00">import</span>引入，例如：<span data-tip="匯入模組或套件的關鍵字，引入外部功能" style="color:#ffae00">import</span> {add} <span data-tip="Python import 語句或 SQL FROM 子句" style="color:#ffae00">from</span> <span style="color:#00eeff">'./math.js'</span>;。這是現代前端框架（React、Vue）的基礎，學會模組化思考非常重要。</p>
 </section>
-            <section id="section5">
-                <h2>5. 網頁互動與非同步</h2>
-                <p>JS最核心的功能是操作<span style="color:#fa6dff">「DOM（Document Object Model）」</span>，把HTML元素轉換成JS物件來操控。常用方法：<span style="color:#ffae00">document.querySelector()</span>（用CSS選擇器選一個元素）、<span style="color:#ffae00">document.querySelectorAll()</span>（選所有符合的元素）、修改內容用<span style="color:#ffae00">.textContent</span>或<span style="color:#ffae00">.innerHTML</span>、修改樣式用<span style="color:#ffae00">.style.屬性</span>。</p>
-                <p><span style="color:#fa6dff">「事件監聽（Event Listener）」</span>讓你對使用者的操作做反應：<span style="color:#ffae00">element.addEventListener</span>(<span style="color:#00eeff">'click'</span>, () =&gt; {...})，常見事件有click（點擊）、input（輸入）、submit（表單送出）、keydown（按鍵）、mouseover（滑鼠移過）。這是讓網頁「活起來」的關鍵！</p>
-                <p>JS的<span style="color:#fa6dff">「非同步（Async）」</span>是一大特色，因為JS是單執行緒，為了不阻塞畫面，耗時的操作（API請求、計時器）會非同步執行。舊式寫法用<span style="color:#ffae00">Callback</span>，容易形成「Callback Hell」；現代用<span style="color:#ffae00">Promise</span>，或更優雅的<span style="color:#ffae00">async/await</span>語法。</p>
-                <p><span style="color:#ffae00">async/await</span>讓非同步程式碼看起來像同步：在函式前加<span style="color:#ffae00">async</span>，耗時操作前加<span style="color:#ffae00">await</span>，例如：<span style="color:#ffae00">const</span> data = <span style="color:#ffae00">await</span> <span style="color:#ffae00">fetch</span>(<span style="color:#00eeff">'https://api.example.com'</span>)，搭配<span style="color:#ffae00">try/catch</span>處理錯誤，是目前最推薦的非同步寫法。</p>
-                <p>恭喜完成JavaScript基礎！JS是前端開發的核心，下一步可以學React或Vue等框架，或是Node.js做後端，甚至用Electron做桌面應用程式——JS的應用場景廣到嚇人，繼續加油！🚀</p>
+<section id="section5">
+<h2>5. 網頁互動與非同步</h2>
+<p>JS最核心的功能是操作<span data-tip="文件物件模型，將 HTML 文件表示為可用 JavaScript 操作的樹狀結構" style="color:#fa6dff">「DOM（Document Object Model）」</span>，把HTML元素轉換成JS物件來操控。常用方法：<span data-tip="JavaScript 方法，依 CSS 選取器找到第一個符合的 DOM 元素" style="color:#ffae00">document.querySelector()</span>（用CSS選擇器選一個元素）、<span data-tip="JavaScript 方法，依 CSS 選取器找到所有符合的 DOM 元素" style="color:#ffae00">document.querySelectorAll()</span>（選所有符合的元素）、修改內容用<span data-tip="JavaScript 屬性，取得元素內部的純文字內容" style="color:#ffae00">.textContent</span>或<span data-tip="JavaScript 屬性，取得或設定元素內部的 HTML 字串" style="color:#ffae00">.innerHTML</span>、修改樣式用<span data-tip="JavaScript 語法，直接修改 HTML 元素的行內 CSS 樣式" style="color:#ffae00">.style.屬性</span>。</p>
+<p><span data-tip="監聽並回應 DOM 事件（點擊、鍵盤等）的函式" style="color:#fa6dff">「事件監聽（Event Listener）」</span>讓你對使用者的操作做反應：<span data-tip="JavaScript 方法，為 DOM 元素綁定事件監聽函式" style="color:#ffae00">element.addEventListener</span>(<span style="color:#00eeff">'click'</span>, () =&gt; {...})，常見事件有click（點擊）、input（輸入）、submit（表單送出）、keydown（按鍵）、mouseover（滑鼠移過）。這是讓網頁「活起來」的關鍵！</p>
+<p>JS的<span data-tip="程式發出請求後不等待結果，繼續執行其他任務" style="color:#fa6dff">「非同步（Async）」</span>是一大特色，因為JS是單執行緒，為了不阻塞畫面，耗時的操作（API請求、計時器）會非同步執行。舊式寫法用<span data-tip="回呼函式，作為引數傳入另一個函式並在特定時機被呼叫" style="color:#ffae00">Callback</span>，容易形成「Callback Hell」；現代用<span data-tip="JavaScript 非同步物件，代表一個未來才會完成的操作" style="color:#ffae00">Promise</span>，或更優雅的<span data-tip="非同步程式語法糖，讓非同步程式碼看起來像同步程式碼" style="color:#ffae00">async/await</span>語法。</p>
+<p><span data-tip="非同步程式語法糖，讓非同步程式碼看起來像同步程式碼" style="color:#ffae00">async/await</span>讓非同步程式碼看起來像同步：在函式前加<span data-tip="宣告一個非同步函式，函式內可使用 await 等待非同步操作" style="color:#ffae00">async</span>，耗時操作前加<span data-tip="等待非同步操作完成的關鍵字，只能在 async 函式內使用" style="color:#ffae00">await</span>，例如：<span data-tip="常數宣告關鍵字，宣告後不可重新賦值" style="color:#ffae00">const</span> data = <span data-tip="等待非同步操作完成的關鍵字，只能在 async 函式內使用" style="color:#ffae00">await</span> <span data-tip="JavaScript 原生 API，發送 HTTP 請求並回傳 Promise" style="color:#ffae00">fetch</span>(<span style="color:#00eeff">'https://api.example.com'</span>)，搭配<span data-tip="例外處理語法，try 執行可能出錯的程式，catch 捕捉並處理錯誤" style="color:#ffae00">try/catch</span>處理錯誤，是目前最推薦的非同步寫法。</p>
+<p>恭喜完成JavaScript基礎！JS是前端開發的核心，下一步可以學React或Vue等框架，或是Node.js做後端，甚至用Electron做桌面應用程式——JS的應用場景廣到嚇人，繼續加油！🚀</p>
 </section>
-        </main>
-        <div style="height: 60px;"></div> 
-        <p>最後這裡提供一個用GoogleAI(Gemini)NotebookLM製作的教學綱要簡報簡報，下載起來，方便需要時做迅速的統整和複習~</p>
-        <a href="C  _基礎與實踐藍圖.pdf" download class="download-btn">立即下載檔案</a>
-    <script>
-        const navLinks = document.querySelectorAll('.nav-link');
-        const sections = document.querySelectorAll('section');
-        window.addEventListener('scroll', () => {
-            let current = '';
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                const sectionHeight = section.clientHeight;
-                if (window.pageYOffset >= (sectionTop - 100)) {
-                    current = section.getAttribute('id');
-                }
-            });
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href').includes(current)) {
-                    link.classList.add('active');
-                }
-            });
-        });
-    </script>
-    </header>
-    <div id="gdbFloatWindow">
-        <div class="window-header" id="dragHandle">
-            <span class="window-title">GDB</span>
-            <span class="close-btn" onclick="toggleGdbWindow()">&times;</span>
-        </div>
-        <div class="window-content">
-            <iframe 
-                id="gdbFrame"
-                data-src="https://www.onlinegdb.com/"
-                src="https://www.onlinegdb.com/"
-                sandbox="allow-forms allow-scripts allow-same-origin allow-popups">
-            </iframe>
-        </div>
-    </div>
-    <script>
+<div style="margin-top: 40px; padding: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px;">
+<p style="color: var(--muted); margin-bottom: 16px;">📄 最後這裡提供一個用GoogleAI(Gemini)NotebookLM製作的教學綱要簡報簡報，下載起來，方便需要時做迅速的統整和複習~</p>
+<a class="download-btn" download="" href="C  _基礎與實踐藍圖.pdf">立即下載檔案</a>
+</div>
+</div>
+</div>
+<!-- GDB Float Window -->
+<div id="gdbFloatWindow">
+<div class="window-header" id="dragHandle">
+<span class="window-title">⌨ GDB Online</span>
+<span class="close-btn" onclick="toggleGdbWindow()">×</span>
+</div>
+<div class="window-content">
+<iframe id="gdbFrame" sandbox="allow-forms allow-scripts allow-same-origin allow-popups" src="https://www.onlinegdb.com/"></iframe>
+</div>
+</div>
+<script src="shared.js"></script>
+<script>
         const floatWindow = document.getElementById('gdbFloatWindow');
-        const iframe = document.getElementById('gdbFrame');
-        const dragHandle = document.getElementById('dragHandle');
+        const dragHandle  = document.getElementById('dragHandle');
         function toggleGdbWindow() {
-            if (floatWindow.style.display === 'flex') {
-                floatWindow.style.display = 'none';
-            } else {
-                floatWindow.style.display = 'flex';
-                if (iframe.getAttribute('src') === "") {
-                    iframe.setAttribute('src', iframe.getAttribute('data-src'));
-                }
-            }
+            floatWindow.style.display = floatWindow.style.display === 'flex' ? 'none' : 'flex';
         }
-        let isDragging = false;
-        let startX, startY, initialLeft, initialTop;
-        dragHandle.addEventListener('mousedown', function(e) {
+        let isDragging = false, startX, startY, initLeft, initTop;
+        dragHandle.addEventListener('mousedown', e => {
             isDragging = true;
-            startX = e.clientX;
-            startY = e.clientY;
-            const rect = floatWindow.getBoundingClientRect();
-            initialLeft = rect.left;
-            initialTop = rect.top;
+            startX = e.clientX; startY = e.clientY;
+            const r = floatWindow.getBoundingClientRect();
+            initLeft = r.left; initTop = r.top;
             floatWindow.classList.add('is-dragging');
         });
-        document.addEventListener('mousemove', function(e) {
-            if (isDragging) {
-                const dx = e.clientX - startX;
-                const dy = e.clientY - startY;
-                floatWindow.style.left = `${initialLeft + dx}px`;
-                floatWindow.style.top = `${initialTop + dy}px`;
-                floatWindow.style.right = 'auto'; 
-            }
+        document.addEventListener('mousemove', e => {
+            if (!isDragging) return;
+            floatWindow.style.left = `${initLeft + e.clientX - startX}px`;
+            floatWindow.style.top  = `${initTop  + e.clientY - startY}px`;
+            floatWindow.style.right = 'auto';
         });
-        document.addEventListener('mouseup', function() {
+        document.addEventListener('mouseup', () => {
             isDragging = false;
             floatWindow.classList.remove('is-dragging');
         });
     </script>
+<script src="tooltips.js"></script>
 </body>
 </html>
