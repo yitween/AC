@@ -1,201 +1,259 @@
 <!DOCTYPE html>
+
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AC_C</title>
-    <link rel="icon" href="螢幕擷取畫面 2026-01-05 125529.png" sizes="48x48" type="image/png">
-    <style>
-        body {
-            background-color: rgb(20, 20, 20);
-            color: white;
-            font-family: "Microsoft JhengHei", sans-serif;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AC — C</title>
+<link href="螢幕擷取畫面 2026-01-05 125529.png" rel="icon" sizes="48x48" type="image/png"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="shared.css" rel="stylesheet"/>
+<style>
+        /* ── GDB FLOAT WINDOW ── */
+        #gdbFloatWindow {
+            display: none; position: fixed;
+            top: 100px; right: 50px;
+            width: 600px; height: 500px;
+            background: #1e1e1e;
+            border: 1px solid #444; border-radius: 10px;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.6);
+            z-index: 2000; flex-direction: column;
+            overflow: hidden; resize: both;
+            min-width: 320px; min-height: 250px;
+            max-width: 95vw; max-height: 95vh;
         }
-        .back-button {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            text-decoration: none;
-            color: aquamarine;
-            border: 1px solid aquamarine;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: all 0.3s;
-            z-index: 1000;
+        .window-header {
+            height: 40px; background: #2a2a2a;
+            display: flex; align-items: center;
+            justify-content: space-between;
+            padding: 0 14px; cursor: move;
+            border-bottom: 1px solid #444;
+            user-select: none; flex-shrink: 0;
         }
-        .back-button:hover {
-            background-color: aquamarine;
-            color: black;
+        .window-title {
+            color: #ccc; font-weight: 700; font-size: 0.85rem;
+            font-family: 'JetBrains Mono', monospace;
         }
-        .content {
-            max-width: 800px;
-            text-align: center;
-            margin-top: 50px;
+        .close-btn {
+            color: #888; font-size: 22px; cursor: pointer;
+            line-height: 1; transition: color 0.2s;
         }
-        h1 { color: aquamarine; font-size: 3rem; margin-bottom: 10px; }
-        p { font-size: 1.2rem; line-height: 1.6; color: #ddd; }
-        .big-logo {
-            width: 150px;
-            height: 150px;
-            object-fit: contain;
-            margin-bottom: 20px;
+        .close-btn:hover { color: #f87171; }
+        .window-content { flex: 1; height: calc(100% - 40px); }
+        .window-content iframe { width: 100%; height: 100%; border: none; }
+        .is-dragging iframe { pointer-events: none; }
+        /* ── PAGE HERO ── */
+        .page-hero {
+            display: flex; align-items: center; gap: 20px;
+            margin-bottom: 24px;
         }
-        html {
-            scroll-behavior: smooth;
+        .page-hero img {
+            width: 72px; height: 72px; object-fit: contain;
+            border-radius: 12px; background: rgba(255,255,255,0.04);
+            padding: 8px; border: 1px solid var(--border);
+            box-shadow: none; margin: 0;
         }
-        .sidebar {
-            width: 200px;
-            height: 100vh;
-            position: fixed; 
-            top: 0;
-            left: 0;
-            background-color: #faa11cd0;
-            padding: 20px;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            overflow-y: auto;
+        .page-hero h1 {
+            font-size: clamp(1.8rem, 4vw, 2.4rem);
+            color: var(--accent); font-weight: 700; margin: 0;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 0.03em;
         }
-        .sidebar ul {
-            list-style: none;
-            padding: 0;
+        /* ── DOWNLOAD BUTTON ── */
+        .download-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            margin-top: 32px; padding: 12px 24px;
+            background: #1d4ed8; color: #fff;
+            text-decoration: none; border-radius: 8px;
+            font-weight: 700; font-size: 0.9rem;
+            transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
         }
-        .sidebar li {
-            margin-bottom: 15px;
+        .download-btn::before { content: '⬇'; }
+        .download-btn:hover {
+            background: #2563eb; transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(29,78,216,0.35);
         }
-        .sidebar a {
-            text-decoration: none;
-            color: #333;
-            display: block;
-            padding: 8px 12px;
-            border-left: 4px solid transparent; 
-            transition: all 0.3s;
+        .download-btn:active { transform: translateY(0); }
+        /* ── GDB INLINE BTN ── */
+        .gdb-inline {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 16px; background: transparent;
+            color: var(--accent); border: 1px solid var(--accent);
+            border-radius: 6px; cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700; font-size: 0.85rem;
+            transition: background 0.2s, color 0.2s, transform 0.15s;
+            margin-left: 8px;
         }
-        .sidebar a:hover {
-            background-color: #faa11cd0;
+        .gdb-inline:hover {
+            background: var(--accent); color: #111;
+            transform: translateY(-1px);
         }
-        .sidebar a.active {
-            color: #007bff;    
-            font-weight: bold;
-            border-left: 4px solid #007bff;
-            background-color: #faa11cd0;
-        }
-        .content {
-            margin-left: 240px;
-            padding: 40px;
-            max-width: 800px;
-        }
-        section {
-            min-height: 80vh; 
-            padding-top: 20px;
-            border-bottom: 1px solid #faa11cd0;
-        }
-        h2 {
-            margin-top: 0;
-        }
+        .gdb-inline:active { transform: translateY(0); }
     </style>
-</head>
+<style>
+/* ── TOOLTIP ── */
+[data-tip] {
+    position: relative;
+    cursor: help;
+    text-decoration: underline dotted currentColor;
+    text-underline-offset: 3px;
+}
+[data-tip]::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e1e2e;
+    color: #e0e0e0;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    white-space: normal;
+    width: max-content;
+    max-width: 260px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(127,255,212,0.25);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    transform: translateX(-50%) translateY(4px);
+    z-index: 9999;
+}
+[data-tip]:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+/* arrow */
+[data-tip]::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 2px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: rgba(127,255,212,0.25);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.18s ease;
+    z-index: 9999;
+}
+[data-tip]:hover::before { opacity: 1; }
+</style></head>
 <body>
-    <a href="index.html" class="back-button">← 回首頁</a>
-    <nav class="sidebar">
-        <div style="height: 30px;"></div>
-        <h3>章節目錄</h3>
-        <ul>
-            <li><a href="#section1" class="nav-link">1. 開頭檔與基礎</a></li>
-            <li><a href="#section2" class="nav-link">2. 變數與資料</a></li>
-            <li><a href="#section3" class="nav-link">3. 流程控制</a></li>
-            <li><a href="#section4" class="nav-link">4. 函式</a></li>
-            <li><a href="#section5" class="nav-link">5. 進階與記憶體： 結構</a></li>
-        </ul>
-    </nav>
-    <header>
-        <div class="content">
-        <img src="C_Logo-removebg-preview.png" class="big-logo">
-        <h1>C</h1>
-        <hr style="border-color: #333; margin: 20px 0;">
-        <div style="height: 50px;"></div>
-        <center>
-            <p style="color:#ddd;font-size:2rem"><B><I>Try Code Here!</I></B></p>
-        </center>
-        <div style="height: 30px;"></div>
-        <div style="max-width: 90%; margin: 0 auto; box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);">
-            <iframe 
-                src="https://www.onlinegdb.com/" 
-                width="100%" 
-                height="600px" 
-                frameborder="0" 
-                style="border-radius: 10px; border: 1px solid #333;"
-                allowfullscreen>
-            </iframe>
-        </div>
-        <div style="height: 30px;"></div>
-        <main class="content">
-            <section id="section1">
-                <h2>1. 開頭檔與基礎</h2>
-                <p>C語言是一切的根基，許多現代語言（包含C++、C#）都深受它影響。要學C，第一步就是認識<span style="color:#fa6dff">「開頭檔」</span>，也就是<span style="color:#ffae00">#include</span>。它的功用是把別人已經寫好的<span style="color:#fa6dff">函式庫</span><span style="color:#ffee00fa">引入</span>你的程式，最常用的是<span style="color:#ffae00">#include</span><span style="color:#00eeff">&ltstdio.h&gt</span>（負責輸入輸出），其他常見的還有<span style="color:#00eeff">&ltstdlib.h&gt</span>（記憶體管理、亂數等）和<span style="color:#00eeff">&ltmath.h&gt</span>（數學函式）。</p>
-                <p>每一支C程式的起點都是<span style="color:#ffae00">int main()</span>，這是主程式進入點，所有邏輯都從這裡開始跑。函式最後要有<span style="color:#ffae00">return 0;</span>，代表程式正常結束，回傳0給作業系統。每一行敘述結束後都要加<span style="color:#ffee00fa">分號（;）</span>，這是C語言的規定，少了分號<span style="color:#fa6dff">編譯器</span>就會報錯。</p>
-                <p>C語言的<span style="color:#ffee00fa">輸出</span>用<span style="color:#ffae00">printf()</span>，<span style="color:#ffee00fa">輸入</span>用<span style="color:#ffae00">scanf()</span>，兩者都來自<span style="color:#00eeff">&ltstdio.h&gt</span>。printf的用法是把要印的內容放在雙引號裡，例如 <span style="color:#ffae00">printf</span>(<span style="color:#00eeff">"Hello World\n"</span>);，其中<span style="color:#00eeff">\n</span>是換行符號。若要印出變數的值，需要用<span style="color:#fa6dff">「格式符」</span>：整數用<span style="color:#ffae00">%d</span>、浮點數用<span style="color:#ffae00">%f</span>、字元用<span style="color:#ffae00">%c</span>、字串用<span style="color:#ffae00">%s</span>，例如 <span style="color:#ffae00">printf</span>(<span style="color:#00eeff">"%d\n"</span>, a);。</p>
-                <p><span style="color:#ffae00">scanf()</span>的用法類似，但要在變數名稱前加上<span style="color:#ffae00">&amp;</span>（取址運算子），例如 <span style="color:#ffae00">scanf</span>(<span style="color:#00eeff">"%d"</span>, &amp;a);，這是告訴程式要把輸入的值<span style="color:#ffee00fa">存到變數a的記憶體位置</span>，這個概念在後面講指標時會更深入說明。</p>
-                <p>本節最後說說<span style="color:#fa6dff">「運算子」</span>，和C++幾乎一樣：<span style="color:#fa6dff">算術運算子</span>有+、-、*、/、%（取餘數）、++（加1）、--（減1）；<span style="color:#fa6dff">關係運算子</span>有&gt;、&lt;、==、&gt;=、&lt;=、!=；<span style="color:#fa6dff">邏輯運算子</span>有&&（且）、||（或）、!（否）。這些是所有程式邏輯的基石，要熟練！</p>
-            </section>
-            <section id="section2">
-                <h2>2. 變數與資料</h2>
-                <p><span style="color:#fa6dff">「變數」</span>是用來<span style="color:#ffee00fa">儲存資料</span>的命名空間，C語言是<span style="color:#ffae00">強型別語言</span>，宣告變數時必須指定型態，且變數要在使用前先宣告。基本語法是「型態 名稱 = 初始值;」。</p>
-                <p>C語言常見的<span style="color:#fa6dff">資料型態</span>有：<span style="color:#ffae00">int</span>（整數）、<span style="color:#ffae00">float</span>（單精度浮點數）、<span style="color:#ffae00">double</span>（雙精度浮點數，精確度更高）、<span style="color:#ffae00">char</span>（單一字元，用單引號包住，例：<span style="color:#00eeff">'A'</span>）。C語言<span style="color:#ffee00fa">沒有原生的string型態</span>，字串是用<span style="color:#ffae00">char</span>陣列來表示，例如 <span style="color:#ffae00">char</span> <span style="color:#00eeff">name</span>[20] = <span style="color:#00eeff">"Alice"</span>;。</p>
-                <p>還有幾個加強版型態：<span style="color:#ffae00">long</span>（更大的整數）、<span style="color:#ffae00">unsigned int</span>（只存正整數，範圍更大）、<span style="color:#ffae00">short</span>（較小的整數，節省記憶體）。用<span style="color:#ffae00">sizeof()</span>可以查看某型態佔用幾個Bytes，例如 <span style="color:#ffae00">sizeof</span>(<span style="color:#ffae00">int</span>) 通常是4。</p>
-                <p>再來是<span style="color:#fa6dff">「陣列」</span>，語法是「型態 名稱[大小];」，例如 <span style="color:#ffae00">int</span> <span style="color:#00eeff">arr</span>[5];。記住索引<span style="color:#ffee00fa">從0開始</span>，arr[0]是第一個、arr[4]是最後一個。也可以在宣告時直接初始化：<span style="color:#ffae00">int</span> <span style="color:#00eeff">arr</span>[5] = {1, 2, 3, 4, 5};。</p>
-                <p>C語言字串的操作需要用<span style="color:#00eeff">&ltstring.h&gt</span>裡的函式，常用的有：<span style="color:#ffae00">strlen()</span>取得字串長度、<span style="color:#ffae00">strcpy()</span>複製字串、<span style="color:#ffae00">strcat()</span>串接字串、<span style="color:#ffae00">strcmp()</span>比較字串。注意C語言的字串結尾有一個看不見的<span style="color:#ffee00fa">空字元 '\0'</span>，所以char陣列的大小要比字串長度多1。</p>
-                <p>最後介紹<span style="color:#fa6dff">「指標（Pointer）」</span>的入門概念，這是C語言最獨特也最強大的特性。指標是一個<span style="color:#ffee00fa">儲存記憶體位址</span>的變數，宣告語法是「型態* 名稱;」，用<span style="color:#ffae00">&amp;</span>取得變數的位址，用<span style="color:#ffae00">*</span>取得該位址的值，例如：<span style="color:#ffae00">int</span> a = 10; <span style="color:#ffae00">int*</span> <span style="color:#00eeff">p</span> = &amp;a; // p存的是a的位址，*p的值就是10。</p>
-            </section>
-            <section id="section3">
-                <h2>3. 流程控制</h2>
-                <p><span style="color:#fa6dff">「流程控制」</span>決定程式的執行路徑，分為<span style="color:#ffee00fa">條件判斷</span>和<span style="color:#ffee00fa">迴圈</span>兩大類。C語言的流程控制語法和C++幾乎完全相同，畢竟C++就是從C演化來的！</p>
-                <p>條件判斷的主角是<span style="color:#ffae00">if...else if...else</span>，語法是：<span style="color:#ffae00">if</span>（條件）{...} <span style="color:#ffae00">else if</span>（條件）{...} <span style="color:#ffae00">else</span> {... }。條件成立就執行對應的區塊，從上往下依序判斷，找到第一個成立的就跑那塊、其他跳過。</p>
-                <p>另一個是<span style="color:#ffae00">switch</span>，適合用在「一個變數對應多種固定值」的場景，語法是：<span style="color:#ffae00">switch</span>（變數）{ <span style="color:#ffae00">case</span> 值: ... <span style="color:#ffae00">break</span>; <span style="color:#ffae00">default</span>: ...}。每個case後<span style="color:#ffee00fa">一定要加break</span>，否則程式會繼續往下執行所有case（這個行為叫fall-through）。</p>
-                <p>迴圈有三種：<span style="color:#ffae00">for</span>適合已知執行次數的情況，語法是 <span style="color:#ffae00">for</span>（初始; 條件; 更新）{...}；<span style="color:#ffae00">while</span>適合條件未知的情況，語法是 <span style="color:#ffae00">while</span>（條件）{...}，先判斷再執行；<span style="color:#ffae00">do...while</span>則是先執行一次再判斷，語法是 <span style="color:#ffae00">do</span> {...} <span style="color:#ffae00">while</span>（條件）;，保證至少跑一次。</p>
-                <p>迴圈內可以用<span style="color:#ffae00">break</span>直接<span style="color:#ffee00fa">跳出</span>整個迴圈，或用<span style="color:#ffae00">continue</span><span style="color:#ffee00fa">跳過</span>這一輪剩餘的程式直接進行下一輪。另外，C語言也支援<span style="color:#ffae00">goto</span>語法可以跳到指定的標籤位置，但現代程式設計通常不建議使用，因為會讓程式邏輯變得難以追蹤。</p>
-            </section>
-            <section id="section4">
-                <h2>4. 函式</h2>
-                <p><span style="color:#fa6dff">「函式」</span>是C語言模組化程式的核心，把重複使用的程式碼包裝起來取個名字，需要時直接<span style="color:#ffee00fa">呼叫</span>，不用重複寫。宣告語法是「<span style="color:#ffae00">回傳型態</span> <span style="color:#00eeff">函式名稱</span>（<span style="color:#fa6dff">參數型態 參數名稱</span>）{... <span style="color:#ffae00">return</span> 值;}」。</p>
-                <p>如果函式不需要回傳值，型態寫<span style="color:#ffae00">void</span>；不需要參數則括號內留空或寫<span style="color:#ffae00">void</span>。C語言的函式必須在<span style="color:#ffee00fa">使用前先宣告</span>，如果函式定義在main之後，需要在前面先寫<span style="color:#fa6dff">「函式原型（prototype）」</span>，例如：<span style="color:#ffae00">int</span> <span style="color:#00eeff">add</span>(<span style="color:#ffae00">int</span> a, <span style="color:#ffae00">int</span> b); // 原型宣告，有分號。</p>
-                <p>C語言的<span style="color:#fa6dff">「參數傳遞」</span>預設是<span style="color:#ffae00">傳值（pass by value）</span>，函式收到的是複製品，修改不影響原變數。若要在函式內修改原變數，要用<span style="color:#ffae00">傳指標（pass by pointer）</span>，把變數的位址傳進去，例如：<span style="color:#ffae00">void</span> <span style="color:#00eeff">swap</span>(<span style="color:#ffae00">int*</span> a, <span style="color:#ffae00">int*</span> b){<span style="color:#ffae00">int</span> tmp = *a; *a = *b; *b = tmp;}，呼叫時寫 <span style="color:#00eeff">swap</span>(&amp;x, &amp;y);。</p>
-                <p>陣列傳入函式時比較特別，它<span style="color:#ffee00fa">自動傳址</span>，函式內修改陣列會影響原本的陣列，所以通常還要額外傳入陣列的<span style="color:#ffee00fa">長度</span>，因為函式內無法用sizeof取得原陣列大小，例如：<span style="color:#ffae00">void</span> <span style="color:#00eeff">printArr</span>(<span style="color:#ffae00">int</span> arr[], <span style="color:#ffae00">int</span> size){...}。</p>
-                <p>C語言同樣支援<span style="color:#fa6dff">「遞迴」</span>，函式自己呼叫自己。經典範例是費氏數列或河內塔。遞迴的重點是要有<span style="color:#ffee00fa">終止條件（base case）</span>，不然程式會一直呼叫自己直到<span style="color:#ffee00fa">stack overflow</span>崩潰。遞迴很優雅，但每次呼叫都會佔用一份stack空間，在資源有限的環境要謹慎使用。</p>
-            </section>
-            <section id="section5">
-                <h2>5. 進階與記憶體：結構</h2>
-                <p>這章是C語言最有特色的部分，也是讓你真正理解「電腦在做什麼」的關鍵。先深入談<span style="color:#fa6dff">「指標（Pointer）」</span>，前面說過指標存的是記憶體位址，它強大的地方在於可以直接操作記憶體，實作高效率的資料結構，也是理解C語言精髓的必修課。</p>
-                <p>指標可以做<span style="color:#fa6dff">「動態記憶體配置」</span>，讓程式在執行時才決定要用多少記憶體，語法用<span style="color:#00eeff">&ltstdlib.h&gt</span>裡的函式：<span style="color:#ffae00">malloc()</span>配置記憶體（例如配置10個int的空間：<span style="color:#ffae00">int*</span> <span style="color:#00eeff">p</span> = (<span style="color:#ffae00">int*</span>)<span style="color:#ffae00">malloc</span>(10 * <span style="color:#ffae00">sizeof</span>(<span style="color:#ffae00">int</span>));）；用完後<span style="color:#ffee00fa">一定要</span>用<span style="color:#ffae00">free(p)</span>釋放，不然會造成<span style="color:#ffee00fa">記憶體洩漏（memory leak）</span>！</p>
-                <p>再來是<span style="color:#fa6dff">「結構（struct）」</span>，它讓你可以把不同型態的資料組合成一個新的型態，有點像C++的class但沒有方法。語法是：<span style="color:#ffae00">struct</span> <span style="color:#00eeff">Student</span> { <span style="color:#ffae00">int</span> id; <span style="color:#ffae00">char</span> name[20]; <span style="color:#ffae00">float</span> score; };，使用時宣告 <span style="color:#ffae00">struct</span> <span style="color:#00eeff">Student</span> s1;，存取成員用<span style="color:#ffae00">.</span>，例如 s1.<span style="color:#00eeff">score</span> = 95.5;。</p>
-                <p>搭配指標存取結構成員時，可以用箭頭運算子<span style="color:#ffae00">-&gt;</span>取代「*+.」，例如：<span style="color:#ffae00">struct</span> <span style="color:#00eeff">Student*</span> sp = &amp;s1; sp-&gt;<span style="color:#00eeff">score</span> = 95.5;，這和 (*sp).score 是同樣意思，只是箭頭更簡潔直觀。</p>
-                <p>最後是<span style="color:#fa6dff">「typedef」</span>，可以幫型態取別名，讓程式更好讀，常用在struct上：<span style="color:#ffae00">typedef struct</span> { <span style="color:#ffae00">int</span> id; <span style="color:#ffae00">char</span> name[20]; } <span style="color:#00eeff">Student</span>;，之後就可以直接寫 <span style="color:#00eeff">Student</span> s1; 而不用每次都加struct關鍵字，清爽許多！</p>
-                <p>恭喜學完C語言的基礎！C語言是所有程式語言的地基，把這裡學好，之後不管學C++、Java還是Python都會更快上手。建議多練習指標和記憶體的操作，這部分是最多人卡關但也最有成就感的地方(加油！)</p>
-            </section>
-        </main>
-    <script>
-        const navLinks = document.querySelectorAll('.nav-link');
-        const sections = document.querySelectorAll('section');
-        window.addEventListener('scroll', () => {
-            let current = '';
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                const sectionHeight = section.clientHeight;
-                if (window.pageYOffset >= (sectionTop - 100)) {
-                    current = section.getAttribute('id');
-                }
-            });
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href').includes(current)) {
-                    link.classList.add('active');
-                }
-            });
+<nav class="top-nav">
+<a class="back" href="index.html">← 回首頁</a>
+<ul class="nav-menu">
+<li><a href="index.html">首頁</a></li>
+<li><a href="guide.html">網站導覽</a></li>
+<li><a href="about.html">關於我們</a></li>
+<li><a href="others.html">其他</a></li>
+<li><button class="gdb-inline" onclick="toggleGdbWindow()">⌨ GDB</button></li>
+</ul>
+</nav>
+<div class="layout">
+<nav class="sidebar">
+<h3>章節目錄</h3>
+<ul>
+<li><a href="#section1">1. 開頭檔與基礎</a></li>
+<li><a href="#section2">2. 變數與資料</a></li>
+<li><a href="#section3">3. 流程控制</a></li>
+<li><a href="#section4">4. 函式</a></li>
+<li><a href="#section5">5. 進階與記憶體：結構</a></li>
+</ul>
+</nav>
+<div class="main-content">
+<div class="page-hero">
+<img alt="C" src="C_Logo-removebg-preview.png"/>
+<h1>C</h1>
+</div>
+<hr class="page-divider"/>
+<section id="section1">
+<h2>1. 開頭檔與基礎</h2>
+<p>C語言是一切的根基，許多現代語言（包含C++、C#）都深受它影響。要學C，第一步就是認識<span data-tip="C/C++ 以 #include 引入的標頭檔，宣告函式原型與常數" style="color:#fa6dff">「開頭檔」</span>，也就是<span data-tip="C/C++ 前置處理指令，將指定標頭檔內容插入程式" style="color:#ffae00">#include</span>。它的功用是把別人已經寫好的<span data-tip="預先編寫好的程式碼集合，可匯入重複使用特定功能" style="color:#fa6dff">函式庫</span><span style="color:#ffee00fa">引入</span>你的程式，最常用的是<span data-tip="C/C++ 前置處理指令，將指定標頭檔內容插入程式" style="color:#ffae00">#include</span><span style="color:#00eeff">&amp;ltstdio.h&gt;</span>（負責輸入輸出），其他常見的還有<span style="color:#00eeff">&amp;ltstdlib.h&gt;</span>（記憶體管理、亂數等）和<span style="color:#00eeff">&amp;ltmath.h&gt;</span>（數學函式）。</p>
+<p>每一支C程式的起點都是<span data-tip="C/C++ 程式入口函式，程式從這裡開始執行" style="color:#ffae00">int main()</span>，這是主程式進入點，所有邏輯都從這裡開始跑。函式最後要有<span style="color:#ffae00">return 0;</span>，代表程式正常結束，回傳0給作業系統。每一行敘述結束後都要加<span style="color:#ffee00fa">分號（;）</span>，這是C語言的規定，少了分號<span data-tip="將高階程式語言原始碼轉換為機器碼的程式" style="color:#fa6dff">編譯器</span>就會報錯。</p>
+<p>C語言的<span style="color:#ffee00fa">輸出</span>用<span data-tip="C 語言函式，以格式化字串輸出資料到標準輸出" style="color:#ffae00">printf()</span>，<span style="color:#ffee00fa">輸入</span>用<span data-tip="C 語言函式，依格式符從標準輸入讀取並儲存資料" style="color:#ffae00">scanf()</span>，兩者都來自<span style="color:#00eeff">&amp;ltstdio.h&gt;</span>。printf的用法是把要印的內容放在雙引號裡，例如 <span data-tip="C 格式化輸出函式，依格式符輸出各種型態的資料" style="color:#ffae00">printf</span>(<span style="color:#00eeff">"Hello World\n"</span>);，其中<span style="color:#00eeff">\n</span>是換行符號。若要印出變數的值，需要用<span data-tip="C 語言中指定輸入輸出資料型態的佔位符（%d、%s 等）" style="color:#fa6dff">「格式符」</span>：整數用<span data-tip="C 格式符，用於 printf/scanf 處理整數" style="color:#ffae00">%d</span>、浮點數用<span data-tip="C 格式符，用於 printf/scanf 處理浮點數" style="color:#ffae00">%f</span>、字元用<span data-tip="C 格式符，用於 printf/scanf 處理單一字元" style="color:#ffae00">%c</span>、字串用<span data-tip="C 格式符，用於 printf/scanf 處理字串" style="color:#ffae00">%s</span>，例如 <span data-tip="C 格式化輸出函式，依格式符輸出各種型態的資料" style="color:#ffae00">printf</span>(<span style="color:#00eeff">"%d\n"</span>, a);。</p>
+<p><span data-tip="C 語言函式，依格式符從標準輸入讀取並儲存資料" style="color:#ffae00">scanf()</span>的用法類似，但要在變數名稱前加上<span style="color:#ffae00">&amp;</span>（取址運算子），例如 <span data-tip="C 語言格式化輸入函式，從標準輸入讀取資料" style="color:#ffae00">scanf</span>(<span style="color:#00eeff">"%d"</span>, &amp;a);，這是告訴程式要把輸入的值<span style="color:#ffee00fa">存到變數a的記憶體位置</span>，這個概念在後面講指標時會更深入說明。</p>
+<p>本節最後說說<span data-tip="執行特定操作的符號（+、-、==、&amp;&amp;等）" style="color:#fa6dff">「運算子」</span>，和C++幾乎一樣：<span data-tip="執行加減乘除等數學計算的運算子" style="color:#fa6dff">算術運算子</span>有+、-、*、/、%（取餘數）、++（加1）、--（減1）；<span data-tip="比較兩個值的運算子（==、!=、&lt;、&gt; 等），結果為布林值" style="color:#fa6dff">關係運算子</span>有&gt;、&lt;、==、&gt;=、&lt;=、!=；<span data-tip="處理布林值的運算子（&amp;&amp;、||、!）" style="color:#fa6dff">邏輯運算子</span>有&amp;&amp;（且）、||（或）、!（否）。這些是所有程式邏輯的基石，要熟練！</p>
+</section>
+<section id="section2">
+<h2>2. 變數與資料</h2>
+<p><span data-tip="儲存資料的具名容器，值可在程式執行中改變" style="color:#fa6dff">「變數」</span>是用來<span style="color:#ffee00fa">儲存資料</span>的命名空間，C語言是<span data-tip="變數型態在編譯期嚴格檢查，不允許隱性型態轉換" style="color:#ffae00">強型別語言</span>，宣告變數時必須指定型態，且變數要在使用前先宣告。基本語法是「型態 名稱 = 初始值;」。</p>
+<p>C語言常見的<span data-tip="定義變數可儲存哪種資料及其操作方式" style="color:#fa6dff">資料型態</span>有：<span data-tip="整數型態，儲存不含小數點的數字" style="color:#ffae00">int</span>（整數）、<span data-tip="浮點數型態，或 CSS 的浮動排版屬性" style="color:#ffae00">float</span>（單精度浮點數）、<span data-tip="雙精度浮點型態，佔 64 位元，比 float 精度更高" style="color:#ffae00">double</span>（雙精度浮點數，精確度更高）、<span data-tip="字元型態，儲存單一字元（通常為 ASCII 或 Unicode）" style="color:#ffae00">char</span>（單一字元，用單引號包住，例：<span style="color:#00eeff">'A'</span>）。C語言<span style="color:#ffee00fa">沒有原生的string型態</span>，字串是用<span data-tip="字元型態，儲存單一字元（通常為 ASCII 或 Unicode）" style="color:#ffae00">char</span>陣列來表示，例如 <span data-tip="字元型態，儲存單一字元（通常為 ASCII 或 Unicode）" style="color:#ffae00">char</span> <span style="color:#00eeff">name</span>[20] = <span style="color:#00eeff">"Alice"</span>;。</p>
+<p>還有幾個加強版型態：<span data-tip="長整數型態，比 int 範圍更大（通常 64 位元）" style="color:#ffae00">long</span>（更大的整數）、<span data-tip="C/C++ 無符號整數型態，只儲存非負整數值域更大" style="color:#ffae00">unsigned int</span>（只存正整數，範圍更大）、<span data-tip="短整數型態，佔 16 位元，值域 -32768 到 32767" style="color:#ffae00">short</span>（較小的整數，節省記憶體）。用<span data-tip="C/C++ 運算子，計算指定型態或變數的記憶體大小（位元組）" style="color:#ffae00">sizeof()</span>可以查看某型態佔用幾個Bytes，例如 <span data-tip="C/C++ 運算子，回傳型態或變數佔用的位元組數" style="color:#ffae00">sizeof</span>(<span data-tip="整數型態，儲存不含小數點的數字" style="color:#ffae00">int</span>) 通常是4。</p>
+<p>再來是<span data-tip="連續記憶體儲存相同型態元素的基本資料結構" style="color:#fa6dff">「陣列」</span>，語法是「型態 名稱[大小];」，例如 <span data-tip="整數型態，儲存不含小數點的數字" style="color:#ffae00">int</span> <span style="color:#00eeff">arr</span>[5];。記住索引<span style="color:#ffee00fa">從0開始</span>，arr[0]是第一個、arr[4]是最後一個。也可以在宣告時直接初始化：<span data-tip="整數型態，儲存不含小數點的數字" style="color:#ffae00">int</span> <span style="color:#00eeff">arr</span>[5] = {1, 2, 3, 4, 5};。</p>
+<p>C語言字串的操作需要用<span style="color:#00eeff">&amp;ltstring.h&gt;</span>裡的函式，常用的有：<span data-tip="C 字串函式，回傳字串的長度（不含結尾 null 字元）" style="color:#ffae00">strlen()</span>取得字串長度、<span data-tip="C 字串函式，將來源字串複製到目標緩衝區" style="color:#ffae00">strcpy()</span>複製字串、<span data-tip="C 字串函式，將第二個字串串接到第一個字串末尾" style="color:#ffae00">strcat()</span>串接字串、<span data-tip="C 字串函式，比較兩個字串的字典順序" style="color:#ffae00">strcmp()</span>比較字串。注意C語言的字串結尾有一個看不見的<span style="color:#ffee00fa">空字元 '\0'</span>，所以char陣列的大小要比字串長度多1。</p>
+<p>最後介紹<span data-tip="C/C++ 儲存記憶體位址的變數，可直接操作記憶體" style="color:#fa6dff">「指標（Pointer）」</span>的入門概念，這是C語言最獨特也最強大的特性。指標是一個<span style="color:#ffee00fa">儲存記憶體位址</span>的變數，宣告語法是「型態* 名稱;」，用<span style="color:#ffae00">&amp;</span>取得變數的位址，用<span style="color:#ffae00">*</span>取得該位址的值，例如：<span data-tip="整數型態，儲存不含小數點的數字" style="color:#ffae00">int</span> a = 10; <span data-tip="C/C++ 指標型態，儲存整數變數的記憶體位址" style="color:#ffae00">int*</span> <span style="color:#00eeff">p</span> = &amp;a; // p存的是a的位址，*p的值就是10。</p>
+</section>
+<section id="section3">
+<h2>3. 流程控制</h2>
+<p><span data-tip="決定程式執行順序的語法（條件判斷、迴圈、跳轉）" style="color:#fa6dff">「流程控制」</span>決定程式的執行路徑，分為<span style="color:#ffee00fa">條件判斷</span>和<span style="color:#ffee00fa">迴圈</span>兩大類。C語言的流程控制語法和C++幾乎完全相同，畢竟C++就是從C演化來的！</p>
+<p>條件判斷的主角是<span style="color:#ffae00">if...else if...else</span>，語法是：<span data-tip="條件判斷關鍵字，條件成立時執行指定區塊" style="color:#ffae00">if</span>（條件）{...} <span data-tip="多條件判斷語法，當前一個 if 條件不成立時繼續判斷" style="color:#ffae00">else if</span>（條件）{...} <span data-tip="條件判斷關鍵字，當 if 條件不成立時執行的區塊" style="color:#ffae00">else</span> {... }。條件成立就執行對應的區塊，從上往下依序判斷，找到第一個成立的就跑那塊、其他跳過。</p>
+<p>另一個是<span data-tip="多分支條件語句，依變數值選擇對應的 case 執行" style="color:#ffae00">switch</span>，適合用在「一個變數對應多種固定值」的場景，語法是：<span data-tip="多分支條件語句，依變數值選擇對應的 case 執行" style="color:#ffae00">switch</span>（變數）{ <span data-tip="switch 語句中的分支條件標籤" style="color:#ffae00">case</span> 值: ... <span data-tip="跳出當前迴圈或 switch 語句，繼續執行後續程式碼" style="color:#ffae00">break</span>; <span data-tip="switch 語句的預設分支，當無任何 case 符合時執行" style="color:#ffae00">default</span>: ...}。每個case後<span style="color:#ffee00fa">一定要加break</span>，否則程式會繼續往下執行所有case（這個行為叫fall-through）。</p>
+<p>迴圈有三種：<span data-tip="計數迴圈語法，重複執行指定次數或遍歷集合" style="color:#ffae00">for</span>適合已知執行次數的情況，語法是 <span data-tip="計數迴圈語法，重複執行指定次數或遍歷集合" style="color:#ffae00">for</span>（初始; 條件; 更新）{...}；<span data-tip="條件迴圈語法，條件為真時持續重複執行" style="color:#ffae00">while</span>適合條件未知的情況，語法是 <span data-tip="條件迴圈語法，條件為真時持續重複執行" style="color:#ffae00">while</span>（條件）{...}，先判斷再執行；<span data-tip="先執行一次再判斷條件的迴圈，確保至少執行一次" style="color:#ffae00">do...while</span>則是先執行一次再判斷，語法是 <span data-tip="do...while 迴圈關鍵字，確保程式碼至少執行一次" style="color:#ffae00">do</span> {...} <span data-tip="條件迴圈語法，條件為真時持續重複執行" style="color:#ffae00">while</span>（條件）;，保證至少跑一次。</p>
+<p>迴圈內可以用<span data-tip="跳出當前迴圈或 switch 語句，繼續執行後續程式碼" style="color:#ffae00">break</span>直接<span style="color:#ffee00fa">跳出</span>整個迴圈，或用<span data-tip="跳過本次迴圈剩餘程式碼，直接進入下一次迭代" style="color:#ffae00">continue</span><span style="color:#ffee00fa">跳過</span>這一輪剩餘的程式直接進行下一輪。另外，C語言也支援<span data-tip="無條件跳轉指令（C/Go），跳到指定標籤繼續執行" style="color:#ffae00">goto</span>語法可以跳到指定的標籤位置，但現代程式設計通常不建議使用，因為會讓程式邏輯變得難以追蹤。</p>
+</section>
+<section id="section4">
+<h2>4. 函式</h2>
+<p><span data-tip="封裝可重複執行邏輯的程式碼區塊，接受輸入回傳輸出" style="color:#fa6dff">「函式」</span>是C語言模組化程式的核心，把重複使用的程式碼包裝起來取個名字，需要時直接<span style="color:#ffee00fa">呼叫</span>，不用重複寫。宣告語法是「<span data-tip="函式宣告中指定回傳值的資料型態" style="color:#ffae00">回傳型態</span> <span style="color:#00eeff">函式名稱</span>（<span style="color:#fa6dff">參數型態 參數名稱</span>）{... <span data-tip="函式回傳值的關鍵字，結束函式執行並傳回結果" style="color:#ffae00">return</span> 值;}」。</p>
+<p>如果函式不需要回傳值，型態寫<span data-tip="無回傳值的函式宣告型態" style="color:#ffae00">void</span>；不需要參數則括號內留空或寫<span data-tip="無回傳值的函式宣告型態" style="color:#ffae00">void</span>。C語言的函式必須在<span style="color:#ffee00fa">使用前先宣告</span>，如果函式定義在main之後，需要在前面先寫<span data-tip="C 語言函式的事先宣告，告知編譯器函式的簽名" style="color:#fa6dff">「函式原型（prototype）」</span>，例如：<span data-tip="整數型態，儲存不含小數點的數字" style="color:#ffae00">int</span> <span style="color:#00eeff">add</span>(<span data-tip="整數型態，儲存不含小數點的數字" style="color:#ffae00">int</span> a, <span data-tip="整數型態，儲存不含小數點的數字" style="color:#ffae00">int</span> b); // 原型宣告，有分號。</p>
+<p>C語言的<span data-tip="函式呼叫時將資料傳入函式的方式（傳值或傳參考）" style="color:#fa6dff">「參數傳遞」</span>預設是<span data-tip="函式呼叫時複製資料傳入，修改不影響原始變數" style="color:#ffae00">傳值（pass by value）</span>，函式收到的是複製品，修改不影響原變數。若要在函式內修改原變數，要用<span data-tip="C/C++ 傳遞變數的記憶體位址，透過指標操作原始資料" style="color:#ffae00">傳指標（pass by pointer）</span>，把變數的位址傳進去，例如：<span data-tip="無回傳值的函式宣告型態" style="color:#ffae00">void</span> <span style="color:#00eeff">swap</span>(<span data-tip="C/C++ 指標型態，儲存整數變數的記憶體位址" style="color:#ffae00">int*</span> a, <span data-tip="C/C++ 指標型態，儲存整數變數的記憶體位址" style="color:#ffae00">int*</span> b){<span data-tip="整數型態，儲存不含小數點的數字" style="color:#ffae00">int</span> tmp = *a; *a = *b; *b = tmp;}，呼叫時寫 <span style="color:#00eeff">swap</span>(&amp;x, &amp;y);。</p>
+<p>陣列傳入函式時比較特別，它<span style="color:#ffee00fa">自動傳址</span>，函式內修改陣列會影響原本的陣列，所以通常還要額外傳入陣列的<span style="color:#ffee00fa">長度</span>，因為函式內無法用sizeof取得原陣列大小，例如：<span data-tip="無回傳值的函式宣告型態" style="color:#ffae00">void</span> <span style="color:#00eeff">printArr</span>(<span data-tip="整數型態，儲存不含小數點的數字" style="color:#ffae00">int</span> arr[], <span data-tip="整數型態，儲存不含小數點的數字" style="color:#ffae00">int</span> size){...}。</p>
+<p>C語言同樣支援<span data-tip="函式呼叫自身以解決規模更小的相同問題" style="color:#fa6dff">「遞迴」</span>，函式自己呼叫自己。經典範例是費氏數列或河內塔。遞迴的重點是要有<span style="color:#ffee00fa">終止條件（base case）</span>，不然程式會一直呼叫自己直到<span style="color:#ffee00fa">stack overflow</span>崩潰。遞迴很優雅，但每次呼叫都會佔用一份stack空間，在資源有限的環境要謹慎使用。</p>
+</section>
+<section id="section5">
+<h2>5. 進階與記憶體：結構</h2>
+<p>這章是C語言最有特色的部分，也是讓你真正理解「電腦在做什麼」的關鍵。先深入談<span data-tip="C/C++ 儲存記憶體位址的變數，可直接操作記憶體" style="color:#fa6dff">「指標（Pointer）」</span>，前面說過指標存的是記憶體位址，它強大的地方在於可以直接操作記憶體，實作高效率的資料結構，也是理解C語言精髓的必修課。</p>
+<p>指標可以做<span data-tip="程式執行時在堆積上動態申請記憶體（malloc/new）" style="color:#fa6dff">「動態記憶體配置」</span>，讓程式在執行時才決定要用多少記憶體，語法用<span style="color:#00eeff">&amp;ltstdlib.h&gt;</span>裡的函式：<span data-tip="C 語言函式，在堆積上動態配置指定位元組的記憶體" style="color:#ffae00">malloc()</span>配置記憶體（例如配置10個int的空間：<span data-tip="C/C++ 指標型態，儲存整數變數的記憶體位址" style="color:#ffae00">int*</span> <span style="color:#00eeff">p</span> = (<span data-tip="C/C++ 指標型態，儲存整數變數的記憶體位址" style="color:#ffae00">int*</span>)<span data-tip="C 語言函式，在堆積上動態配置指定大小的記憶體" style="color:#ffae00">malloc</span>(10 * <span data-tip="C/C++ 運算子，回傳型態或變數佔用的位元組數" style="color:#ffae00">sizeof</span>(<span data-tip="整數型態，儲存不含小數點的數字" style="color:#ffae00">int</span>));）；用完後<span style="color:#ffee00fa">一定要</span>用<span data-tip="C 語言函式，釋放之前由 malloc 配置的記憶體" style="color:#ffae00">free(p)</span>釋放，不然會造成<span style="color:#ffee00fa">記憶體洩漏（memory leak）</span>！</p>
+<p>再來是<span data-tip="C/C++/Rust 自定義資料型態，將多個欄位組合為一個單元" style="color:#fa6dff">「結構（struct）」</span>，它讓你可以把不同型態的資料組合成一個新的型態，有點像C++的class但沒有方法。語法是：<span data-tip="結構體，將不同型態的資料組合為一個自定義型態" style="color:#ffae00">struct</span> <span style="color:#00eeff">Student</span> { <span data-tip="整數型態，儲存不含小數點的數字" style="color:#ffae00">int</span> id; <span data-tip="字元型態，儲存單一字元（通常為 ASCII 或 Unicode）" style="color:#ffae00">char</span> name[20]; <span data-tip="浮點數型態，或 CSS 的浮動排版屬性" style="color:#ffae00">float</span> score; };，使用時宣告 <span data-tip="結構體，將不同型態的資料組合為一個自定義型態" style="color:#ffae00">struct</span> <span style="color:#00eeff">Student</span> s1;，存取成員用<span style="color:#ffae00">.</span>，例如 s1.<span style="color:#00eeff">score</span> = 95.5;。</p>
+<p>搭配指標存取結構成員時，可以用箭頭運算子<span style="color:#ffae00">-&gt;</span>取代「*+.」，例如：<span data-tip="結構體，將不同型態的資料組合為一個自定義型態" style="color:#ffae00">struct</span> <span style="color:#00eeff">Student*</span> sp = &amp;s1; sp-&gt;<span style="color:#00eeff">score</span> = 95.5;，這和 (*sp).score 是同樣意思，只是箭頭更簡潔直觀。</p>
+<p>最後是<span data-tip="C/C++ 關鍵字，為現有型態建立新的別名" style="color:#fa6dff">「typedef」</span>，可以幫型態取別名，讓程式更好讀，常用在struct上：<span style="color:#ffae00">typedef struct</span> { <span data-tip="整數型態，儲存不含小數點的數字" style="color:#ffae00">int</span> id; <span data-tip="字元型態，儲存單一字元（通常為 ASCII 或 Unicode）" style="color:#ffae00">char</span> name[20]; } <span style="color:#00eeff">Student</span>;，之後就可以直接寫 <span style="color:#00eeff">Student</span> s1; 而不用每次都加struct關鍵字，清爽許多！</p>
+<p>恭喜學完C語言的基礎！C語言是所有程式語言的地基，把這裡學好，之後不管學C++、Java還是Python都會更快上手。建議多練習指標和記憶體的操作，這部分是最多人卡關但也最有成就感的地方(加油！)</p>
+</section>
+</div>
+</div>
+<!-- GDB Float Window -->
+<div id="gdbFloatWindow">
+<div class="window-header" id="dragHandle">
+<span class="window-title">⌨ GDB Online</span>
+<span class="close-btn" onclick="toggleGdbWindow()">×</span>
+</div>
+<div class="window-content">
+<iframe id="gdbFrame" sandbox="allow-forms allow-scripts allow-same-origin allow-popups" src="https://www.onlinegdb.com/"></iframe>
+</div>
+</div>
+<script src="shared.js"></script>
+<script>
+        const floatWindow = document.getElementById('gdbFloatWindow');
+        const dragHandle  = document.getElementById('dragHandle');
+        function toggleGdbWindow() {
+            floatWindow.style.display = floatWindow.style.display === 'flex' ? 'none' : 'flex';
+        }
+        let isDragging = false, startX, startY, initLeft, initTop;
+        dragHandle.addEventListener('mousedown', e => {
+            isDragging = true;
+            startX = e.clientX; startY = e.clientY;
+            const r = floatWindow.getBoundingClientRect();
+            initLeft = r.left; initTop = r.top;
+            floatWindow.classList.add('is-dragging');
+        });
+        document.addEventListener('mousemove', e => {
+            if (!isDragging) return;
+            floatWindow.style.left = `${initLeft + e.clientX - startX}px`;
+            floatWindow.style.top  = `${initTop  + e.clientY - startY}px`;
+            floatWindow.style.right = 'auto';
+        });
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+            floatWindow.classList.remove('is-dragging');
         });
     </script>
-    </header>
+<script src="tooltips.js"></script>
 </body>
 </html>
