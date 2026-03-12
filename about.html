@@ -3,189 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AC_ABOUT</title>
+    <title>AC — 關於我們</title>
     <link rel="icon" href="螢幕擷取畫面 2026-01-05 125529.png" sizes="48x48" type="image/png">
-    <style>
-        body {
-            background-color: rgb(20, 20, 20);
-            color: white;
-            font-family: "Microsoft JhengHei", sans-serif;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .back-button {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            text-decoration: none;
-            color: aquamarine;
-            border: 1px solid aquamarine;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: all 0.3s;
-            z-index: 1000;
-        }
-        .back-button:hover {
-            background-color: aquamarine;
-            color: black;
-        }
-        .content {
-            max-width: 800px;
-            text-align: center;
-            margin-top: 50px;
-        }
-        h1 { color: aquamarine; font-size: 3rem; margin-bottom: 10px; }
-        p { font-size: 1.2rem; line-height: 1.6; color: #ddd; }
-        .big-logo {
-            width: 150px;
-            height: 150px;
-            object-fit: contain;
-            margin-bottom: 20px;
-        }
-        html {
-            scroll-behavior: smooth;
-        }
-        .sidebar {
-            width: 200px;
-            height: 100vh;
-            position: fixed; 
-            top: 0;
-            left: 0;
-            background-color: #faa11cd0;
-            padding: 20px;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            overflow-y: auto;
-        }
-        .sidebar ul {
-            list-style: none;
-            padding: 0;
-        }
-        .sidebar li {
-            margin-bottom: 15px;
-        }
-        .sidebar a {
-            text-decoration: none;
-            color: #333;
-            display: block;
-            padding: 8px 12px;
-            border-left: 4px solid transparent; 
-            transition: all 0.3s;
-        }
-        .sidebar a:hover {
-            background-color: #faa11cd0;
-        }
-        .sidebar a.active {
-            color: #007bff;    
-            font-weight: bold;
-            border-left: 4px solid #007bff;
-            background-color: #faa11cd0;
-        }
-        .content {
-            margin-left: 240px;
-            padding: 40px;
-            max-width: 800px;
-        }
-        section {
-            min-height: 80vh; 
-            padding-top: 20px;
-            border-bottom: 1px solid #faa11cd0;
-        }
-        h2 {
-            margin-top: 0;
-        }
-        .nav-menu {
-            display: flex;
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-        .nav-menu li {
-            margin-left: 20px;
-        }
-        .nav-menu a {
-            text-decoration: none;
-            color: #ccc;
-            font-size: 1rem;
-            padding: 5px 10px;
-            border-radius: 4px;
-            transition: all 0.3s;
-        }
-        .nav-menu a:hover {
-            color: white;
-            background-color: rgba(255,255,255,0.1);
-        }
-        .nav-menu a.active {
-            color: #fff;
-            background-color: #007bff; 
-            font-weight: bold;
-        }
-    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="shared.css">
 </head>
 <body>
-    <ul class="nav-menu">
-            <li><a href="index.html" class="nav-link">首頁</a></li>
-            <li><a href="guide.html" class="nav-link">網站導覽</a></li>
-            <li><a href="about.html" class="nav-link">關於我們</a></li>
-            <li><a href="others.html" class="nav-link">其他</a></li>
-        </ul>
-    <a href="index.html" class="back-button">← 回首頁</a>
-    <nav class="sidebar">
-        <div style="height: 30px;"></div>
-        <h3>章節目錄</h3>
-        <ul>
-            <li><a href="#section1" class="nav-link">1. 前言聲明</a></li>
-            <li><a href="#section2" class="nav-link">2. 一段閒聊</a></li>
-            <li><a href="#section3" class="nav-link">3. 願景期許</a></li>
-            <li><a href="#section4" class="nav-link">4. 洋蔥部分</a></li>
+
+    <nav class="top-nav">
+        <a href="index.html" class="back">← 回首頁</a>
+        <ul class="nav-menu">
+            <li><a href="index.html">首頁</a></li>
+            <li><a href="guide.html">網站導覽</a></li>
+            <li><a href="about.html">關於我們</a></li>
+            <li><a href="others.html">其他</a></li>
         </ul>
     </nav>
-    <header>
-        <div class="content">
-        <h1>關於我們</h1>
-        <hr style="border-color: #333; margin: 20px 0;">
-        <div style="height: 30px;"></div>
-        <main class="content">
+
+    <div class="layout">
+        <nav class="sidebar">
+            <h3>章節目錄</h3>
+            <ul>
+                <li><a href="#section1">1. 前言聲明</a></li>
+                <li><a href="#section2">2. 一段閒聊</a></li>
+                <li><a href="#section3">3. 願景期許</a></li>
+                <li><a href="#section4">4. 洋蔥部分</a></li>
+            </ul>
+        </nav>
+
+        <div class="main-content">
+            <h1 class="page-title">關於我們</h1>
+            <hr class="page-divider">
+
             <section id="section1">
                 <h2>1. 前言聲明</h2>
-                <p>這裡沒有任何教育內容，純幹話，前方高能，怕雷勿入</p>
-                <div style="height: 30px;"></div>
+                <p>這裡沒有任何教育內容，純幹話，前方高能，怕雷勿入。</p>
             </section>
+
             <section id="section2">
                 <h2>2. 一段閒聊</h2>
-                <p>這是一個說長不長、說短不短的故事；我國中的時候只是一個程式小有天賦的普通學生，過著年年領班排一的無聊日子，直到高一我加入程式設計社，在這裡，我遇到教會我寫遊戲的恩師陳奕誠(我校史上第一個APCS7級分，Burns Out Games工程師，代表作:夢魘獵人)、給我一堆特權跟薪水的資訊股長陳俊宇(跟我同年離開學校)、使我對程式設計社產生歸屬感的第四屆社長王莉安學姊、同屆生殷宏宇(偷偷跟你們說這倆是社對)，總而言之，做為第四屆副社長的我早早扛下社長重任，決心推廣程式教育，立志讓我社在校內地位取代生物醫學社(與我社、財經研習社在學校三足鼎立)，讓校內高一、高二、高三APCS平均分數7級分，總而言之，希望諸位能與我一樣熱愛程式、熟習程式、盡情揮灑程式!<br>by林宜霆</p>
+                <p>這是一個說長不長、說短不短的故事。我國中的時候只是一個程式小有天賦的普通學生，過著年年領班排一的無聊日子，直到高一加入程式設計社。在這裡，我遇到了教會我寫遊戲的恩師陳奕誠（我校史上第一個 APCS 7 級分，Burns Out Games 工程師，代表作：夢魘獵人）、給我一堆特權跟薪水的資訊股長陳俊宇（跟我同年離開學校）、使我對社團產生歸屬感的第四屆社長王莉安學姊，以及同屆生殷宏宇（偷偷說這倆是社對）。</p>
+                <p>總而言之，做為第四屆副社長的我早早扛下社長重任，決心推廣程式教育，立志讓社團在校內地位超越生物醫學社（與我社、財經研習社三足鼎立），讓校內高一、高二、高三 APCS 平均分數達 7 級分。希望諸位能與我一樣熱愛程式、熟習程式、盡情揮灑程式！</p>
+                <p>— by 林宜霆</p>
             </section>
+
             <section id="section3">
                 <h2>3. 願景期許</h2>
-                <p>據我社統計，我國有50%的學子不了解程式語言，剩餘50%中的50%不了解如何應用，也就是說，我國只有25%的學子能熟習並利用程式語言，吾製此網站，所為促進我國學子資訊素養能力，與時俱進</p>
+                <p>據我社統計，我國有 50% 的學子不了解程式語言，剩餘 50% 中又有 50% 不了解如何應用。也就是說，我國只有 25% 的學子能熟習並利用程式語言。吾製此網站，所為促進我國學子資訊素養能力，與時俱進。</p>
             </section>
+
             <section id="section4">
                 <h2>4. 洋蔥部分</h2>
-                <p>製作這個網站的時候，已經是高二上學期了，前輩都將前往大學，只剩下我輩迷茫，但我等必將行盡前人之路，後開拓前人未竟之康莊大道，以此偉業，致我的程式導師:陳奕誠、陳俊宇、李朝成、王莉安</p>
+                <p>製作這個網站的時候，已經是高二上學期了，前輩都將前往大學，只剩下我輩迷茫。但我等必將行盡前人之路，後開拓前人未竟之康莊大道。以此偉業，致我的程式導師：陳奕誠、陳俊宇、李朝成、王莉安。</p>
             </section>
-        </main>
-    <script>
-        const navLinks = document.querySelectorAll('.nav-link');
-        const sections = document.querySelectorAll('section');
-        window.addEventListener('scroll', () => {
-            let current = '';
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                const sectionHeight = section.clientHeight;
-                if (window.pageYOffset >= (sectionTop - 100)) {
-                    current = section.getAttribute('id');
-                }
-            });
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href').includes(current)) {
-                    link.classList.add('active');
-                }
-            });
-        });
-    </script>
-    </header>
+        </div>
+    </div>
+
+    <script src="shared.js"></script>
 </body>
 </html>
