@@ -1,198 +1,257 @@
 <!DOCTYPE html>
+
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AC_SYSTEM</title>
-    <link rel="icon" href="螢幕擷取畫面 2026-01-05 125529.png" sizes="48x48" type="image/png">
-    <style>
-        body {
-            background-color: rgb(20, 20, 20);
-            color: white;
-            font-family: "Microsoft JhengHei", sans-serif;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AC — SYSTEM</title>
+<link href="螢幕擷取畫面 2026-01-05 125529.png" rel="icon" sizes="48x48" type="image/png"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="shared.css" rel="stylesheet"/>
+<style>
+        /* ── GDB FLOAT WINDOW ── */
+        #gdbFloatWindow {
+            display: none; position: fixed;
+            top: 100px; right: 50px;
+            width: 600px; height: 500px;
+            background: #1e1e1e;
+            border: 1px solid #444; border-radius: 10px;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.6);
+            z-index: 2000; flex-direction: column;
+            overflow: hidden; resize: both;
+            min-width: 320px; min-height: 250px;
+            max-width: 95vw; max-height: 95vh;
         }
-        .back-button {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            text-decoration: none;
-            color: aquamarine;
-            border: 1px solid aquamarine;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: all 0.3s;
-            z-index: 1000;
+        .window-header {
+            height: 40px; background: #2a2a2a;
+            display: flex; align-items: center;
+            justify-content: space-between;
+            padding: 0 14px; cursor: move;
+            border-bottom: 1px solid #444;
+            user-select: none; flex-shrink: 0;
         }
-        .back-button:hover {
-            background-color: aquamarine;
-            color: black;
+        .window-title {
+            color: #ccc; font-weight: 700; font-size: 0.85rem;
+            font-family: 'JetBrains Mono', monospace;
         }
-        .content {
-            max-width: 800px;
-            text-align: center;
-            margin-top: 50px;
+        .close-btn {
+            color: #888; font-size: 22px; cursor: pointer;
+            line-height: 1; transition: color 0.2s;
         }
-        h1 { color: aquamarine; font-size: 3rem; margin-bottom: 10px; }
-        p { font-size: 1.2rem; line-height: 1.6; color: #ddd; }
-        .big-logo {
-            width: 150px;
-            height: 150px;
-            object-fit: contain;
-            margin-bottom: 20px;
+        .close-btn:hover { color: #f87171; }
+        .window-content { flex: 1; height: calc(100% - 40px); }
+        .window-content iframe { width: 100%; height: 100%; border: none; }
+        .is-dragging iframe { pointer-events: none; }
+        /* ── PAGE HERO ── */
+        .page-hero {
+            display: flex; align-items: center; gap: 20px;
+            margin-bottom: 24px;
         }
-        html {
-            scroll-behavior: smooth;
+        .page-hero img {
+            width: 72px; height: 72px; object-fit: contain;
+            border-radius: 12px; background: rgba(255,255,255,0.04);
+            padding: 8px; border: 1px solid var(--border);
+            box-shadow: none; margin: 0;
         }
-        .sidebar {
-            width: 200px;
-            height: 100vh;
-            position: fixed; 
-            top: 0;
-            left: 0;
-            background-color: #faa11cd0;
-            padding: 20px;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            overflow-y: auto;
+        .page-hero h1 {
+            font-size: clamp(1.8rem, 4vw, 2.4rem);
+            color: var(--accent); font-weight: 700; margin: 0;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 0.03em;
         }
-        .sidebar ul {
-            list-style: none;
-            padding: 0;
+        /* ── DOWNLOAD BUTTON ── */
+        .download-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            margin-top: 32px; padding: 12px 24px;
+            background: #1d4ed8; color: #fff;
+            text-decoration: none; border-radius: 8px;
+            font-weight: 700; font-size: 0.9rem;
+            transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
         }
-        .sidebar li {
-            margin-bottom: 15px;
+        .download-btn::before { content: '⬇'; }
+        .download-btn:hover {
+            background: #2563eb; transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(29,78,216,0.35);
         }
-        .sidebar a {
-            text-decoration: none;
-            color: #333;
-            display: block;
-            padding: 8px 12px;
-            border-left: 4px solid transparent; 
-            transition: all 0.3s;
+        .download-btn:active { transform: translateY(0); }
+        /* ── GDB INLINE BTN ── */
+        .gdb-inline {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 16px; background: transparent;
+            color: var(--accent); border: 1px solid var(--accent);
+            border-radius: 6px; cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700; font-size: 0.85rem;
+            transition: background 0.2s, color 0.2s, transform 0.15s;
+            margin-left: 8px;
         }
-        .sidebar a:hover {
-            background-color: #faa11cd0;
+        .gdb-inline:hover {
+            background: var(--accent); color: #111;
+            transform: translateY(-1px);
         }
-        .sidebar a.active {
-            color: #007bff;    
-            font-weight: bold;
-            border-left: 4px solid #007bff;
-            background-color: #faa11cd0;
-        }
-        .content {
-            margin-left: 240px;
-            padding: 40px;
-            max-width: 800px;
-        }
-        section {
-            min-height: 80vh; 
-            padding-top: 20px;
-            border-bottom: 1px solid #faa11cd0;
-        }
-        h2 {
-            margin-top: 0;
-        }
+        .gdb-inline:active { transform: translateY(0); }
     </style>
-</head>
+<style>
+/* ── TOOLTIP ── */
+[data-tip] {
+    position: relative;
+    cursor: help;
+    text-decoration: underline dotted currentColor;
+    text-underline-offset: 3px;
+}
+[data-tip]::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e1e2e;
+    color: #e0e0e0;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    white-space: normal;
+    width: max-content;
+    max-width: 260px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(127,255,212,0.25);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    transform: translateX(-50%) translateY(4px);
+    z-index: 9999;
+}
+[data-tip]:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+/* arrow */
+[data-tip]::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 2px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: rgba(127,255,212,0.25);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.18s ease;
+    z-index: 9999;
+}
+[data-tip]:hover::before { opacity: 1; }
+</style></head>
 <body>
-    <a href="index.html" class="back-button">← 回首頁</a>
-    <nav class="sidebar">
-        <div style="height: 30px;"></div>
-        <h3>章節目錄</h3>
-        <ul>
-            <li><a href="#section1" class="nav-link">1. Linux 基礎回顧</a></li>
-            <li><a href="#section2" class="nav-link">2. Shell Script 程式設計</a></li>
-            <li><a href="#section3" class="nav-link">3. 系統服務管理</a></li>
-            <li><a href="#section4" class="nav-link">4. 排程與系統監控</a></li>
-            <li><a href="#section5" class="nav-link">5. 實作專案：系統監控儀表板</a></li>
-        </ul>
-    </nav>
-    <header>
-        <div class="content">
-        <img src="system.png" class="big-logo">
-        <h1>SYSTEM</h1>
-        <hr style="border-color: #333; margin: 20px 0;">
-        <div style="height: 50px;"></div>
-        <center>
-            <p style="color:#ddd;font-size:2rem"><B><I>Try Code Here!</I></B></p>
-        </center>
-        <div style="height: 30px;"></div>
-        <div style="max-width: 90%; margin: 0 auto; box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);">
-            <iframe 
-                src="https://www.onlinegdb.com/" 
-                width="100%" 
-                height="600px" 
-                frameborder="0" 
-                style="border-radius: 10px; border: 1px solid #333;"
-                allowfullscreen>
-            </iframe>
-        <div style="height: 50px;"></div>
-        <main class="content">
-            <section id="section1">
-                <h2>1. Linux 基礎回顧</h2>
-                <p>要用程式做「系統」，首先要了解<span style="color:#fa6dff">「作業系統（OS）」</span>本身。Linux是目前伺服器和嵌入式裝置最主流的OS，學習在Linux上製作系統工具，是工程師的必備技能。這章以<span style="color:#ffae00">Linux指令</span>和<span style="color:#ffae00">Shell Script</span>為核心，帶你做出真實可用的系統管理工具。</p>
-                <p>系統開發最常用的Linux指令：<span style="color:#ffae00">ps aux</span>查看所有行程（Process）；<span style="color:#ffae00">top</span>/<span style="color:#ffae00">htop</span>即時監控CPU、記憶體；<span style="color:#ffae00">df -h</span>查磁碟使用量；<span style="color:#ffae00">free -h</span>查記憶體用量；<span style="color:#ffae00">netstat -tulnp</span>（或<span style="color:#ffae00">ss -tulnp</span>）查看開放的網路埠口；<span style="color:#ffae00">lsof</span>查哪個程式開了哪些檔案。</p>
-                <p>系統日誌（Log）是診斷問題的重要線索，存放在<span style="color:#00eeff">/var/log/</span>目錄：<span style="color:#ffae00">syslog</span>或<span style="color:#ffae00">messages</span>是系統總日誌；<span style="color:#ffae00">auth.log</span>記錄登入驗證；<span style="color:#ffae00">kern.log</span>記錄核心訊息。查看日誌用<span style="color:#ffae00">tail -f /var/log/syslog</span>即時追蹤，或用<span style="color:#ffae00">journalctl -xe</span>（systemd系統）查看詳細錯誤。</p>
-                <p>Linux上的<span style="color:#fa6dff">「環境變數（Environment Variables）」</span>是系統設定的重要方式：<span style="color:#ffae00">echo $PATH</span>查看執行檔搜尋路徑；<span style="color:#ffae00">export MY_VAR="value"</span>設定環境變數（只在當前session有效）；要永久保留則加到<span style="color:#00eeff">~/.bashrc</span>或<span style="color:#00eeff">~/.profile</span>，然後<span style="color:#ffae00">source ~/.bashrc</span>讓它生效。環境變數讓你的程式可以讀取系統設定，不用把密碼或路徑寫死在程式碼裡。</p>
-                <p>最後，<span style="color:#fa6dff">「管道（Pipe）」</span>和<span style="color:#fa6dff">「重定向」</span>是組合指令的核心：<span style="color:#ffae00">|</span>把上一個指令的輸出傳給下一個；<span style="color:#ffae00">grep</span>過濾內容；<span style="color:#ffae00">awk</span>擷取特定欄位；<span style="color:#ffae00">sort</span>排序；<span style="color:#ffae00">uniq</span>去重；例如：<span style="color:#ffae00">ps aux | grep python | awk '{print $2}'</span> 就能列出所有Python行程的PID。</p>
+<nav class="top-nav">
+<a class="back" href="index.html">← 回首頁</a>
+<ul class="nav-menu">
+<li><a href="index.html">首頁</a></li>
+<li><a href="guide.html">網站導覽</a></li>
+<li><a href="about.html">關於我們</a></li>
+<li><a href="others.html">其他</a></li>
+<li><button class="gdb-inline" onclick="toggleGdbWindow()">⌨ GDB</button></li>
+</ul>
+</nav>
+<div class="layout">
+<nav class="sidebar">
+<h3>章節目錄</h3>
+<ul>
+<li><a href="#section1">1. Linux 基礎回顧</a></li>
+<li><a href="#section2">2. Shell Script 程式設計</a></li>
+<li><a href="#section3">3. 系統服務管理</a></li>
+<li><a href="#section4">4. 排程與系統監控</a></li>
+<li><a href="#section5">5. 實作專案：系統監控儀表板</a></li>
+</ul>
+</nav>
+<div class="main-content">
+<div class="page-hero">
+<img alt="SYSTEM" src="system.png"/>
+<h1>SYSTEM</h1>
+</div>
+<hr class="page-divider"/>
+<section id="section1">
+<h2>1. Linux 基礎回顧</h2>
+<p>要用程式做「系統」，首先要了解<span data-tip="管理電腦硬體與軟體資源的基礎系統程式" style="color:#fa6dff">「作業系統（OS）」</span>本身。Linux是目前伺服器和嵌入式裝置最主流的OS，學習在Linux上製作系統工具，是工程師的必備技能。這章以<span style="color:#ffae00">Linux指令</span>和<span data-tip="Shell 腳本，將一連串指令寫成檔案自動化執行" style="color:#ffae00">Shell Script</span>為核心，帶你做出真實可用的系統管理工具。</p>
+<p>系統開發最常用的Linux指令：<span data-tip="Linux 指令，顯示所有使用者的執行中行程詳細資訊" style="color:#ffae00">ps aux</span>查看所有行程（Process）；<span data-tip="Linux 動態行程監控指令，即時顯示 CPU 與記憶體使用狀況" style="color:#ffae00">top</span>/<span data-tip="Linux 互動式行程監控工具，顯示 CPU、記憶體使用情況" style="color:#ffae00">htop</span>即時監控CPU、記憶體；<span style="color:#ffae00">df -h</span>查磁碟使用量；<span style="color:#ffae00">free -h</span>查記憶體用量；<span data-tip="Linux 網路狀態指令，顯示所有監聽中的連接埠與服務" style="color:#ffae00">netstat -tulnp</span>（或<span data-tip="Linux 網路連接工具，顯示監聽中的 TCP/UDP 連接埠" style="color:#ffae00">ss -tulnp</span>）查看開放的網路埠口；<span data-tip="Linux 指令，列出所有已開啟的檔案與對應的行程" style="color:#ffae00">lsof</span>查哪個程式開了哪些檔案。</p>
+<p>系統日誌（Log）是診斷問題的重要線索，存放在<span style="color:#00eeff">/var/log/</span>目錄：<span data-tip="Linux 系統日誌服務，記錄核心與各服務的事件訊息" style="color:#ffae00">syslog</span>或<span style="color:#ffae00">messages</span>是系統總日誌；<span style="color:#ffae00">auth.log</span>記錄登入驗證；<span style="color:#ffae00">kern.log</span>記錄核心訊息。查看日誌用<span style="color:#ffae00">tail -f /var/log/syslog</span>即時追蹤，或用<span style="color:#ffae00">journalctl -xe</span>（systemd系統）查看詳細錯誤。</p>
+<p>Linux上的<span data-tip="作業系統層級的設定值，供程式在執行時讀取使用" style="color:#fa6dff">「環境變數（Environment Variables）」</span>是系統設定的重要方式：<span data-tip="顯示系統環境變數 PATH 的值（指令搜尋路徑清單）" style="color:#ffae00">echo $PATH</span>查看執行檔搜尋路徑；<span style="color:#ffae00">export MY_VAR="value"</span>設定環境變數（只在當前session有效）；要永久保留則加到<span style="color:#00eeff">~/.bashrc</span>或<span style="color:#00eeff">~/.profile</span>，然後<span style="color:#ffae00">source ~/.bashrc</span>讓它生效。環境變數讓你的程式可以讀取系統設定，不用把密碼或路徑寫死在程式碼裡。</p>
+<p>最後，<span data-tip="Linux | 符號，將前一指令的輸出作為後一指令的輸入" style="color:#fa6dff">「管道（Pipe）」</span>和<span data-tip="伺服器或程式將請求轉向另一個 URL" style="color:#fa6dff">「重定向」</span>是組合指令的核心：<span style="color:#ffae00">|</span>把上一個指令的輸出傳給下一個；<span data-tip="Linux 文字搜尋指令，在檔案中尋找符合正規表示式的行" style="color:#ffae00">grep</span>過濾內容；<span data-tip="Linux 文字處理工具，以欄為單位解析與處理文字資料" style="color:#ffae00">awk</span>擷取特定欄位；<span data-tip="排序函式，將序列元素依指定順序重新排列" style="color:#ffae00">sort</span>排序；<span data-tip="Linux 指令，移除相鄰重複行（通常先排序再使用）" style="color:#ffae00">uniq</span>去重；例如：<span style="color:#ffae00">ps aux | grep python | awk '{print $2}'</span> 就能列出所有Python行程的PID。</p>
 </section>
-            <section id="section2">
-                <h2>2. Shell Script 程式設計</h2>
-                <p><span style="color:#fa6dff">「Shell Script」</span>是Linux系統自動化的核心，把一連串指令寫成腳本，一鍵執行複雜任務。建立Script：新增副檔名<span style="color:#ffae00">.sh</span>的檔案，第一行固定寫<span style="color:#ffae00">#!/bin/bash</span>（Shebang），告訴系統用bash執行，然後<span style="color:#ffae00">chmod +x script.sh</span>賦予執行權，用<span style="color:#ffae00">./script.sh</span>執行。</p>
-                <p>Shell Script的<span style="color:#fa6dff">「變數」</span>不需要宣告型態，直接賦值：<span style="color:#ffae00">NAME="Alice"</span>（等號兩邊不能有空格！），使用時加<span style="color:#ffae00">$</span>：<span style="color:#ffae00">echo $NAME</span>。接收命令列參數：<span style="color:#ffae00">$1</span>是第一個參數、<span style="color:#ffae00">$2</span>是第二個，<span style="color:#ffae00">$#</span>是參數總數，<span style="color:#ffae00">$@</span>是所有參數。用<span style="color:#ffae00">read 變數名</span>可以互動式地讀取使用者輸入。</p>
-                <p>流程控制：條件判斷用<span style="color:#ffae00">if [ 條件 ]; then ... elif ... else ... fi</span>，條件裡數字比較用<span style="color:#ffae00">-eq</span>（等於）、<span style="color:#ffae00">-ne</span>（不等於）、<span style="color:#ffae00">-gt</span>（大於）、<span style="color:#ffae00">-lt</span>（小於）；字串比較用<span style="color:#ffae00">=</span>和<span style="color:#ffae00">!=</span>；判斷檔案存在用<span style="color:#ffae00">-f 檔名</span>，判斷目錄存在用<span style="color:#ffae00">-d 目錄名</span>。</p>
-                <p>迴圈方面：<span style="color:#ffae00">for i in {1..10}; do ... done</span>跑1到10；<span style="color:#ffae00">for file in *.log; do ... done</span>遍歷所有log檔；<span style="color:#ffae00">while [ 條件 ]; do ... done</span>條件迴圈；用<span style="color:#ffae00">$(指令)</span>把指令的輸出存成變數，例如：<span style="color:#ffae00">FILES=$(ls *.txt)</span>。函式定義：<span style="color:#ffae00">function_name() { ... }</span>，呼叫：<span style="color:#ffae00">function_name 參數</span>。</p>
-                <p>實用技巧：<span style="color:#ffae00">set -e</span>讓Script在任一指令失敗時立即停止（很重要！）；<span style="color:#ffae00">set -x</span>開啟debug模式（每行執行前先印出）；<span style="color:#ffae00">trap 'cleanup' EXIT</span>讓Script結束時（不管正常或異常）執行清理函式；<span style="color:#ffae00">$?</span>取得上一個指令的結束碼（0=成功，非0=失敗）。</p>
+<section id="section2">
+<h2>2. Shell Script 程式設計</h2>
+<p><span data-tip="Shell 腳本，將一連串指令寫成檔案自動化執行" style="color:#fa6dff">「Shell Script」</span>是Linux系統自動化的核心，把一連串指令寫成腳本，一鍵執行複雜任務。建立Script：新增副檔名<span data-tip="Shell 腳本檔案的副檔名，可用 bash 執行" style="color:#ffae00">.sh</span>的檔案，第一行固定寫<span data-tip="Shebang 行，指定此腳本用 bash 解譯器執行" style="color:#ffae00">#!/bin/bash</span>（Shebang），告訴系統用bash執行，然後<span style="color:#ffae00">chmod +x script.sh</span>賦予執行權，用<span data-tip="在當前目錄執行名為 script.sh 的 Shell 腳本" style="color:#ffae00">./script.sh</span>執行。</p>
+<p>Shell Script的<span data-tip="儲存資料的具名容器，值可在程式執行中改變" style="color:#fa6dff">「變數」</span>不需要宣告型態，直接賦值：<span style="color:#ffae00">NAME="Alice"</span>（等號兩邊不能有空格！），使用時加<span style="color:#ffae00">$</span>：<span style="color:#ffae00">echo $NAME</span>。接收命令列參數：<span style="color:#ffae00">$1</span>是第一個參數、<span style="color:#ffae00">$2</span>是第二個，<span style="color:#ffae00">$#</span>是參數總數，<span style="color:#ffae00">$@</span>是所有參數。用<span data-tip="Shell 指令，讀取使用者輸入並儲存到指定變數" style="color:#ffae00">read 變數名</span>可以互動式地讀取使用者輸入。</p>
+<p>流程控制：條件判斷用<span style="color:#ffae00">if [ 條件 ]; then ... elif ... else ... fi</span>，條件裡數字比較用<span data-tip="Shell 條件式，判斷兩個整數是否相等" style="color:#ffae00">-eq</span>（等於）、<span data-tip="Shell 條件式，判斷兩個整數是否不相等" style="color:#ffae00">-ne</span>（不等於）、<span data-tip="Shell 條件式，判斷左側整數是否大於右側" style="color:#ffae00">-gt</span>（大於）、<span data-tip="Shell 條件式，判斷左側整數是否小於右側" style="color:#ffae00">-lt</span>（小於）；字串比較用<span style="color:#ffae00">=</span>和<span style="color:#ffae00">!=</span>；判斷檔案存在用<span data-tip="Shell 指令選項，指定要操作的檔案" style="color:#ffae00">-f 檔名</span>，判斷目錄存在用<span data-tip="Linux mkdir 指令搭配選項，建立目錄" style="color:#ffae00">-d 目錄名</span>。</p>
+<p>迴圈方面：<span style="color:#ffae00">for i in {1..10}; do ... done</span>跑1到10；<span style="color:#ffae00">for file in *.log; do ... done</span>遍歷所有log檔；<span style="color:#ffae00">while [ 條件 ]; do ... done</span>條件迴圈；用<span data-tip="Shell 命令替換語法，將指令執行結果作為字串使用" style="color:#ffae00">$(指令)</span>把指令的輸出存成變數，例如：<span style="color:#ffae00">FILES=$(ls *.txt)</span>。函式定義：<span style="color:#ffae00">function_name() { ... }</span>，呼叫：<span style="color:#ffae00">function_name 參數</span>。</p>
+<p>實用技巧：<span data-tip="Shell 腳本設定，遇到任何指令失敗時立即中止腳本" style="color:#ffae00">set -e</span>讓Script在任一指令失敗時立即停止（很重要！）；<span data-tip="Shell 除錯設定，執行前印出每個指令及其引數" style="color:#ffae00">set -x</span>開啟debug模式（每行執行前先印出）；<span style="color:#ffae00">trap 'cleanup' EXIT</span>讓Script結束時（不管正常或異常）執行清理函式；<span style="color:#ffae00">$?</span>取得上一個指令的結束碼（0=成功，非0=失敗）。</p>
 </section>
-            <section id="section3">
-                <h2>3. 系統服務管理</h2>
-                <p>現代Linux用<span style="color:#fa6dff">「systemd」</span>管理系統服務（daemon），讓你的程式可以開機自動啟動、崩潰時自動重啟。查看服務狀態：<span style="color:#ffae00">systemctl status nginx</span>；啟動/停止/重啟：<span style="color:#ffae00">sudo systemctl start/stop/restart nginx</span>；設為開機自啟：<span style="color:#ffae00">sudo systemctl enable nginx</span>；查看所有服務：<span style="color:#ffae00">systemctl list-units --type=service</span>。</p>
-                <p>要把自己的程式做成<span style="color:#ffee00fa">系統服務</span>，需要建立一個<span style="color:#fa6dff">「.service 設定檔」</span>，放在<span style="color:#00eeff">/etc/systemd/system/</span>下，例如 myapp.service，基本內容包含：<span style="color:#ffae00">[Unit]</span>描述服務、<span style="color:#ffae00">[Service]</span>設定執行指令（ExecStart）、重啟策略（Restart=always）、執行使用者（User）、<span style="color:#ffae00">[Install]</span>設定啟動等級。設好後執行<span style="color:#ffae00">sudo systemctl daemon-reload</span>讓systemd重新讀取設定。</p>
-                <p><span style="color:#fa6dff">「行程管理」</span>是系統開發的重要技能：<span style="color:#ffae00">kill -9 PID</span>強制終止行程；<span style="color:#ffae00">killall 程式名</span>終止所有同名行程；<span style="color:#ffae00">nohup 指令 &amp;</span>讓程式在背景持續運行，關掉終端也不會停；<span style="color:#ffae00">screen</span>或<span style="color:#ffae00">tmux</span>可以建立可以保留的終端會話，是遠端工作的必備工具。</p>
-                <p>系統資源限制用<span style="color:#ffae00">ulimit</span>設定，例如：<span style="color:#ffae00">ulimit -n 65536</span>提高可開啟檔案數（預設1024，做高流量伺服器時常需要調整）。<span style="color:#ffae00">nice -n 10 ./heavy_job</span>可以降低行程的CPU優先權，讓系統其他程式不被拖累；<span style="color:#ffae00">renice</span>可以對已執行中的行程調整優先權。</p>
-                <p>網路設定方面：<span style="color:#ffae00">ip addr show</span>查看網路介面和IP；<span style="color:#ffae00">ip route show</span>查看路由表；<span style="color:#ffae00">iptables</span>或<span style="color:#ffae00">ufw</span>設定防火牆規則，例如<span style="color:#ffae00">sudo ufw allow 80/tcp</span>開放80埠。這些都是架設真實系統服務的必要知識。</p>
+<section id="section3">
+<h2>3. 系統服務管理</h2>
+<p>現代Linux用<span data-tip="Linux 現代初始化系統，管理系統服務的啟動與生命週期" style="color:#fa6dff">「systemd」</span>管理系統服務（daemon），讓你的程式可以開機自動啟動、崩潰時自動重啟。查看服務狀態：<span data-tip="Linux 指令，查看 nginx 服務的目前執行狀態" style="color:#ffae00">systemctl status nginx</span>；啟動/停止/重啟：<span style="color:#ffae00">sudo systemctl start/stop/restart nginx</span>；設為開機自啟：<span style="color:#ffae00">sudo systemctl enable nginx</span>；查看所有服務：<span style="color:#ffae00">systemctl list-units --type=service</span>。</p>
+<p>要把自己的程式做成<span style="color:#ffee00fa">系統服務</span>，需要建立一個<span data-tip="systemd 服務單元檔案，定義服務的啟動行為與依賴關係" style="color:#fa6dff">「.service 設定檔」</span>，放在<span style="color:#00eeff">/etc/systemd/system/</span>下，例如 myapp.service，基本內容包含：<span style="color:#ffae00">[Unit]</span>描述服務、<span style="color:#ffae00">[Service]</span>設定執行指令（ExecStart）、重啟策略（Restart=always）、執行使用者（User）、<span style="color:#ffae00">[Install]</span>設定啟動等級。設好後執行<span style="color:#ffae00">sudo systemctl daemon-reload</span>讓systemd重新讀取設定。</p>
+<p><span data-tip="Linux 中監控、啟動、停止執行中程式的操作" style="color:#fa6dff">「行程管理」</span>是系統開發的重要技能：<span style="color:#ffae00">kill -9 PID</span>強制終止行程；<span data-tip="Linux 指令，終止所有符合指定名稱的行程" style="color:#ffae00">killall 程式名</span>終止所有同名行程；<span style="color:#ffae00">nohup 指令 &amp;</span>讓程式在背景持續運行，關掉終端也不會停；<span data-tip="Linux 終端機多工工具，可建立持續執行的會話" style="color:#ffae00">screen</span>或<span data-tip="Linux 終端機多工器，可分割視窗並保持會話持續執行" style="color:#ffae00">tmux</span>可以建立可以保留的終端會話，是遠端工作的必備工具。</p>
+<p>系統資源限制用<span data-tip="Linux 指令，查看或設定 Shell 的資源使用限制" style="color:#ffae00">ulimit</span>設定，例如：<span style="color:#ffae00">ulimit -n 65536</span>提高可開啟檔案數（預設1024，做高流量伺服器時常需要調整）。<span style="color:#ffae00">nice -n 10 ./heavy_job</span>可以降低行程的CPU優先權，讓系統其他程式不被拖累；<span data-tip="Linux 指令，調整正在執行的行程優先級" style="color:#ffae00">renice</span>可以對已執行中的行程調整優先權。</p>
+<p>網路設定方面：<span data-tip="Linux 指令，顯示所有網路介面的 IP 位址設定" style="color:#ffae00">ip addr show</span>查看網路介面和IP；<span data-tip="Linux 指令，顯示系統的路由表資訊" style="color:#ffae00">ip route show</span>查看路由表；<span data-tip="Linux 防火牆設定工具，管理網路封包過濾規則" style="color:#ffae00">iptables</span>或<span data-tip="Ubuntu 簡化防火牆工具，管理 iptables 規則" style="color:#ffae00">ufw</span>設定防火牆規則，例如<span style="color:#ffae00">sudo ufw allow 80/tcp</span>開放80埠。這些都是架設真實系統服務的必要知識。</p>
 </section>
-            <section id="section4">
-                <h2>4. 排程與系統監控</h2>
-                <p><span style="color:#fa6dff">「Cron排程」</span>讓你的系統任務定時自動執行，用<span style="color:#ffae00">crontab -e</span>編輯，格式是「<span style="color:#ffae00">分 時 日 月 週 指令</span>」，例如：<span style="color:#00eeff">0 2 * * * /home/user/backup.sh</span>每天凌晨2點執行備份；<span style="color:#00eeff">*/5 * * * * /home/user/monitor.sh</span>每5分鐘執行一次監控腳本；<span style="color:#00eeff">0 0 1 * * /home/user/monthly.sh</span>每月1號執行。<span style="color:#ffae00">crontab -l</span>查看目前設定。</p>
-                <p>系統監控腳本的核心是把各種系統資訊<span style="color:#ffee00fa">蒐集、判斷、通知</span>。例如：用<span style="color:#ffae00">df -h | awk</span>擷取磁碟使用率，超過80%就發警告；用<span style="color:#ffae00">free | awk</span>計算記憶體使用百分比；用<span style="color:#ffae00">ping -c 1 目標IP</span>檢查網路連通性，返回碼非0就代表不通。把這些判斷寫進Shell Script，配上Cron定時執行，就是基本的系統監控工具。</p>
-                <p>通知機制：最簡單的是用<span style="color:#ffae00">mail</span>指令發email；或呼叫<span style="color:#fa6dff">「Webhook」</span>，例如Slack、LINE Notify的API，用<span style="color:#ffae00">curl -X POST -d "message=警告" https://notify-api.line.me/api/notify</span>送出通知訊息，讓你在手機上即時收到系統警報。</p>
-                <p><span style="color:#fa6dff">「Log管理」</span>是系統穩定運作的關鍵：用<span style="color:#ffae00">logrotate</span>自動輪替日誌（避免log檔無限成長撐爆磁碟）；在Script中把輸出寫入log：<span style="color:#ffae00">echo "$(date) 備份完成" &gt;&gt; /var/log/myapp.log</span>；<span style="color:#ffae00">$(date +"%Y-%m-%d %H:%M:%S")</span>取得當前時間戳記，讓log有時間記錄。</p>
-                <p>進階監控可以用<span style="color:#ffae00">Python</span>搭配<span style="color:#00eeff">psutil</span>套件，提供更豐富的系統資訊API：CPU、記憶體、磁碟、網路流量全都可以用Python程式讀取和分析，比Shell Script更靈活，也更容易整合資料庫儲存歷史數據。</p>
+<section id="section4">
+<h2>4. 排程與系統監控</h2>
+<p><span data-tip="Linux 定時任務系統，依設定的時間週期自動執行指令" style="color:#fa6dff">「Cron排程」</span>讓你的系統任務定時自動執行，用<span data-tip="編輯當前使用者的 cron 定時任務設定" style="color:#ffae00">crontab -e</span>編輯，格式是「<span data-tip="crontab 五個時間欄位格式，定義定時任務執行時間" style="color:#ffae00">分 時 日 月 週 指令</span>」，例如：<span style="color:#00eeff">0 2 * * * /home/user/backup.sh</span>每天凌晨2點執行備份；<span style="color:#00eeff">*/5 * * * * /home/user/monitor.sh</span>每5分鐘執行一次監控腳本；<span style="color:#00eeff">0 0 1 * * /home/user/monthly.sh</span>每月1號執行。<span style="color:#ffae00">crontab -l</span>查看目前設定。</p>
+<p>系統監控腳本的核心是把各種系統資訊<span style="color:#ffee00fa">蒐集、判斷、通知</span>。例如：用<span style="color:#ffae00">df -h | awk</span>擷取磁碟使用率，超過80%就發警告；用<span style="color:#ffae00">free | awk</span>計算記憶體使用百分比；用<span style="color:#ffae00">ping -c 1 目標IP</span>檢查網路連通性，返回碼非0就代表不通。把這些判斷寫進Shell Script，配上Cron定時執行，就是基本的系統監控工具。</p>
+<p>通知機制：最簡單的是用<span style="color:#ffae00">mail</span>指令發email；或呼叫<span data-tip="事件驅動的 HTTP 回呼，當特定事件發生時主動推送通知到指定 URL" style="color:#fa6dff">「Webhook」</span>，例如Slack、LINE Notify的API，用<span style="color:#ffae00">curl -X POST -d "message=警告" https://notify-api.line.me/api/notify</span>送出通知訊息，讓你在手機上即時收到系統警報。</p>
+<p><span style="color:#fa6dff">「Log管理」</span>是系統穩定運作的關鍵：用<span style="color:#ffae00">logrotate</span>自動輪替日誌（避免log檔無限成長撐爆磁碟）；在Script中把輸出寫入log：<span style="color:#ffae00">echo "$(date) 備份完成" &gt;&gt; /var/log/myapp.log</span>；<span style="color:#ffae00">$(date +"%Y-%m-%d %H:%M:%S")</span>取得當前時間戳記，讓log有時間記錄。</p>
+<p>進階監控可以用<span data-tip="直譯式高階語言，語法簡潔，廣用於 AI、資料科學、網頁後端" style="color:#ffae00">Python</span>搭配<span style="color:#00eeff">psutil</span>套件，提供更豐富的系統資訊API：CPU、記憶體、磁碟、網路流量全都可以用Python程式讀取和分析，比Shell Script更靈活，也更容易整合資料庫儲存歷史數據。</p>
 </section>
-            <section id="section5">
-                <h2>5. 實作專案：系統監控儀表板</h2>
-                <p>把前面學到的所有技術整合起來，做一個<span style="color:#fa6dff">「系統健康監控儀表板」</span>！整體架構：Shell Script定期收集系統資訊 → 寫入文字檔或資料庫 → Python Flask提供Web API → 簡單的HTML/JS前端顯示即時圖表。這是一個完整的全端系統小專案！</p>
-                <p>資料收集腳本（<span style="color:#ffae00">collect.sh</span>）：每分鐘執行，蒐集CPU使用率（<span style="color:#ffae00">top -bn1 | grep "Cpu(s)"</span>）、記憶體（<span style="color:#ffae00">free -m</span>）、磁碟（<span style="color:#ffae00">df -h /</span>）、目前時間，格式化成CSV追加寫入<span style="color:#00eeff">metrics.csv</span>，用Cron設定每分鐘執行。</p>
-                <p>Python API（<span style="color:#ffae00">app.py</span>）：用<span style="color:#ffae00">Flask</span>建立簡單後端，讀取metrics.csv的最近N筆資料，提供<span style="color:#00eeff">/api/metrics</span>端點回傳JSON；若有告警條件（例如CPU>90%）則在回傳資料中標記。<span style="color:#ffae00">flask run --host=0.0.0.0</span>啟動後，外部機器就能透過HTTP存取。</p>
-                <p>前端頁面：用HTML+JS的<span style="color:#ffae00">Chart.js</span>每10秒呼叫一次API，把回傳的數據畫成即時折線圖；有告警時用紅色顯示。這樣就完成了一個可以在瀏覽器上看到伺服器即時狀態的監控系統！</p>
-                <p>最後，把Flask app做成systemd服務，確保主機重開機後自動啟動；把collect.sh設定Cron排程。這樣整個系統就會自動持續運作，不需要手動維護，這就是<span style="color:#ffee00fa">系統自動化</span>的精髓！恭喜完成一個真實的系統工程專案！🖥️</p>
+<section id="section5">
+<h2>5. 實作專案：系統監控儀表板</h2>
+<p>把前面學到的所有技術整合起來，做一個<span data-tip="顯示 CPU、記憶體、磁碟等系統資源即時狀態的視覺介面" style="color:#fa6dff">「系統健康監控儀表板」</span>！整體架構：Shell Script定期收集系統資訊 → 寫入文字檔或資料庫 → Python Flask提供Web API → 簡單的HTML/JS前端顯示即時圖表。這是一個完整的全端系統小專案！</p>
+<p>資料收集腳本（<span style="color:#ffae00">collect.sh</span>）：每分鐘執行，蒐集CPU使用率（<span style="color:#ffae00">top -bn1 | grep "Cpu(s)"</span>）、記憶體（<span style="color:#ffae00">free -m</span>）、磁碟（<span style="color:#ffae00">df -h /</span>）、目前時間，格式化成CSV追加寫入<span style="color:#00eeff">metrics.csv</span>，用Cron設定每分鐘執行。</p>
+<p>Python API（<span data-tip="Flask 應用程式的主入口檔案，定義路由與應用設定" style="color:#ffae00">app.py</span>）：用<span data-tip="Python 輕量級 Web 框架，快速建立 RESTful API 與網頁應用" style="color:#ffae00">Flask</span>建立簡單後端，讀取metrics.csv的最近N筆資料，提供<span style="color:#00eeff">/api/metrics</span>端點回傳JSON；若有告警條件（例如CPU&gt;90%）則在回傳資料中標記。<span style="color:#ffae00">flask run --host=0.0.0.0</span>啟動後，外部機器就能透過HTTP存取。</p>
+<p>前端頁面：用HTML+JS的<span data-tip="JavaScript 圖表函式庫，簡單快速產生互動式圖表" style="color:#ffae00">Chart.js</span>每10秒呼叫一次API，把回傳的數據畫成即時折線圖；有告警時用紅色顯示。這樣就完成了一個可以在瀏覽器上看到伺服器即時狀態的監控系統！</p>
+<p>最後，把Flask app做成systemd服務，確保主機重開機後自動啟動；把collect.sh設定Cron排程。這樣整個系統就會自動持續運作，不需要手動維護，這就是<span style="color:#ffee00fa">系統自動化</span>的精髓！恭喜完成一個真實的系統工程專案！🖥️</p>
 </section>
-        </main>
-    <script>
-        const navLinks = document.querySelectorAll('.nav-link');
-        const sections = document.querySelectorAll('section');
-        window.addEventListener('scroll', () => {
-            let current = '';
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                const sectionHeight = section.clientHeight;
-                if (window.pageYOffset >= (sectionTop - 100)) {
-                    current = section.getAttribute('id');
-                }
-            });
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href').includes(current)) {
-                    link.classList.add('active');
-                }
-            });
+</div>
+</div>
+<!-- GDB Float Window -->
+<div id="gdbFloatWindow">
+<div class="window-header" id="dragHandle">
+<span class="window-title">⌨ GDB Online</span>
+<span class="close-btn" onclick="toggleGdbWindow()">×</span>
+</div>
+<div class="window-content">
+<iframe id="gdbFrame" sandbox="allow-forms allow-scripts allow-same-origin allow-popups" src="https://www.onlinegdb.com/"></iframe>
+</div>
+</div>
+<script src="shared.js"></script>
+<script>
+        const floatWindow = document.getElementById('gdbFloatWindow');
+        const dragHandle  = document.getElementById('dragHandle');
+        function toggleGdbWindow() {
+            floatWindow.style.display = floatWindow.style.display === 'flex' ? 'none' : 'flex';
+        }
+        let isDragging = false, startX, startY, initLeft, initTop;
+        dragHandle.addEventListener('mousedown', e => {
+            isDragging = true;
+            startX = e.clientX; startY = e.clientY;
+            const r = floatWindow.getBoundingClientRect();
+            initLeft = r.left; initTop = r.top;
+            floatWindow.classList.add('is-dragging');
+        });
+        document.addEventListener('mousemove', e => {
+            if (!isDragging) return;
+            floatWindow.style.left = `${initLeft + e.clientX - startX}px`;
+            floatWindow.style.top  = `${initTop  + e.clientY - startY}px`;
+            floatWindow.style.right = 'auto';
+        });
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+            floatWindow.classList.remove('is-dragging');
         });
     </script>
-    </header>
+<script src="tooltips.js"></script>
 </body>
 </html>
