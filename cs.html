@@ -1,288 +1,262 @@
 <!DOCTYPE html>
+
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AC_CS</title>
-    <link rel="icon" href="螢幕擷取畫面 2026-01-05 125529.png" sizes="48x48" type="image/png">
-    <style>
-        body {
-            background-color: rgb(20, 20, 20);
-            color: white;
-            font-family: "Microsoft JhengHei", sans-serif;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AC — CS</title>
+<link href="螢幕擷取畫面 2026-01-05 125529.png" rel="icon" sizes="48x48" type="image/png"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="shared.css" rel="stylesheet"/>
+<style>
+        /* ── GDB FLOAT WINDOW ── */
+        #gdbFloatWindow {
+            display: none; position: fixed;
+            top: 100px; right: 50px;
+            width: 600px; height: 500px;
+            background: #1e1e1e;
+            border: 1px solid #444; border-radius: 10px;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.6);
+            z-index: 2000; flex-direction: column;
+            overflow: hidden; resize: both;
+            min-width: 320px; min-height: 250px;
+            max-width: 95vw; max-height: 95vh;
         }
-        .back-button {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            text-decoration: none;
-            color: aquamarine;
-            border: 1px solid aquamarine;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: all 0.3s;
-            z-index: 1000;
+        .window-header {
+            height: 40px; background: #2a2a2a;
+            display: flex; align-items: center;
+            justify-content: space-between;
+            padding: 0 14px; cursor: move;
+            border-bottom: 1px solid #444;
+            user-select: none; flex-shrink: 0;
         }
-        .back-button:hover {
-            background-color: aquamarine;
-            color: black;
+        .window-title {
+            color: #ccc; font-weight: 700; font-size: 0.85rem;
+            font-family: 'JetBrains Mono', monospace;
         }
-        .content {
-            max-width: 800px;
-            text-align: center;
-            margin-top: 50px;
+        .close-btn {
+            color: #888; font-size: 22px; cursor: pointer;
+            line-height: 1; transition: color 0.2s;
         }
-        h1 { color: aquamarine; font-size: 3rem; margin-bottom: 10px; }
-        p { font-size: 1.2rem; line-height: 1.6; color: #ddd; }
-        .big-logo {
-            width: 150px;
-            height: 150px;
-            object-fit: contain;
-            margin-bottom: 20px;
+        .close-btn:hover { color: #f87171; }
+        .window-content { flex: 1; height: calc(100% - 40px); }
+        .window-content iframe { width: 100%; height: 100%; border: none; }
+        .is-dragging iframe { pointer-events: none; }
+        /* ── PAGE HERO ── */
+        .page-hero {
+            display: flex; align-items: center; gap: 20px;
+            margin-bottom: 24px;
         }
-        html {
-            scroll-behavior: smooth;
+        .page-hero img {
+            width: 72px; height: 72px; object-fit: contain;
+            border-radius: 12px; background: rgba(255,255,255,0.04);
+            padding: 8px; border: 1px solid var(--border);
+            box-shadow: none; margin: 0;
         }
-        .sidebar {
-            width: 200px;
-            height: 100vh;
-            position: fixed; 
-            top: 0;
-            left: 0;
-            background-color: #faa11cd0;
-            padding: 20px;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            overflow-y: auto;
+        .page-hero h1 {
+            font-size: clamp(1.8rem, 4vw, 2.4rem);
+            color: var(--accent); font-weight: 700; margin: 0;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 0.03em;
         }
-        .sidebar ul {
-            list-style: none;
-            padding: 0;
+        /* ── DOWNLOAD BUTTON ── */
+        .download-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            margin-top: 32px; padding: 12px 24px;
+            background: #1d4ed8; color: #fff;
+            text-decoration: none; border-radius: 8px;
+            font-weight: 700; font-size: 0.9rem;
+            transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
         }
-        .sidebar li {
-            margin-bottom: 15px;
+        .download-btn::before { content: '⬇'; }
+        .download-btn:hover {
+            background: #2563eb; transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(29,78,216,0.35);
         }
-        .sidebar a {
-            text-decoration: none;
-            color: #333;
-            display: block;
-            padding: 8px 12px;
-            border-left: 4px solid transparent; 
-            transition: all 0.3s;
+        .download-btn:active { transform: translateY(0); }
+        /* ── GDB INLINE BTN ── */
+        .gdb-inline {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 16px; background: transparent;
+            color: var(--accent); border: 1px solid var(--accent);
+            border-radius: 6px; cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700; font-size: 0.85rem;
+            transition: background 0.2s, color 0.2s, transform 0.15s;
+            margin-left: 8px;
         }
-        .sidebar a:hover {
-            background-color: #faa11cd0;
+        .gdb-inline:hover {
+            background: var(--accent); color: #111;
+            transform: translateY(-1px);
         }
-        .sidebar a.active {
-            color: #007bff;    
-            font-weight: bold;
-            border-left: 4px solid #007bff;
-            background-color: #faa11cd0;
-        }
-        .content {
-            margin-left: 240px;
-            padding: 40px;
-            max-width: 800px;
-        }
-        section {
-            min-height: 80vh; 
-            padding-top: 20px;
-            border-bottom: 1px solid #faa11cd0;
-        }
-        h2 {
-            margin-top: 0;
-        }
-        .nav-menu {
-            display: flex;
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            align-items: center;
-        }
-        .nav-menu li {
-            margin-left: 20px;
-        }
-        .nav-menu a {
-            text-decoration: none;
-            color: #ccc;
-            font-size: 1rem;
-            padding: 5px 10px;
-            border-radius: 4px;
-            transition: all 0.3s;
-        }
-        .nav-menu a:hover {
-            color: white;
-            background-color: rgba(255,255,255,0.1);
-        }
+        .gdb-inline:active { transform: translateY(0); }
     </style>
-    <ul class="nav-menu">
-        <li>
-            <button class="gdb-btn" onclick="toggleGdbWindow()">
-                GDB
-            </button>
-        </li>
-    </ul>
-</head>
+<style>
+/* ── TOOLTIP ── */
+[data-tip] {
+    position: relative;
+    cursor: help;
+    text-decoration: underline dotted currentColor;
+    text-underline-offset: 3px;
+}
+[data-tip]::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e1e2e;
+    color: #e0e0e0;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    white-space: normal;
+    width: max-content;
+    max-width: 260px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(127,255,212,0.25);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    transform: translateX(-50%) translateY(4px);
+    z-index: 9999;
+}
+[data-tip]:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+/* arrow */
+[data-tip]::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 2px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: rgba(127,255,212,0.25);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.18s ease;
+    z-index: 9999;
+}
+[data-tip]:hover::before { opacity: 1; }
+</style></head>
 <body>
-    <a href="index.html" class="back-button">← 回首頁</a>
-    <nav class="sidebar">
-        <div style="height: 30px;"></div>
-        <h3>章節目錄</h3>
-        <ul>
-            <li><a href="#section1" class="nav-link">1. 環境與基礎</a></li>
-            <li><a href="#section2" class="nav-link">2. 變數與資料</a></li>
-            <li><a href="#section3" class="nav-link">3. 流程控制</a></li>
-            <li><a href="#section4" class="nav-link">4. 方法</a></li>
-            <li><a href="#section5" class="nav-link">5. 物件與特性</a></li>
-        </ul>
-    </nav>
-    <header>
-        <div class="content">
-        <img src="Logo_C_sharp.svg-removebg-preview.png" class="big-logo">
-        <h1>C#</h1>
-        <button class="gdb-btn" onclick="toggleGdbWindow()">
-            GDB
-        </button>
-        <hr style="border-color: #333; margin: 20px 0;">
-        <div style="height: 50px;"></div>
-        <center>
-            <p style="color:#ddd;font-size:2rem"><B><I>Try Code Here!</I></B></p>
-        </center>
-        <div style="height: 30px;"></div>
-        <div style="max-width: 90%; margin: 0 auto; box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);">
-            <iframe 
-                src="https://www.onlinegdb.com/" 
-                width="100%" 
-                height="600px" 
-                frameborder="0" 
-                style="border-radius: 10px; border: 1px solid #333;"
-                allowfullscreen>
-            </iframe>
-        </div>
-        <div style="height: 30px;"></div>
-        <main class="content">
-            <section id="section1">
-                <h2>1. 環境與基礎</h2>
-                <p>C#（唸「C Sharp」）是微軟開發的物件導向語言，執行在<span style="color:#fa6dff">「.NET 平台」</span>上，和Java有點像，都是先編譯成中間碼再由虛擬機執行，讓程式可以跨平台運作。C#語法大量借鑒了C++，但更簡潔現代，拿來開發Windows應用、遊戲（Unity就是用C#）、後端服務都非常適合。</p>
-                <p>C#程式的基本結構長這樣：最外層用<span style="color:#ffae00">namespace</span>包住（命名空間，用來組織程式碼，避免名稱衝突）；裡面宣告一個<span style="color:#ffae00">class</span>；再裡面是<span style="color:#ffae00">static void Main(string[] args)</span>，這是程式的進入點，對應C語言的int main()，一切從這裡開始跑。</p>
-                <p>C#的<span style="color:#ffee00fa">輸出</span>用<span style="color:#ffae00">Console.WriteLine()</span>（會自動換行）或<span style="color:#ffae00">Console.Write()</span>（不換行），例如 <span style="color:#ffae00">Console.WriteLine</span>(<span style="color:#00eeff">"Hello World"</span>);。<span style="color:#ffee00fa">輸入</span>用<span style="color:#ffae00">Console.ReadLine()</span>，它回傳的是<span style="color:#ffae00">string</span>，若要轉成數字需要用<span style="color:#ffae00">int.Parse()</span>或<span style="color:#ffae00">Convert.ToInt32()</span>。</p>
-                <p>C#最方便的是<span style="color:#fa6dff">「字串插值（String Interpolation）」</span>，在字串前加<span style="color:#ffae00">$</span>就可以在雙引號內用<span style="color:#00eeff">{變數名稱}</span>直接嵌入變數值，例如 <span style="color:#ffae00">Console.WriteLine</span>(<span style="color:#ffae00">$</span><span style="color:#00eeff">"我叫{name}，今年{age}歲"</span>);，比起C的printf格式符直觀很多！</p>
-                <p>另外，C#的每一行敘述也要以<span style="color:#ffee00fa">分號（;）</span>結尾，程式區塊用大括號<span style="color:#ffae00">{}</span>包住，和C/C++一樣。C#也有<span style="color:#ffae00">using</span>關鍵字（類似C++的#include），例如<span style="color:#ffae00">using</span> <span style="color:#00eeff">System;</span>可以引入基礎函式庫，這樣才能用Console等常用工具。</p>
-            </section>
-            <section id="section2">
-                <h2>2. 變數與資料</h2>
-                <p>C#的<span style="color:#fa6dff">「資料型態」</span>分為<span style="color:#ffae00">實值型態（Value Types）</span>和<span style="color:#ffae00">參考型態（Reference Types）</span>兩大類。實值型態直接儲存資料本身，參考型態儲存的是指向資料的位址，這個概念之後學到class時會更清楚。</p>
-                <p>常見的<span style="color:#ffae00">實值型態</span>有：<span style="color:#ffae00">int</span>（整數）、<span style="color:#ffae00">long</span>（大整數）、<span style="color:#ffae00">float</span>（單精度浮點數，後面要加f，例：3.14<span style="color:#00eeff">f</span>）、<span style="color:#ffae00">double</span>（雙精度浮點數）、<span style="color:#ffae00">decimal</span>（超高精度，適合金融計算）、<span style="color:#ffae00">char</span>（字元，用單引號）、<span style="color:#ffae00">bool</span>（true/false）。常見的<span style="color:#ffae00">參考型態</span>有<span style="color:#ffae00">string</span>（字串）和陣列。</p>
-                <p>C#有個超方便的關鍵字<span style="color:#ffae00">var</span>，讓<span style="color:#fa6dff">編譯器</span>自動<span style="color:#ffee00fa">推斷型態</span>，例如 <span style="color:#ffae00">var</span> <span style="color:#00eeff">x</span> = 10; 編譯器會自動知道x是int。這讓程式碼更簡潔，但可讀性有時會下降，建議型態明確時還是寫清楚比較好。</p>
-                <p>C#的<span style="color:#fa6dff">「陣列」</span>宣告語法是「型態[] 名稱 = new 型態[大小];」，例如 <span style="color:#ffae00">int</span>[] <span style="color:#00eeff">arr</span> = <span style="color:#ffae00">new int</span>[5];，或直接初始化 <span style="color:#ffae00">int</span>[] <span style="color:#00eeff">arr</span> = {1, 2, 3, 4, 5};。索引同樣從0開始，陣列有個<span style="color:#00eeff">.Length</span>屬性可以取得長度，比C語言方便很多！</p>
-                <p>更強大的是<span style="color:#ffae00">List&lt;T&gt;</span>，類似C++的vector，是動態大小的集合，需要<span style="color:#ffee00fa">引入</span><span style="color:#00eeff">System.Collections.Generic</span>。宣告：<span style="color:#ffae00">List</span>&lt;<span style="color:#ffae00">int</span>&gt; <span style="color:#00eeff">list</span> = <span style="color:#ffae00">new</span> <span style="color:#ffae00">List</span>&lt;<span style="color:#ffae00">int</span>&gt;();，新增用<span style="color:#00eeff">.Add()</span>，移除用<span style="color:#00eeff">.Remove()</span>，數量用<span style="color:#00eeff">.Count</span>，比陣列靈活超多！</p>
-            </section>
-            <section id="section3">
-                <h2>3. 流程控制</h2>
-                <p>C#的<span style="color:#fa6dff">「流程控制」</span>和C/C++非常相似，有條件判斷和迴圈兩大類，語法幾乎一樣，但C#多了一些更現代的寫法，讓程式碼更簡潔。</p>
-                <p>條件判斷用<span style="color:#ffae00">if...else if...else</span>，語法和C++相同。C#的<span style="color:#ffae00">switch</span>更強大，不只能比對整數，<span style="color:#ffee00fa">字串、enum甚至型態</span>都可以比對，例如 <span style="color:#ffae00">switch</span>(name){ <span style="color:#ffae00">case</span> <span style="color:#00eeff">"Alice"</span>: ...; <span style="color:#ffae00">break</span>; }，和C一樣記得加break。</p>
-                <p>C#還有個超簡潔的<span style="color:#fa6dff">「三元運算子」</span>，語法是「條件 ? 成立的值 : 不成立的值」，例如 <span style="color:#ffae00">int</span> max = (a &gt; b) <span style="color:#ffae00">?</span> a <span style="color:#ffae00">:</span> b;，一行搞定if-else，適合簡單的賦值判斷。</p>
-                <p>迴圈一樣有<span style="color:#ffae00">for</span>、<span style="color:#ffae00">while</span>、<span style="color:#ffae00">do...while</span>，語法和C++相同。C#還多了一個很好用的<span style="color:#ffae00">foreach</span>，專門用來<span style="color:#ffee00fa">遍歷集合</span>，語法是 <span style="color:#ffae00">foreach</span>（<span style="color:#ffae00">int</span> <span style="color:#00eeff">item</span> <span style="color:#ffae00">in</span> arr）{...}，不用管索引，直接一個一個把元素拿出來用，遍歷陣列或List時非常方便！</p>
-                <p>同樣地，<span style="color:#ffae00">break</span>用來<span style="color:#ffee00fa">跳出</span>迴圈，<span style="color:#ffae00">continue</span>用來<span style="color:#ffee00fa">跳過</span>這一輪直接進行下一輪。C#還有<span style="color:#ffae00">return</span>可以直接結束整個方法，在複雜邏輯中「提早return」是讓程式碼更清晰的好習慣，比一層一層if-else好讀多了。</p>
-            </section>
-            <section id="section4">
-                <h2>4. 方法</h2>
-                <p>C#把函式稱為<span style="color:#fa6dff">「方法（Method）」</span>，因為在C#裡所有東西都必須在class裡面，所以函式的正式名稱就叫方法。宣告語法是：「<span style="color:#ffae00">存取修飾詞 回傳型態</span> <span style="color:#00eeff">方法名稱</span>（<span style="color:#fa6dff">參數型態 參數名稱</span>）{... <span style="color:#ffae00">return</span> 值;}」。</p>
-                <p><span style="color:#fa6dff">「存取修飾詞」</span>決定方法可以被誰呼叫：<span style="color:#ffae00">public</span>（任何地方都能用）、<span style="color:#ffae00">private</span>（只有同一class內能用）、<span style="color:#ffae00">protected</span>（同class和子class能用）。在Main裡直接呼叫的方法需要加<span style="color:#ffae00">static</span>，因為Main本身是static的，static方法可以不用建立物件就直接呼叫。</p>
-                <p>C#的<span style="color:#fa6dff">「參數傳遞」</span>預設也是傳值，若要修改原變數，可以用<span style="color:#ffae00">ref</span>（傳參考，變數要先初始化）或<span style="color:#ffae00">out</span>（也是傳參考，但方法內必須賦值，常用在一個方法要回傳多個值的情況），例如：<span style="color:#ffae00">void</span> <span style="color:#00eeff">GetInfo</span>(<span style="color:#ffae00">out int</span> age, <span style="color:#ffae00">out string</span> name){age = 18; name = <span style="color:#00eeff">"Alice"</span>;}。</p>
-                <p>C#支援<span style="color:#fa6dff">「方法多載（Overloading）」</span>，同名方法可以有不同的參數型態或數量，編譯器自動選對的版本。另外還有<span style="color:#fa6dff">「選擇性參數」</span>，在宣告時給預設值，呼叫時可以省略，例如：<span style="color:#ffae00">void</span> <span style="color:#00eeff">Greet</span>(<span style="color:#ffae00">string</span> name = <span style="color:#00eeff">"訪客"</span>){...}，這樣呼叫Greet()不傳參數也沒問題！</p>
-                <p>C#還有個強大的<span style="color:#fa6dff">「Lambda 運算式」</span>，可以用超簡短的語法定義小型函式，符號是<span style="color:#ffae00">=&gt;</span>，例如：<span style="color:#ffae00">var</span> <span style="color:#00eeff">square</span> = (<span style="color:#ffae00">int</span> x) <span style="color:#ffae00">=&gt;</span> x * x;，呼叫 square(5) 就回傳25。搭配LINQ和集合操作時非常好用，是現代C#開發的必學語法。</p>
-            </section>
-            <section id="section5">
-                <h2>5. 物件與特性</h2>
-                <p>C#是完全的<span style="color:#fa6dff">「物件導向語言（OOP）」</span>，這章是整個C#的核心精神。先說<span style="color:#fa6dff">「類別（class）」</span>：它是物件的設計圖，裡面有<span style="color:#ffae00">屬性（Properties）</span>儲存資料和<span style="color:#ffae00">方法（Methods）</span>定義行為，而<span style="color:#fa6dff">「物件（object）」</span>就是依照設計圖建出來的實體，用<span style="color:#ffae00">new</span>關鍵字建立，例如：<span style="color:#00eeff">Dog</span> myDog = <span style="color:#ffae00">new</span> <span style="color:#00eeff">Dog</span>();。</p>
-                <p>C#的<span style="color:#fa6dff">「屬性（Property）」</span>比C++的成員變數更強大，可以加上<span style="color:#ffae00">get</span>和<span style="color:#ffae00">set</span>存取子來控制讀寫，例如：<span style="color:#ffae00">public int</span> <span style="color:#00eeff">Age</span> { <span style="color:#ffae00">get</span>; <span style="color:#ffae00">set</span>; }，這叫「自動屬性」，也可以在get/set裡加邏輯，例如防止年齡被設為負數。</p>
-                <p><span style="color:#fa6dff">「建構子（Constructor）」</span>和class同名、沒有回傳型態，建立物件時自動執行，用來初始化屬性，可以多載。<span style="color:#fa6dff">「繼承（Inheritance）」</span>語法是 <span style="color:#ffae00">class</span> <span style="color:#00eeff">子類別</span> : <span style="color:#00eeff">父類別</span> {...}，子類別會繼承父類別的public和protected成員，可以用<span style="color:#ffae00">override</span>覆寫父類別的<span style="color:#ffae00">virtual</span>方法，這就是<span style="color:#fa6dff">「多型（Polymorphism）」</span>。</p>
-                <p>C#還有<span style="color:#fa6dff">「介面（Interface）」</span>，用<span style="color:#ffae00">interface</span>關鍵字宣告，只定義方法的簽名而不實作，讓實作它的class保證有這些方法，例如：<span style="color:#ffae00">interface</span> <span style="color:#00eeff">IAnimal</span> { <span style="color:#ffae00">void</span> <span style="color:#00eeff">Speak</span>(); }。一個class可以實作多個interface，解決了C#不支援多重繼承的限制。</p>
-                <p>最後介紹C#超實用的<span style="color:#fa6dff">「例外處理」</span>，語法和C++類似：<span style="color:#ffae00">try</span> {...} <span style="color:#ffae00">catch</span>（<span style="color:#00eeff">Exception</span> e）{...} <span style="color:#ffae00">finally</span> {...}，finally區塊不管有沒有例外都會執行，通常用來做清理工作（例如關閉檔案）。可以用<span style="color:#ffae00">throw new Exception</span>(<span style="color:#00eeff">"錯誤訊息"</span>)手動拋出例外，也可以用更具體的型態如<span style="color:#00eeff">ArgumentNullException</span>、<span style="color:#00eeff">IndexOutOfRangeException</span>等讓錯誤更清楚。</p>
-                <p>恭喜完成C#的基礎學習！C#功能豐富、生態系完整，下一步可以嘗試用它開發一個小型主控台應用程式，或是跑進Unity玩遊戲開發，你會發現這些基礎觀念馬上就派上用場！(加油🎉)</p>
-            </section>
-        </main>
-        <div style="height: 60px;"></div> 
-        <p>最後這裡提供一個用GoogleAI(Gemini)NotebookLM製作的教學綱要簡報簡報，下載起來，方便需要時做迅速的統整和複習~</p>
-        <a href="C  _基礎與實踐藍圖.pdf" download class="download-btn">立即下載檔案</a>
-    <script>
-        const navLinks = document.querySelectorAll('.nav-link');
-        const sections = document.querySelectorAll('section');
-        window.addEventListener('scroll', () => {
-            let current = '';
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                const sectionHeight = section.clientHeight;
-                if (window.pageYOffset >= (sectionTop - 100)) {
-                    current = section.getAttribute('id');
-                }
-            });
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href').includes(current)) {
-                    link.classList.add('active');
-                }
-            });
-        });
-    </script>
-    </header>
-    <div id="gdbFloatWindow">
-        <div class="window-header" id="dragHandle">
-            <span class="window-title">GDB</span>
-            <span class="close-btn" onclick="toggleGdbWindow()">&times;</span>
-        </div>
-        <div class="window-content">
-            <iframe 
-                id="gdbFrame"
-                data-src="https://www.onlinegdb.com/"
-                src="https://www.onlinegdb.com/"
-                sandbox="allow-forms allow-scripts allow-same-origin allow-popups">
-            </iframe>
-        </div>
-    </div>
-    <script>
+<nav class="top-nav">
+<a class="back" href="index.html">← 回首頁</a>
+<ul class="nav-menu">
+<li><a href="index.html">首頁</a></li>
+<li><a href="guide.html">網站導覽</a></li>
+<li><a href="about.html">關於我們</a></li>
+<li><a href="others.html">其他</a></li>
+<li><button class="gdb-inline" onclick="toggleGdbWindow()">⌨ GDB</button></li>
+</ul>
+</nav>
+<div class="layout">
+<nav class="sidebar">
+<h3>章節目錄</h3>
+<ul>
+<li><a href="#section1">1. 環境與基礎</a></li>
+<li><a href="#section2">2. 變數與資料</a></li>
+<li><a href="#section3">3. 流程控制</a></li>
+<li><a href="#section4">4. 方法</a></li>
+<li><a href="#section5">5. 物件與特性</a></li>
+</ul>
+</nav>
+<div class="main-content">
+<div class="page-hero">
+<img alt="C#" src="Logo_C_sharp.svg-removebg-preview.png"/>
+<h1>C#</h1>
+</div>
+<hr class="page-divider"/>
+<section id="section1">
+<h2>1. 環境與基礎</h2>
+<p>C#（唸「C Sharp」）是微軟開發的物件導向語言，執行在<span data-tip="微軟開發的跨平台應用程式框架，支援 C#、F# 等語言" style="color:#fa6dff">「.NET 平台」</span>上，和Java有點像，都是先編譯成中間碼再由虛擬機執行，讓程式可以跨平台運作。C#語法大量借鑒了C++，但更簡潔現代，拿來開發Windows應用、遊戲（Unity就是用C#）、後端服務都非常適合。</p>
+<p>C#程式的基本結構長這樣：最外層用<span data-tip="命名空間，避免不同函式庫中同名識別符衝突的機制" style="color:#ffae00">namespace</span>包住（命名空間，用來組織程式碼，避免名稱衝突）；裡面宣告一個<span data-tip="類別定義關鍵字，封裝屬性和方法的物件導向基本單元" style="color:#ffae00">class</span>；再裡面是<span style="color:#ffae00">static void Main(string[] args)</span>，這是程式的進入點，對應C語言的int main()，一切從這裡開始跑。</p>
+<p>C#的<span style="color:#ffee00fa">輸出</span>用<span data-tip="C# 方法，在主控台輸出文字並自動換行" style="color:#ffae00">Console.WriteLine()</span>（會自動換行）或<span data-tip="C# 方法，在主控台輸出文字但不換行" style="color:#ffae00">Console.Write()</span>（不換行），例如 <span data-tip="C# 方法，在主控台輸出文字並自動換行" style="color:#ffae00">Console.WriteLine</span>(<span style="color:#00eeff">"Hello World"</span>);。<span style="color:#ffee00fa">輸入</span>用<span data-tip="C# 方法，讀取使用者在主控台輸入的一行文字" style="color:#ffae00">Console.ReadLine()</span>，它回傳的是<span data-tip="字串型態，儲存文字序列的資料型態" style="color:#ffae00">string</span>，若要轉成數字需要用<span style="color:#ffae00">int.Parse()</span>或<span data-tip="C# 方法，將字串或其他型態轉換為 32 位元整數" style="color:#ffae00">Convert.ToInt32()</span>。</p>
+<p>C#最方便的是<span data-tip="在字串中直接嵌入變數或運算式的語法" style="color:#fa6dff">「字串插值（String Interpolation）」</span>，在字串前加<span style="color:#ffae00">$</span>就可以在雙引號內用<span style="color:#00eeff">{變數名稱}</span>直接嵌入變數值，例如 <span data-tip="C# 方法，在主控台輸出文字並自動換行" style="color:#ffae00">Console.WriteLine</span>(<span style="color:#ffae00">$</span><span style="color:#00eeff">"我叫{name}，今年{age}歲"</span>);，比起C的printf格式符直觀很多！</p>
+<p>另外，C#的每一行敘述也要以<span style="color:#ffee00fa">分號（;）</span>結尾，程式區塊用大括號<span style="color:#ffae00">{}</span>包住，和C/C++一樣。C#也有<span data-tip="C# 命名空間匯入或資源自動釋放的關鍵字" style="color:#ffae00">using</span>關鍵字（類似C++的#include），例如<span data-tip="C# 命名空間匯入或資源自動釋放的關鍵字" style="color:#ffae00">using</span> <span style="color:#00eeff">System;</span>可以引入基礎函式庫，這樣才能用Console等常用工具。</p>
+</section>
+<section id="section2">
+<h2>2. 變數與資料</h2>
+<p>C#的<span data-tip="定義變數可儲存哪種資料及其操作方式" style="color:#fa6dff">「資料型態」</span>分為<span data-tip="C# 中直接儲存資料的型態，位於堆疊而非堆積" style="color:#ffae00">實值型態（Value Types）</span>和<span data-tip="儲存物件記憶體位址，賦值時共用同一物件" style="color:#ffae00">參考型態（Reference Types）</span>兩大類。實值型態直接儲存資料本身，參考型態儲存的是指向資料的位址，這個概念之後學到class時會更清楚。</p>
+<p>常見的<span data-tip="直接儲存資料的型態，賦值時複製整個值（int、struct 等）" style="color:#ffae00">實值型態</span>有：<span data-tip="整數型態，儲存不含小數點的數字" style="color:#ffae00">int</span>（整數）、<span data-tip="長整數型態，比 int 範圍更大（通常 64 位元）" style="color:#ffae00">long</span>（大整數）、<span data-tip="浮點數型態，或 CSS 的浮動排版屬性" style="color:#ffae00">float</span>（單精度浮點數，後面要加f，例：3.14<span style="color:#00eeff">f</span>）、<span data-tip="雙精度浮點型態，佔 64 位元，比 float 精度更高" style="color:#ffae00">double</span>（雙精度浮點數）、<span data-tip="C# 高精度十進位浮點型態，常用於金融計算" style="color:#ffae00">decimal</span>（超高精度，適合金融計算）、<span data-tip="字元型態，儲存單一字元（通常為 ASCII 或 Unicode）" style="color:#ffae00">char</span>（字元，用單引號）、<span data-tip="布林型態，只有 true 或 false 兩種值" style="color:#ffae00">bool</span>（true/false）。常見的<span data-tip="儲存物件記憶體位址的型態，多個參考可指向同一物件" style="color:#ffae00">參考型態</span>有<span data-tip="字串型態，儲存文字序列的資料型態" style="color:#ffae00">string</span>（字串）和陣列。</p>
+<p>C#有個超方便的關鍵字<span data-tip="可重新賦值的變數宣告關鍵字" style="color:#ffae00">var</span>，讓<span data-tip="將高階程式語言原始碼轉換為機器碼的程式" style="color:#fa6dff">編譯器</span>自動<span style="color:#ffee00fa">推斷型態</span>，例如 <span data-tip="可重新賦值的變數宣告關鍵字" style="color:#ffae00">var</span> <span style="color:#00eeff">x</span> = 10; 編譯器會自動知道x是int。這讓程式碼更簡潔，但可讀性有時會下降，建議型態明確時還是寫清楚比較好。</p>
+<p>C#的<span data-tip="連續記憶體儲存相同型態元素的基本資料結構" style="color:#fa6dff">「陣列」</span>宣告語法是「型態[] 名稱 = new 型態[大小];」，例如 <span data-tip="整數型態，儲存不含小數點的數字" style="color:#ffae00">int</span>[] <span style="color:#00eeff">arr</span> = <span style="color:#ffae00">new int</span>[5];，或直接初始化 <span data-tip="整數型態，儲存不含小數點的數字" style="color:#ffae00">int</span>[] <span style="color:#00eeff">arr</span> = {1, 2, 3, 4, 5};。索引同樣從0開始，陣列有個<span style="color:#00eeff">.Length</span>屬性可以取得長度，比C語言方便很多！</p>
+<p>更強大的是<span style="color:#ffae00">List&lt;T&gt;</span>，類似C++的vector，是動態大小的集合，需要<span style="color:#ffee00fa">引入</span><span style="color:#00eeff">System.Collections.Generic</span>。宣告：<span data-tip="有序可重複的集合資料結構，支援索引存取" style="color:#ffae00">List</span>&lt;<span data-tip="整數型態，儲存不含小數點的數字" style="color:#ffae00">int</span>&gt; <span style="color:#00eeff">list</span> = <span data-tip="建立物件實例的關鍵字，在記憶體中配置並初始化物件" style="color:#ffae00">new</span> <span data-tip="有序可重複的集合資料結構，支援索引存取" style="color:#ffae00">List</span>&lt;<span data-tip="整數型態，儲存不含小數點的數字" style="color:#ffae00">int</span>&gt;();，新增用<span style="color:#00eeff">.Add()</span>，移除用<span style="color:#00eeff">.Remove()</span>，數量用<span style="color:#00eeff">.Count</span>，比陣列靈活超多！</p>
+</section>
+<section id="section3">
+<h2>3. 流程控制</h2>
+<p>C#的<span data-tip="決定程式執行順序的語法（條件判斷、迴圈、跳轉）" style="color:#fa6dff">「流程控制」</span>和C/C++非常相似，有條件判斷和迴圈兩大類，語法幾乎一樣，但C#多了一些更現代的寫法，讓程式碼更簡潔。</p>
+<p>條件判斷用<span style="color:#ffae00">if...else if...else</span>，語法和C++相同。C#的<span data-tip="多分支條件語句，依變數值選擇對應的 case 執行" style="color:#ffae00">switch</span>更強大，不只能比對整數，<span style="color:#ffee00fa">字串、enum甚至型態</span>都可以比對，例如 <span data-tip="多分支條件語句，依變數值選擇對應的 case 執行" style="color:#ffae00">switch</span>(name){ <span data-tip="switch 語句中的分支條件標籤" style="color:#ffae00">case</span> <span style="color:#00eeff">"Alice"</span>: ...; <span data-tip="跳出當前迴圈或 switch 語句，繼續執行後續程式碼" style="color:#ffae00">break</span>; }，和C一樣記得加break。</p>
+<p>C#還有個超簡潔的<span data-tip="條件? 真值 : 假值，單行的條件選擇語法" style="color:#fa6dff">「三元運算子」</span>，語法是「條件 ? 成立的值 : 不成立的值」，例如 <span data-tip="整數型態，儲存不含小數點的數字" style="color:#ffae00">int</span> max = (a &gt; b) <span style="color:#ffae00">?</span> a <span style="color:#ffae00">:</span> b;，一行搞定if-else，適合簡單的賦值判斷。</p>
+<p>迴圈一樣有<span data-tip="計數迴圈語法，重複執行指定次數或遍歷集合" style="color:#ffae00">for</span>、<span data-tip="條件迴圈語法，條件為真時持續重複執行" style="color:#ffae00">while</span>、<span data-tip="先執行一次再判斷條件的迴圈，確保至少執行一次" style="color:#ffae00">do...while</span>，語法和C++相同。C#還多了一個很好用的<span data-tip="C# 迴圈語法，遍歷集合中每個元素" style="color:#ffae00">foreach</span>，專門用來<span style="color:#ffee00fa">遍歷集合</span>，語法是 <span data-tip="C# 迴圈語法，遍歷集合中每個元素" style="color:#ffae00">foreach</span>（<span data-tip="整數型態，儲存不含小數點的數字" style="color:#ffae00">int</span> <span style="color:#00eeff">item</span> <span data-tip="Python 成員運算子，判斷元素是否在集合中" style="color:#ffae00">in</span> arr）{...}，不用管索引，直接一個一個把元素拿出來用，遍歷陣列或List時非常方便！</p>
+<p>同樣地，<span data-tip="跳出當前迴圈或 switch 語句，繼續執行後續程式碼" style="color:#ffae00">break</span>用來<span style="color:#ffee00fa">跳出</span>迴圈，<span data-tip="跳過本次迴圈剩餘程式碼，直接進入下一次迭代" style="color:#ffae00">continue</span>用來<span style="color:#ffee00fa">跳過</span>這一輪直接進行下一輪。C#還有<span data-tip="函式回傳值的關鍵字，結束函式執行並傳回結果" style="color:#ffae00">return</span>可以直接結束整個方法，在複雜邏輯中「提早return」是讓程式碼更清晰的好習慣，比一層一層if-else好讀多了。</p>
+</section>
+<section id="section4">
+<h2>4. 方法</h2>
+<p>C#把函式稱為<span style="color:#fa6dff">「方法（Method）」</span>，因為在C#裡所有東西都必須在class裡面，所以函式的正式名稱就叫方法。宣告語法是：「<span style="color:#ffae00">存取修飾詞 回傳型態</span> <span style="color:#00eeff">方法名稱</span>（<span style="color:#fa6dff">參數型態 參數名稱</span>）{... <span data-tip="函式回傳值的關鍵字，結束函式執行並傳回結果" style="color:#ffae00">return</span> 值;}」。</p>
+<p><span data-tip="控制類別成員可被存取範圍的關鍵字（public/private）" style="color:#fa6dff">「存取修飾詞」</span>決定方法可以被誰呼叫：<span data-tip="存取修飾詞，成員可從任何地方存取" style="color:#ffae00">public</span>（任何地方都能用）、<span data-tip="存取修飾詞，成員只能在類別內部存取" style="color:#ffae00">private</span>（只有同一class內能用）、<span data-tip="存取修飾詞，成員可在類別內部和子類別中存取" style="color:#ffae00">protected</span>（同class和子class能用）。在Main裡直接呼叫的方法需要加<span data-tip="靜態修飾詞，讓成員屬於類別本身而非特定實例" style="color:#ffae00">static</span>，因為Main本身是static的，static方法可以不用建立物件就直接呼叫。</p>
+<p>C#的<span data-tip="函式呼叫時將資料傳入函式的方式（傳值或傳參考）" style="color:#fa6dff">「參數傳遞」</span>預設也是傳值，若要修改原變數，可以用<span data-tip="C# 參考傳遞，讓函式可修改呼叫者的原始變數" style="color:#ffae00">ref</span>（傳參考，變數要先初始化）或<span style="color:#ffae00">out</span>（也是傳參考，但方法內必須賦值，常用在一個方法要回傳多個值的情況），例如：<span data-tip="無回傳值的函式宣告型態" style="color:#ffae00">void</span> <span style="color:#00eeff">GetInfo</span>(<span data-tip="C# out 關鍵字，讓函式透過參數回傳額外的輸出值" style="color:#ffae00">out int</span> age, <span style="color:#ffae00">out string</span> name){age = 18; name = <span style="color:#00eeff">"Alice"</span>;}。</p>
+<p>C#支援<span data-tip="同名方法有不同參數型態或數量，編譯器依呼叫自動選擇" style="color:#fa6dff">「方法多載（Overloading）」</span>，同名方法可以有不同的參數型態或數量，編譯器自動選對的版本。另外還有<span data-tip="函式定義中有預設值的參數，呼叫時可以省略" style="color:#fa6dff">「選擇性參數」</span>，在宣告時給預設值，呼叫時可以省略，例如：<span data-tip="無回傳值的函式宣告型態" style="color:#ffae00">void</span> <span style="color:#00eeff">Greet</span>(<span data-tip="字串型態，儲存文字序列的資料型態" style="color:#ffae00">string</span> name = <span style="color:#00eeff">"訪客"</span>){...}，這樣呼叫Greet()不傳參數也沒問題！</p>
+<p>C#還有個強大的<span data-tip="C#/Java 的匿名函式語法，常用於 LINQ 或 Stream API" style="color:#fa6dff">「Lambda 運算式」</span>，可以用超簡短的語法定義小型函式，符號是<span style="color:#ffae00">=&gt;</span>，例如：<span data-tip="可重新賦值的變數宣告關鍵字" style="color:#ffae00">var</span> <span style="color:#00eeff">square</span> = (<span data-tip="整數型態，儲存不含小數點的數字" style="color:#ffae00">int</span> x) <span style="color:#ffae00">=&gt;</span> x * x;，呼叫 square(5) 就回傳25。搭配LINQ和集合操作時非常好用，是現代C#開發的必學語法。</p>
+</section>
+<section id="section5">
+<h2>5. 物件與特性</h2>
+<p>C#是完全的<span data-tip="以物件封裝資料與行為的程式設計語言" style="color:#fa6dff">「物件導向語言（OOP）」</span>，這章是整個C#的核心精神。先說<span data-tip="物件導向的設計藍圖，定義物件的屬性和方法" style="color:#fa6dff">「類別（class）」</span>：它是物件的設計圖，裡面有<span style="color:#ffae00">屬性（Properties）</span>儲存資料和<span style="color:#ffae00">方法（Methods）</span>定義行為，而<span style="color:#fa6dff">「物件（object）」</span>就是依照設計圖建出來的實體，用<span data-tip="建立物件實例的關鍵字，在記憶體中配置並初始化物件" style="color:#ffae00">new</span>關鍵字建立，例如：<span style="color:#00eeff">Dog</span> myDog = <span data-tip="建立物件實例的關鍵字，在記憶體中配置並初始化物件" style="color:#ffae00">new</span> <span style="color:#00eeff">Dog</span>();。</p>
+<p>C#的<span style="color:#fa6dff">「屬性（Property）」</span>比C++的成員變數更強大，可以加上<span data-tip="HTTP GET 方法，或物件的 getter 存取器" style="color:#ffae00">get</span>和<span data-tip="集合資料結構，元素唯一不重複，或 SQL 更新子句" style="color:#ffae00">set</span>存取子來控制讀寫，例如：<span style="color:#ffae00">public int</span> <span style="color:#00eeff">Age</span> { <span data-tip="HTTP GET 方法，或物件的 getter 存取器" style="color:#ffae00">get</span>; <span data-tip="集合資料結構，元素唯一不重複，或 SQL 更新子句" style="color:#ffae00">set</span>; }，這叫「自動屬性」，也可以在get/set裡加邏輯，例如防止年齡被設為負數。</p>
+<p><span data-tip="與類別同名的特殊方法，建立物件時自動執行初始化" style="color:#fa6dff">「建構子（Constructor）」</span>和class同名、沒有回傳型態，建立物件時自動執行，用來初始化屬性，可以多載。<span data-tip="讓子類別繼承父類別的屬性與方法，實現程式碼重用" style="color:#fa6dff">「繼承（Inheritance）」</span>語法是 <span data-tip="類別定義關鍵字，封裝屬性和方法的物件導向基本單元" style="color:#ffae00">class</span> <span style="color:#00eeff">子類別</span> : <span style="color:#00eeff">父類別</span> {...}，子類別會繼承父類別的public和protected成員，可以用<span data-tip="方法覆寫關鍵字，子類別重新定義繼承自父類別的方法" style="color:#ffae00">override</span>覆寫父類別的<span data-tip="C++ 虛擬函式修飾詞，讓子類別可覆寫並支援多型" style="color:#ffae00">virtual</span>方法，這就是<span data-tip="父類別參考可指向子類別物件並執行對應的覆寫方法" style="color:#fa6dff">「多型（Polymorphism）」</span>。</p>
+<p>C#還有<span data-tip="定義類別必須實作的方法契約，不包含實作細節" style="color:#fa6dff">「介面（Interface）」</span>，用<span data-tip="介面定義關鍵字，規定類別必須實作的方法契約" style="color:#ffae00">interface</span>關鍵字宣告，只定義方法的簽名而不實作，讓實作它的class保證有這些方法，例如：<span data-tip="介面定義關鍵字，規定類別必須實作的方法契約" style="color:#ffae00">interface</span> <span style="color:#00eeff">IAnimal</span> { <span data-tip="無回傳值的函式宣告型態" style="color:#ffae00">void</span> <span style="color:#00eeff">Speak</span>(); }。一個class可以實作多個interface，解決了C#不支援多重繼承的限制。</p>
+<p>最後介紹C#超實用的<span data-tip="捕捉並妥善處理程式執行時錯誤的機制" style="color:#fa6dff">「例外處理」</span>，語法和C++類似：<span data-tip="例外處理關鍵字，包裹可能發生錯誤的程式碼" style="color:#ffae00">try</span> {...} <span data-tip="例外處理語法，捕捉 try 區塊中拋出的錯誤並處理" style="color:#ffae00">catch</span>（<span style="color:#00eeff">Exception</span> e）{...} <span data-tip="例外處理關鍵字，無論是否發生例外都一定會執行的區塊" style="color:#ffae00">finally</span> {...}，finally區塊不管有沒有例外都會執行，通常用來做清理工作（例如關閉檔案）。可以用<span style="color:#ffae00">throw new Exception</span>(<span style="color:#00eeff">"錯誤訊息"</span>)手動拋出例外，也可以用更具體的型態如<span style="color:#00eeff">ArgumentNullException</span>、<span style="color:#00eeff">IndexOutOfRangeException</span>等讓錯誤更清楚。</p>
+<p>恭喜完成C#的基礎學習！C#功能豐富、生態系完整，下一步可以嘗試用它開發一個小型主控台應用程式，或是跑進Unity玩遊戲開發，你會發現這些基礎觀念馬上就派上用場！(加油🎉)</p>
+</section>
+<div style="margin-top: 40px; padding: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px;">
+<p style="color: var(--muted); margin-bottom: 16px;">📄 最後這裡提供一個用GoogleAI(Gemini)NotebookLM製作的教學綱要簡報簡報，下載起來，方便需要時做迅速的統整和複習~</p>
+<a class="download-btn" download="" href="C  _基礎與實踐藍圖.pdf">立即下載檔案</a>
+</div>
+</div>
+</div>
+<!-- GDB Float Window -->
+<div id="gdbFloatWindow">
+<div class="window-header" id="dragHandle">
+<span class="window-title">⌨ GDB Online</span>
+<span class="close-btn" onclick="toggleGdbWindow()">×</span>
+</div>
+<div class="window-content">
+<iframe id="gdbFrame" sandbox="allow-forms allow-scripts allow-same-origin allow-popups" src="https://www.onlinegdb.com/"></iframe>
+</div>
+</div>
+<script src="shared.js"></script>
+<script>
         const floatWindow = document.getElementById('gdbFloatWindow');
-        const iframe = document.getElementById('gdbFrame');
-        const dragHandle = document.getElementById('dragHandle');
+        const dragHandle  = document.getElementById('dragHandle');
         function toggleGdbWindow() {
-            if (floatWindow.style.display === 'flex') {
-                floatWindow.style.display = 'none';
-            } else {
-                floatWindow.style.display = 'flex';
-                if (iframe.getAttribute('src') === "") {
-                    iframe.setAttribute('src', iframe.getAttribute('data-src'));
-                }
-            }
+            floatWindow.style.display = floatWindow.style.display === 'flex' ? 'none' : 'flex';
         }
-        let isDragging = false;
-        let startX, startY, initialLeft, initialTop;
-        dragHandle.addEventListener('mousedown', function(e) {
+        let isDragging = false, startX, startY, initLeft, initTop;
+        dragHandle.addEventListener('mousedown', e => {
             isDragging = true;
-            startX = e.clientX;
-            startY = e.clientY;
-            const rect = floatWindow.getBoundingClientRect();
-            initialLeft = rect.left;
-            initialTop = rect.top;
+            startX = e.clientX; startY = e.clientY;
+            const r = floatWindow.getBoundingClientRect();
+            initLeft = r.left; initTop = r.top;
             floatWindow.classList.add('is-dragging');
         });
-        document.addEventListener('mousemove', function(e) {
-            if (isDragging) {
-                const dx = e.clientX - startX;
-                const dy = e.clientY - startY;
-                floatWindow.style.left = `${initialLeft + dx}px`;
-                floatWindow.style.top = `${initialTop + dy}px`;
-                floatWindow.style.right = 'auto'; 
-            }
+        document.addEventListener('mousemove', e => {
+            if (!isDragging) return;
+            floatWindow.style.left = `${initLeft + e.clientX - startX}px`;
+            floatWindow.style.top  = `${initTop  + e.clientY - startY}px`;
+            floatWindow.style.right = 'auto';
         });
-        document.addEventListener('mouseup', function() {
+        document.addEventListener('mouseup', () => {
             isDragging = false;
             floatWindow.classList.remove('is-dragging');
         });
     </script>
+<script src="tooltips.js"></script>
 </body>
 </html>

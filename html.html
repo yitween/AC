@@ -1,283 +1,257 @@
 <!DOCTYPE html>
+
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AC_HTML</title>
-    <link rel="icon" href="螢幕擷取畫面 2026-01-05 125529.png" sizes="48x48" type="image/png">
-    <style>
-        body {
-            background-color: rgb(20, 20, 20);
-            color: white;
-            font-family: "Microsoft JhengHei", sans-serif;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AC — HTML</title>
+<link href="螢幕擷取畫面 2026-01-05 125529.png" rel="icon" sizes="48x48" type="image/png"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="shared.css" rel="stylesheet"/>
+<style>
+        /* ── GDB FLOAT WINDOW ── */
+        #gdbFloatWindow {
+            display: none; position: fixed;
+            top: 100px; right: 50px;
+            width: 600px; height: 500px;
+            background: #1e1e1e;
+            border: 1px solid #444; border-radius: 10px;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.6);
+            z-index: 2000; flex-direction: column;
+            overflow: hidden; resize: both;
+            min-width: 320px; min-height: 250px;
+            max-width: 95vw; max-height: 95vh;
         }
-        .back-button {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            text-decoration: none;
-            color: aquamarine;
-            border: 1px solid aquamarine;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: all 0.3s;
-            z-index: 1000;
+        .window-header {
+            height: 40px; background: #2a2a2a;
+            display: flex; align-items: center;
+            justify-content: space-between;
+            padding: 0 14px; cursor: move;
+            border-bottom: 1px solid #444;
+            user-select: none; flex-shrink: 0;
         }
-        .back-button:hover {
-            background-color: aquamarine;
-            color: black;
+        .window-title {
+            color: #ccc; font-weight: 700; font-size: 0.85rem;
+            font-family: 'JetBrains Mono', monospace;
         }
-        .content {
-            max-width: 800px;
-            text-align: center;
-            margin-top: 50px;
+        .close-btn {
+            color: #888; font-size: 22px; cursor: pointer;
+            line-height: 1; transition: color 0.2s;
         }
-        h1 { color: aquamarine; font-size: 3rem; margin-bottom: 10px; }
-        p { font-size: 1.2rem; line-height: 1.6; color: #ddd; }
-        .big-logo {
-            width: 150px;
-            height: 150px;
-            object-fit: contain;
-            margin-bottom: 20px;
+        .close-btn:hover { color: #f87171; }
+        .window-content { flex: 1; height: calc(100% - 40px); }
+        .window-content iframe { width: 100%; height: 100%; border: none; }
+        .is-dragging iframe { pointer-events: none; }
+        /* ── PAGE HERO ── */
+        .page-hero {
+            display: flex; align-items: center; gap: 20px;
+            margin-bottom: 24px;
         }
-        html {
-            scroll-behavior: smooth;
+        .page-hero img {
+            width: 72px; height: 72px; object-fit: contain;
+            border-radius: 12px; background: rgba(255,255,255,0.04);
+            padding: 8px; border: 1px solid var(--border);
+            box-shadow: none; margin: 0;
         }
-        .sidebar {
-            width: 200px;
-            height: 100vh;
-            position: fixed; 
-            top: 0;
-            left: 0;
-            background-color: #faa11cd0;
-            padding: 20px;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            overflow-y: auto;
+        .page-hero h1 {
+            font-size: clamp(1.8rem, 4vw, 2.4rem);
+            color: var(--accent); font-weight: 700; margin: 0;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 0.03em;
         }
-        .sidebar ul {
-            list-style: none;
-            padding: 0;
+        /* ── DOWNLOAD BUTTON ── */
+        .download-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            margin-top: 32px; padding: 12px 24px;
+            background: #1d4ed8; color: #fff;
+            text-decoration: none; border-radius: 8px;
+            font-weight: 700; font-size: 0.9rem;
+            transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
         }
-        .sidebar li {
-            margin-bottom: 15px;
+        .download-btn::before { content: '⬇'; }
+        .download-btn:hover {
+            background: #2563eb; transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(29,78,216,0.35);
         }
-        .sidebar a {
-            text-decoration: none;
-            color: #333;
-            display: block;
-            padding: 8px 12px;
-            border-left: 4px solid transparent; 
-            transition: all 0.3s;
+        .download-btn:active { transform: translateY(0); }
+        /* ── GDB INLINE BTN ── */
+        .gdb-inline {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 16px; background: transparent;
+            color: var(--accent); border: 1px solid var(--accent);
+            border-radius: 6px; cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700; font-size: 0.85rem;
+            transition: background 0.2s, color 0.2s, transform 0.15s;
+            margin-left: 8px;
         }
-        .sidebar a:hover {
-            background-color: #faa11cd0;
+        .gdb-inline:hover {
+            background: var(--accent); color: #111;
+            transform: translateY(-1px);
         }
-        .sidebar a.active {
-            color: #007bff;    
-            font-weight: bold;
-            border-left: 4px solid #007bff;
-            background-color: #faa11cd0;
-        }
-        .content {
-            margin-left: 240px;
-            padding: 40px;
-            max-width: 800px;
-        }
-        section {
-            min-height: 80vh; 
-            padding-top: 20px;
-            border-bottom: 1px solid #faa11cd0;
-        }
-        h2 {
-            margin-top: 0;
-        }
-        .nav-menu {
-            display: flex;
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            align-items: center;
-        }
-        .nav-menu li {
-            margin-left: 20px;
-        }
-        .nav-menu a {
-            text-decoration: none;
-            color: #ccc;
-            font-size: 1rem;
-            padding: 5px 10px;
-            border-radius: 4px;
-            transition: all 0.3s;
-        }
-        .nav-menu a:hover {
-            color: white;
-            background-color: rgba(255,255,255,0.1);
-        }
+        .gdb-inline:active { transform: translateY(0); }
     </style>
-    <ul class="nav-menu">
-        <li>
-            <button class="gdb-btn" onclick="toggleGdbWindow()">
-                GDB
-            </button>
-        </li>
-    </ul>
-</head>
+<style>
+/* ── TOOLTIP ── */
+[data-tip] {
+    position: relative;
+    cursor: help;
+    text-decoration: underline dotted currentColor;
+    text-underline-offset: 3px;
+}
+[data-tip]::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e1e2e;
+    color: #e0e0e0;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    white-space: normal;
+    width: max-content;
+    max-width: 260px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(127,255,212,0.25);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    transform: translateX(-50%) translateY(4px);
+    z-index: 9999;
+}
+[data-tip]:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+/* arrow */
+[data-tip]::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 2px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: rgba(127,255,212,0.25);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.18s ease;
+    z-index: 9999;
+}
+[data-tip]:hover::before { opacity: 1; }
+</style></head>
 <body>
-    <a href="index.html" class="back-button">← 回首頁</a>
-    <nav class="sidebar">
-        <div style="height: 30px;"></div>
-        <h3>章節目錄</h3>
-        <ul>
-            <li><a href="#section1" class="nav-link">1. 文件結構</a></li>
-            <li><a href="#section2" class="nav-link">2. 文字元素</a></li>
-            <li><a href="#section3" class="nav-link">3. 媒體與表格</a></li>
-            <li><a href="#section4" class="nav-link">4. 表單互動</a></li>
-            <li><a href="#section5" class="nav-link">5. 區塊與語意</a></li>
-        </ul>
-    </nav>
-    <header>
-        <div class="content">
-        <img src="htmllogo-removebg-preview.png" class="big-logo">
-        <h1>HTML</h1>
-        <button class="gdb-btn" onclick="toggleGdbWindow()">
-            GDB
-        </button>
-        <hr style="border-color: #333; margin: 20px 0;">
-        <div style="height: 50px;"></div>
-        <center>
-            <p style="color:#ddd;font-size:2rem"><B><I>Try Code Here!</I></B></p>
-        </center>
-        <div style="height: 30px;"></div>
-        <div style="max-width: 90%; margin: 0 auto; box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);">
-            <iframe 
-                src="https://www.onlinegdb.com/" 
-                width="100%" 
-                height="600px" 
-                frameborder="0" 
-                style="border-radius: 10px; border: 1px solid #333;"
-                allowfullscreen>
-            </iframe>
-        </div>
-        <div style="height: 30px;"></div>
-        <main class="content">
-            <section id="section1">
-                <h2>1. 文件結構</h2>
-                <p>HTML（HyperText Markup Language）是網頁的骨架，它不是程式語言，而是<span style="color:#fa6dff">「標記語言」</span>，用<span style="color:#ffae00">標籤（Tag）</span>來描述網頁的結構和內容。瀏覽器讀取HTML後，依照標籤把內容呈現在畫面上。</p>
-                <p>一個完整的HTML文件結構長這樣：最頂端是<span style="color:#ffae00">&lt;!DOCTYPE html&gt;</span>，告訴瀏覽器這是HTML5文件；接著是<span style="color:#ffae00">&lt;html lang="zh-TW"&gt;</span>，包住整份文件，lang屬性設定語言；裡面分兩大區塊：<span style="color:#ffae00">&lt;head&gt;</span>放文件的設定和meta資訊（不在畫面顯示），以及<span style="color:#ffae00">&lt;body&gt;</span>放實際顯示在頁面上的內容。</p>
-                <p><span style="color:#ffae00">&lt;head&gt;</span>裡常見的標籤：<span style="color:#ffae00">&lt;meta charset="UTF-8"&gt;</span>設定字元編碼（不加可能亂碼）；<span style="color:#ffae00">&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</span>讓網頁在手機上正常縮放；<span style="color:#ffae00">&lt;title&gt;</span>設定瀏覽器分頁的標題；<span style="color:#ffae00">&lt;link&gt;</span>引入CSS；<span style="color:#ffae00">&lt;script&gt;</span>引入JavaScript。</p>
-                <p>HTML標籤分<span style="color:#ffee00fa">雙標籤</span>（有開頭和結尾，例如&lt;p&gt;...&lt;/p&gt;）和<span style="color:#ffee00fa">單標籤（自閉合）</span>（不需要結尾，例如&lt;br&gt;、&lt;img&gt;、&lt;input&gt;）。標籤可以有<span style="color:#fa6dff">「屬性（Attribute）」</span>提供額外資訊，格式是 屬性名="屬性值"，例如：<span style="color:#ffae00">&lt;a</span> href="https://example.com"<span style="color:#ffae00">&gt;</span>點我<span style="color:#ffae00">&lt;/a&gt;</span>。</p>
+<nav class="top-nav">
+<a class="back" href="index.html">← 回首頁</a>
+<ul class="nav-menu">
+<li><a href="index.html">首頁</a></li>
+<li><a href="guide.html">網站導覽</a></li>
+<li><a href="about.html">關於我們</a></li>
+<li><a href="others.html">其他</a></li>
+<li><button class="gdb-inline" onclick="toggleGdbWindow()">⌨ GDB</button></li>
+</ul>
+</nav>
+<div class="layout">
+<nav class="sidebar">
+<h3>章節目錄</h3>
+<ul>
+<li><a href="#section1">1. 文件結構</a></li>
+<li><a href="#section2">2. 文字元素</a></li>
+<li><a href="#section3">3. 媒體與表格</a></li>
+<li><a href="#section4">4. 表單互動</a></li>
+<li><a href="#section5">5. 區塊與語意</a></li>
+</ul>
+</nav>
+<div class="main-content">
+<div class="page-hero">
+<img alt="HTML" src="htmllogo-removebg-preview.png"/>
+<h1>HTML</h1>
+</div>
+<hr class="page-divider"/>
+<section id="section1">
+<h2>1. 文件結構</h2>
+<p>HTML（HyperText Markup Language）是網頁的骨架，它不是程式語言，而是<span data-tip="以標籤描述文件結構與格式的語言（如 HTML、XML）" style="color:#fa6dff">「標記語言」</span>，用<span data-tip="HTML 以角括號包圍的元素名稱（如 &lt;div&gt;）" style="color:#ffae00">標籤（Tag）</span>來描述網頁的結構和內容。瀏覽器讀取HTML後，依照標籤把內容呈現在畫面上。</p>
+<p>一個完整的HTML文件結構長這樣：最頂端是<span data-tip="HTML5 文件類型宣告，告知瀏覽器使用標準 HTML5 解析" style="color:#ffae00">&lt;!DOCTYPE html&gt;</span>，告訴瀏覽器這是HTML5文件；接著是<span data-tip="HTML 根標籤，lang 屬性指定文件語言為繁體中文" style="color:#ffae00">&lt;html lang="zh-TW"&gt;</span>，包住整份文件，lang屬性設定語言；裡面分兩大區塊：<span data-tip="HTML 文件頭部標籤，包含 meta、title、link 等不可見設定" style="color:#ffae00">&lt;head&gt;</span>放文件的設定和meta資訊（不在畫面顯示），以及<span data-tip="HTML 主體標籤，包含網頁所有可見內容" style="color:#ffae00">&lt;body&gt;</span>放實際顯示在頁面上的內容。</p>
+<p><span data-tip="HTML 文件頭部標籤，包含 meta、title、link 等不可見設定" style="color:#ffae00">&lt;head&gt;</span>裡常見的標籤：<span data-tip="HTML meta 標籤，宣告文件字元編碼為 UTF-8" style="color:#ffae00">&lt;meta charset="UTF-8"&gt;</span>設定字元編碼（不加可能亂碼）；<span style="color:#ffae00">&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</span>讓網頁在手機上正常縮放；<span data-tip="HTML 標題標籤，設定瀏覽器分頁與搜尋結果顯示的標題" style="color:#ffae00">&lt;title&gt;</span>設定瀏覽器分頁的標題；<span data-tip="HTML 外部資源連結標籤，常用於引入 CSS 樣式表" style="color:#ffae00">&lt;link&gt;</span>引入CSS；<span data-tip="HTML 腳本標籤，用於嵌入或引用 JavaScript 程式" style="color:#ffae00">&lt;script&gt;</span>引入JavaScript。</p>
+<p>HTML標籤分<span style="color:#ffee00fa">雙標籤</span>（有開頭和結尾，例如&lt;p&gt;...&lt;/p&gt;）和<span style="color:#ffee00fa">單標籤（自閉合）</span>（不需要結尾，例如&lt;br&gt;、&lt;img&gt;、&lt;input&gt;）。標籤可以有<span data-tip="HTML 標籤的修飾資訊（如 href、src、class）" style="color:#fa6dff">「屬性（Attribute）」</span>提供額外資訊，格式是 屬性名="屬性值"，例如：<span data-tip="HTML 超連結開始標籤，搭配 href 屬性指定連結目標" style="color:#ffae00">&lt;a</span> href="https://example.com"<span style="color:#ffae00">&gt;</span>點我<span data-tip="HTML 超連結關閉標籤" style="color:#ffae00">&lt;/a&gt;</span>。</p>
 </section>
-            <section id="section2">
-                <h2>2. 文字元素</h2>
-                <p>HTML有豐富的<span style="color:#fa6dff">「文字相關標籤」</span>。標題用<span style="color:#ffae00">&lt;h1&gt;</span>到<span style="color:#ffae00">&lt;h6&gt;</span>，h1最大最重要（一頁通常只有一個h1），h6最小；段落用<span style="color:#ffae00">&lt;p&gt;</span>；換行用<span style="color:#ffae00">&lt;br&gt;</span>（在p內直接換行，不是另起一段）；水平分隔線用<span style="color:#ffae00">&lt;hr&gt;</span>。</p>
-                <p>文字強調標籤：<span style="color:#ffae00">&lt;strong&gt;</span>語義上的重要（瀏覽器預設顯示為粗體）；<span style="color:#ffae00">&lt;em&gt;</span>語義上的強調（預設顯示為斜體）；<span style="color:#ffae00">&lt;b&gt;</span>視覺上的粗體；<span style="color:#ffae00">&lt;i&gt;</span>視覺上的斜體；<span style="color:#ffae00">&lt;u&gt;</span>底線；<span style="color:#ffae00">&lt;del&gt;</span>刪除線；<span style="color:#ffae00">&lt;mark&gt;</span>螢光筆效果；<span style="color:#ffae00">&lt;sup&gt;</span>/<span style="color:#ffae00">&lt;sub&gt;</span>上下標。</p>
-                <p>超連結用<span style="color:#ffae00">&lt;a href="網址"&gt;</span>，加上<span style="color:#ffae00">target="_blank"</span>讓連結在新分頁開啟；連結到頁內錨點時href寫#id名，例如：<span style="color:#ffae00">&lt;a href="#section1"&gt;</span>。清單有兩種：<span style="color:#ffae00">&lt;ul&gt;</span>（無序清單，項目符號）和<span style="color:#ffae00">&lt;ol&gt;</span>（有序清單，數字），清單項目都用<span style="color:#ffae00">&lt;li&gt;</span>包住。</p>
-                <p>顯示程式碼用<span style="color:#ffae00">&lt;code&gt;</span>（行內）或<span style="color:#ffae00">&lt;pre&gt;&lt;code&gt;</span>（保留空白換行的程式碼區塊）；引用文字用<span style="color:#ffae00">&lt;blockquote&gt;</span>；定義說明用<span style="color:#ffae00">&lt;dl&gt;</span>（定義清單）、<span style="color:#ffae00">&lt;dt&gt;</span>（術語）、<span style="color:#ffae00">&lt;dd&gt;</span>（說明）。HTML標籤的選擇應該根據<span style="color:#ffee00fa">語義（Semantics）</span>而非外觀，外觀交給CSS負責。</p>
+<section id="section2">
+<h2>2. 文字元素</h2>
+<p>HTML有豐富的<span data-tip="HTML 中處理文字呈現的標籤（h1-h6、p、span 等）" style="color:#fa6dff">「文字相關標籤」</span>。標題用<span data-tip="HTML 最高層級標題標籤，每頁通常只有一個" style="color:#ffae00">&lt;h1&gt;</span>到<span data-tip="HTML 最低層級標題標籤，共六層 h1-h6" style="color:#ffae00">&lt;h6&gt;</span>，h1最大最重要（一頁通常只有一個h1），h6最小；段落用<span data-tip="HTML 段落標籤，表示一個文字段落" style="color:#ffae00">&lt;p&gt;</span>；換行用<span data-tip="HTML 換行標籤，強制在此處換行" style="color:#ffae00">&lt;br&gt;</span>（在p內直接換行，不是另起一段）；水平分隔線用<span data-tip="HTML 水平分隔線標籤，用於視覺上分隔內容" style="color:#ffae00">&lt;hr&gt;</span>。</p>
+<p>文字強調標籤：<span data-tip="HTML 重要強調標籤，使文字粗體且具語意上的重要性" style="color:#ffae00">&lt;strong&gt;</span>語義上的重要（瀏覽器預設顯示為粗體）；<span data-tip="HTML 強調標籤，使文字斜體並具有語意上的強調意義" style="color:#ffae00">&lt;em&gt;</span>語義上的強調（預設顯示為斜體）；<span data-tip="HTML 粗體標籤，讓文字顯示為粗體（無語意強調）" style="color:#ffae00">&lt;b&gt;</span>視覺上的粗體；<span data-tip="HTML 斜體標籤，使文字顯示為斜體（常用於圖示字型）" style="color:#ffae00">&lt;i&gt;</span>視覺上的斜體；<span data-tip="HTML 底線標籤，使文字加上底線" style="color:#ffae00">&lt;u&gt;</span>底線；<span data-tip="HTML 刪除線標籤，表示已刪除或過時的內容" style="color:#ffae00">&lt;del&gt;</span>刪除線；<span data-tip="HTML 標記標籤，以螢光色背景標示重要文字" style="color:#ffae00">&lt;mark&gt;</span>螢光筆效果；<span data-tip="HTML 上標標籤，使文字顯示在基線上方（如次方）" style="color:#ffae00">&lt;sup&gt;</span>/<span data-tip="HTML 下標標籤，使文字顯示在基線下方（如化學式）" style="color:#ffae00">&lt;sub&gt;</span>上下標。</p>
+<p>超連結用<span style="color:#ffae00">&lt;a href="網址"&gt;</span>，加上<span style="color:#ffae00">target="_blank"</span>讓連結在新分頁開啟；連結到頁內錨點時href寫#id名，例如：<span style="color:#ffae00">&lt;a href="#section1"&gt;</span>。清單有兩種：<span data-tip="HTML 無序列表標籤，項目前有圓點符號" style="color:#ffae00">&lt;ul&gt;</span>（無序清單，項目符號）和<span data-tip="HTML 有序列表標籤，項目前有數字編號" style="color:#ffae00">&lt;ol&gt;</span>（有序清單，數字），清單項目都用<span data-tip="HTML 列表項目標籤，用於 ul 或 ol 內的每一項" style="color:#ffae00">&lt;li&gt;</span>包住。</p>
+<p>顯示程式碼用<span data-tip="HTML 行內程式碼標籤，以等寬字型顯示程式碼片段" style="color:#ffae00">&lt;code&gt;</span>（行內）或<span data-tip="HTML 預格式化程式碼區塊，保留縮排與換行" style="color:#ffae00">&lt;pre&gt;&lt;code&gt;</span>（保留空白換行的程式碼區塊）；引用文字用<span data-tip="HTML 區塊引用標籤，表示從其他來源引用的內容" style="color:#ffae00">&lt;blockquote&gt;</span>；定義說明用<span data-tip="HTML 定義列表標籤，包含 dt（術語）和 dd（定義）" style="color:#ffae00">&lt;dl&gt;</span>（定義清單）、<span data-tip="HTML 定義術語標籤，搭配 dl/dd 構成定義列表" style="color:#ffae00">&lt;dt&gt;</span>（術語）、<span data-tip="HTML 定義描述標籤，搭配 dl/dt 構成定義列表" style="color:#ffae00">&lt;dd&gt;</span>（說明）。HTML標籤的選擇應該根據<span style="color:#ffee00fa">語義（Semantics）</span>而非外觀，外觀交給CSS負責。</p>
 </section>
-            <section id="section3">
-                <h2>3. 媒體與表格</h2>
-                <p>圖片用<span style="color:#ffae00">&lt;img&gt;</span>標籤，重要屬性：<span style="color:#ffae00">src</span>指定圖片路徑；<span style="color:#ffae00">alt</span>提供替代文字（圖片載入失敗時顯示，對無障礙設計很重要，一定要填）；<span style="color:#ffae00">width</span>/<span style="color:#ffae00">height</span>設定尺寸（通常交給CSS控制）。例如：<span style="color:#ffae00">&lt;img</span> src="photo.jpg" alt="風景照"<span style="color:#ffae00">&gt;</span>。</p>
-                <p>影片用<span style="color:#ffae00">&lt;video&gt;</span>，音訊用<span style="color:#ffae00">&lt;audio&gt;</span>，加<span style="color:#ffae00">controls</span>屬性顯示播放控制列，例如：<span style="color:#ffae00">&lt;video</span> src="movie.mp4" controls<span style="color:#ffae00">&gt;&lt;/video&gt;</span>。內嵌其他網頁或服務（YouTube、地圖）用<span style="color:#ffae00">&lt;iframe&gt;</span>，設定src為目標網址，width和height控制大小。</p>
-                <p><span style="color:#fa6dff">「表格（Table）」</span>用來呈現結構化資料，基本結構：<span style="color:#ffae00">&lt;table&gt;</span>包住整個表格；<span style="color:#ffae00">&lt;tr&gt;</span>（Table Row）定義一列；<span style="color:#ffae00">&lt;th&gt;</span>（Table Header）定義表頭欄（預設粗體、置中）；<span style="color:#ffae00">&lt;td&gt;</span>（Table Data）定義資料欄。</p>
-                <p>表格合併欄位用<span style="color:#ffae00">colspan</span>（跨欄）和<span style="color:#ffae00">rowspan</span>（跨列）屬性，例如：<span style="color:#ffae00">&lt;td colspan="2"&gt;</span>合併兩欄。語義化分組用<span style="color:#ffae00">&lt;thead&gt;</span>（表頭區域）、<span style="color:#ffae00">&lt;tbody&gt;</span>（表身區域）、<span style="color:#ffae00">&lt;tfoot&gt;</span>（表尾區域），讓表格結構更清晰，也有助於CSS樣式設定。</p>
+<section id="section3">
+<h2>3. 媒體與表格</h2>
+<p>圖片用<span data-tip="HTML 圖片標籤，嵌入圖片，需搭配 src 和 alt 屬性" style="color:#ffae00">&lt;img&gt;</span>標籤，重要屬性：<span data-tip="HTML 屬性，指定圖片、腳本等外部資源的來源路徑" style="color:#ffae00">src</span>指定圖片路徑；<span style="color:#ffae00">alt</span>提供替代文字（圖片載入失敗時顯示，對無障礙設計很重要，一定要填）；<span data-tip="CSS 屬性，設定元素的寬度" style="color:#ffae00">width</span>/<span data-tip="CSS 屬性，設定元素的高度" style="color:#ffae00">height</span>設定尺寸（通常交給CSS控制）。例如：<span style="color:#ffae00">&lt;img</span> src="photo.jpg" alt="風景照"<span style="color:#ffae00">&gt;</span>。</p>
+<p>影片用<span data-tip="HTML5 影片標籤，在網頁中嵌入影片播放器" style="color:#ffae00">&lt;video&gt;</span>，音訊用<span data-tip="HTML5 音訊標籤，在網頁中嵌入音訊播放器" style="color:#ffae00">&lt;audio&gt;</span>，加<span style="color:#ffae00">controls</span>屬性顯示播放控制列，例如：<span style="color:#ffae00">&lt;video</span> src="movie.mp4" controls<span style="color:#ffae00">&gt;&lt;/video&gt;</span>。內嵌其他網頁或服務（YouTube、地圖）用<span data-tip="HTML 內嵌框架標籤，在頁面中嵌入另一個網頁" style="color:#ffae00">&lt;iframe&gt;</span>，設定src為目標網址，width和height控制大小。</p>
+<p><span data-tip="以行列形式呈現結構化資料的 HTML 元素" style="color:#fa6dff">「表格（Table）」</span>用來呈現結構化資料，基本結構：<span data-tip="HTML 表格標籤，用於呈現二維結構化資料" style="color:#ffae00">&lt;table&gt;</span>包住整個表格；<span data-tip="HTML 表格列標籤，包含一整行的儲存格" style="color:#ffae00">&lt;tr&gt;</span>（Table Row）定義一列；<span data-tip="HTML 表格標題儲存格標籤，預設粗體置中" style="color:#ffae00">&lt;th&gt;</span>（Table Header）定義表頭欄（預設粗體、置中）；<span data-tip="HTML 表格資料儲存格標籤" style="color:#ffae00">&lt;td&gt;</span>（Table Data）定義資料欄。</p>
+<p>表格合併欄位用<span data-tip="HTML 表格屬性，讓儲存格跨越指定數量的欄" style="color:#ffae00">colspan</span>（跨欄）和<span data-tip="HTML 表格屬性，讓儲存格跨越指定數量的列" style="color:#ffae00">rowspan</span>（跨列）屬性，例如：<span style="color:#ffae00">&lt;td colspan="2"&gt;</span>合併兩欄。語義化分組用<span data-tip="HTML 表格頁首標籤，包含欄位標題列" style="color:#ffae00">&lt;thead&gt;</span>（表頭區域）、<span data-tip="HTML 表格主體標籤，包含表格的資料列" style="color:#ffae00">&lt;tbody&gt;</span>（表身區域）、<span data-tip="HTML 表格頁尾標籤，通常放合計或備註列" style="color:#ffae00">&lt;tfoot&gt;</span>（表尾區域），讓表格結構更清晰，也有助於CSS樣式設定。</p>
 </section>
-            <section id="section4">
-                <h2>4. 表單互動</h2>
-                <p><span style="color:#fa6dff">「表單（Form）」</span>是讓使用者輸入資料的主要方式，用<span style="color:#ffae00">&lt;form&gt;</span>標籤包住，重要屬性：<span style="color:#ffae00">action</span>指定資料送往的URL，<span style="color:#ffae00">method</span>設定HTTP方法（<span style="color:#ffae00">GET</span>：資料放在URL，<span style="color:#ffae00">POST</span>：資料放在請求體，通常用POST送敏感資料）。</p>
-                <p>最核心的是<span style="color:#ffae00">&lt;input&gt;</span>，用<span style="color:#ffae00">type</span>屬性決定類型：<span style="color:#ffae00">text</span>（文字輸入）、<span style="color:#ffae00">password</span>（密碼，顯示為點點）、<span style="color:#ffae00">email</span>（email格式驗證）、<span style="color:#ffae00">number</span>（數字）、<span style="color:#ffae00">checkbox</span>（勾選框）、<span style="color:#ffae00">radio</span>（單選鈕，同組的name要相同）、<span style="color:#ffae00">file</span>（上傳檔案）、<span style="color:#ffae00">date</span>（日期選擇器）、<span style="color:#ffae00">submit</span>（送出按鈕）。</p>
-                <p>其他重要表單元素：<span style="color:#ffae00">&lt;textarea&gt;</span>多行文字輸入（用rows和cols控制大小）；<span style="color:#ffae00">&lt;select&gt;</span>下拉選單，搭配<span style="color:#ffae00">&lt;option&gt;</span>定義選項；<span style="color:#ffae00">&lt;button type="submit"&gt;</span>送出按鈕；<span style="color:#ffae00">&lt;label for="id"&gt;</span>為input加上說明文字，點label也能聚焦到對應的input，是無障礙設計的重要元素。</p>
-                <p>表單驗證屬性：<span style="color:#ffae00">required</span>設定必填；<span style="color:#ffae00">placeholder</span>顯示提示文字；<span style="color:#ffae00">minlength</span>/<span style="color:#ffae00">maxlength</span>限制字元數；<span style="color:#ffae00">min</span>/<span style="color:#ffae00">max</span>限制數字範圍；<span style="color:#ffae00">pattern</span>用正則表達式驗證格式。HTML5的原生驗證雖然不夠強大，但可以做基本的防呆，實務上通常還會搭配JavaScript做更完整的驗證。</p>
+<section id="section4">
+<h2>4. 表單互動</h2>
+<p><span data-tip="HTML 表單，收集使用者輸入並提交到伺服器的容器" style="color:#fa6dff">「表單（Form）」</span>是讓使用者輸入資料的主要方式，用<span data-tip="HTML 表單標籤，包裹輸入元素並定義資料送出方式" style="color:#ffae00">&lt;form&gt;</span>標籤包住，重要屬性：<span style="color:#ffae00">action</span>指定資料送往的URL，<span data-tip="物件的函式成員，定義物件可執行的行為" style="color:#ffae00">method</span>設定HTTP方法（<span data-tip="HTTP 請求方法，從伺服器讀取資源，不應改變伺服器狀態" style="color:#ffae00">GET</span>：資料放在URL，<span data-tip="HTTP 請求方法，向伺服器提交資料，通常用於新增資源" style="color:#ffae00">POST</span>：資料放在請求體，通常用POST送敏感資料）。</p>
+<p>最核心的是<span data-tip="HTML 輸入欄位標籤，依 type 屬性呈現不同輸入控件" style="color:#ffae00">&lt;input&gt;</span>，用<span data-tip="型態宣告或查詢型態的關鍵字" style="color:#ffae00">type</span>屬性決定類型：<span data-tip="HTML input 的文字型態，或 requests 回應的文字內容屬性" style="color:#ffae00">text</span>（文字輸入）、<span data-tip="HTML input 的 password 型態，輸入內容以圓點遮罩" style="color:#ffae00">password</span>（密碼，顯示為點點）、<span data-tip="HTML input 的 email 型態，自動驗證電子郵件格式" style="color:#ffae00">email</span>（email格式驗證）、<span data-tip="JavaScript 數字型態，包含整數與浮點數" style="color:#ffae00">number</span>（數字）、<span data-tip="HTML 核取方塊表單控件，讓使用者勾選或取消選項" style="color:#ffae00">checkbox</span>（勾選框）、<span data-tip="HTML input 的 radio 型態，同群組中只能選一個選項" style="color:#ffae00">radio</span>（單選鈕，同組的name要相同）、<span data-tip="Linux 指令，偵測並顯示檔案的類型" style="color:#ffae00">file</span>（上傳檔案）、<span data-tip="Linux 指令，顯示或設定系統目前的日期與時間" style="color:#ffae00">date</span>（日期選擇器）、<span data-tip="HTML 表單提交型態的按鈕" style="color:#ffae00">submit</span>（送出按鈕）。</p>
+<p>其他重要表單元素：<span data-tip="HTML 多行文字輸入框標籤" style="color:#ffae00">&lt;textarea&gt;</span>多行文字輸入（用rows和cols控制大小）；<span data-tip="HTML 下拉選單標籤，讓使用者從選項中選擇" style="color:#ffae00">&lt;select&gt;</span>下拉選單，搭配<span data-tip="HTML 下拉選單選項標籤，用於 select 元素內" style="color:#ffae00">&lt;option&gt;</span>定義選項；<span data-tip="HTML 提交按鈕，點擊後送出表單資料" style="color:#ffae00">&lt;button type="submit"&gt;</span>送出按鈕；<span style="color:#ffae00">&lt;label for="id"&gt;</span>為input加上說明文字，點label也能聚焦到對應的input，是無障礙設計的重要元素。</p>
+<p>表單驗證屬性：<span data-tip="HTML 屬性，標記表單欄位為必填，送出前會驗證" style="color:#ffae00">required</span>設定必填；<span data-tip="HTML 屬性，輸入框未填值時顯示的提示文字" style="color:#ffae00">placeholder</span>顯示提示文字；<span data-tip="HTML 屬性，要求文字輸入框最少需輸入的字元數" style="color:#ffae00">minlength</span>/<span data-tip="HTML 屬性，限制文字輸入框最多可輸入的字元數" style="color:#ffae00">maxlength</span>限制字元數；<span data-tip="內建函式，回傳序列或多個引數中的最小值" style="color:#ffae00">min</span>/<span data-tip="內建函式，回傳序列或多個引數中的最大值" style="color:#ffae00">max</span>限制數字範圍；<span data-tip="HTML 輸入驗證屬性，以正規表示式限制輸入格式" style="color:#ffae00">pattern</span>用正則表達式驗證格式。HTML5的原生驗證雖然不夠強大，但可以做基本的防呆，實務上通常還會搭配JavaScript做更完整的驗證。</p>
 </section>
-            <section id="section5">
-                <h2>5. 區塊與語意</h2>
-                <p>HTML元素的顯示模式分<span style="color:#ffae00">block（區塊）</span>和<span style="color:#ffae00">inline（行內）</span>兩種。Block元素會獨占一整行，前後自動換行，例如&lt;div&gt;、&lt;p&gt;、&lt;h1&gt;等；inline元素只佔自身的寬度，和其他inline元素並排，例如&lt;span&gt;、&lt;a&gt;、&lt;strong&gt;等。這個概念對CSS排版很重要！</p>
-                <p><span style="color:#ffae00">&lt;div&gt;</span>和<span style="color:#ffae00">&lt;span&gt;</span>是兩個「無語義」的通用容器，div是block、span是inline，常用來包住一段內容後用CSS設定樣式或讓JavaScript操作。雖然可以全部用div包，但現代HTML5提倡使用有意義的<span style="color:#fa6dff">「語意標籤（Semantic Tags）」</span>。</p>
-                <p>HTML5的語意標籤讓結構更清晰，也有助於SEO和無障礙設計：<span style="color:#ffae00">&lt;header&gt;</span>（頁首或區塊標題）、<span style="color:#ffae00">&lt;nav&gt;</span>（導覽列）、<span style="color:#ffae00">&lt;main&gt;</span>（頁面主要內容，一頁只有一個）、<span style="color:#ffae00">&lt;article&gt;</span>（獨立的完整文章）、<span style="color:#ffae00">&lt;section&gt;</span>（主題分區）、<span style="color:#ffae00">&lt;aside&gt;</span>（側邊欄或補充資訊）、<span style="color:#ffae00">&lt;footer&gt;</span>（頁尾）。</p>
-                <p>HTML的<span style="color:#fa6dff">「meta標籤」</span>提供網頁的描述資訊給搜尋引擎和社群平台：<span style="color:#ffae00">&lt;meta name="description" content="..."&gt;</span>設定搜尋結果的描述；Open Graph標籤（og:title、og:image）控制分享到Facebook/LINE等社群時的預覽卡片顯示。</p>
-                <p>恭喜學完HTML基礎！HTML只是網頁的骨架，要讓網頁好看需要CSS，要讓網頁有互動需要JavaScript，三者合在一起就是前端開發的核心。建議馬上動手寫一個簡單的個人介紹頁面，把這章學到的標籤全部用上一遍，是最快的學習方式！</p>
+<section id="section5">
+<h2>5. 區塊與語意</h2>
+<p>HTML元素的顯示模式分<span style="color:#ffae00">block（區塊）</span>和<span style="color:#ffae00">inline（行內）</span>兩種。Block元素會獨占一整行，前後自動換行，例如&lt;div&gt;、&lt;p&gt;、&lt;h1&gt;等；inline元素只佔自身的寬度，和其他inline元素並排，例如&lt;span&gt;、&lt;a&gt;、&lt;strong&gt;等。這個概念對CSS排版很重要！</p>
+<p><span data-tip="HTML 區塊容器標籤，用於分組與排版，本身無語意" style="color:#ffae00">&lt;div&gt;</span>和<span data-tip="HTML 行內容器標籤，用於對文字套用樣式，本身無語意" style="color:#ffae00">&lt;span&gt;</span>是兩個「無語義」的通用容器，div是block、span是inline，常用來包住一段內容後用CSS設定樣式或讓JavaScript操作。雖然可以全部用div包，但現代HTML5提倡使用有意義的<span data-tip="HTML5 具有意義的標籤（header、main、article 等）" style="color:#fa6dff">「語意標籤（Semantic Tags）」</span>。</p>
+<p>HTML5的語意標籤讓結構更清晰，也有助於SEO和無障礙設計：<span data-tip="HTML5 語意標籤，表示頁面或區塊的頁首區域" style="color:#ffae00">&lt;header&gt;</span>（頁首或區塊標題）、<span data-tip="HTML5 語意標籤，表示主要導覽連結區域" style="color:#ffae00">&lt;nav&gt;</span>（導覽列）、<span data-tip="HTML5 語意標籤，表示頁面主要內容區域" style="color:#ffae00">&lt;main&gt;</span>（頁面主要內容，一頁只有一個）、<span data-tip="HTML5 語意標籤，表示獨立完整的文章或內容區塊" style="color:#ffae00">&lt;article&gt;</span>（獨立的完整文章）、<span data-tip="HTML5 語意標籤，表示文件中有主題性的獨立章節" style="color:#ffae00">&lt;section&gt;</span>（主題分區）、<span data-tip="HTML5 語意標籤，表示與主內容相關的側邊補充資訊" style="color:#ffae00">&lt;aside&gt;</span>（側邊欄或補充資訊）、<span data-tip="HTML5 語意標籤，表示頁面或區塊的頁尾資訊" style="color:#ffae00">&lt;footer&gt;</span>（頁尾）。</p>
+<p>HTML的<span style="color:#fa6dff">「meta標籤」</span>提供網頁的描述資訊給搜尋引擎和社群平台：<span style="color:#ffae00">&lt;meta name="description" content="..."&gt;</span>設定搜尋結果的描述；Open Graph標籤（og:title、og:image）控制分享到Facebook/LINE等社群時的預覽卡片顯示。</p>
+<p>恭喜學完HTML基礎！HTML只是網頁的骨架，要讓網頁好看需要CSS，要讓網頁有互動需要JavaScript，三者合在一起就是前端開發的核心。建議馬上動手寫一個簡單的個人介紹頁面，把這章學到的標籤全部用上一遍，是最快的學習方式！</p>
 </section>
-        </main>
-        <div style="height: 60px;"></div> 
-        <p>最後這裡提供一個用GoogleAI(Gemini)NotebookLM製作的教學綱要簡報簡報，下載起來，方便需要時做迅速的統整和複習~</p>
-        <a href="C  _基礎與實踐藍圖.pdf" download class="download-btn">立即下載檔案</a>
-    <script>
-        const navLinks = document.querySelectorAll('.nav-link');
-        const sections = document.querySelectorAll('section');
-        window.addEventListener('scroll', () => {
-            let current = '';
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                const sectionHeight = section.clientHeight;
-                if (window.pageYOffset >= (sectionTop - 100)) {
-                    current = section.getAttribute('id');
-                }
-            });
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href').includes(current)) {
-                    link.classList.add('active');
-                }
-            });
-        });
-    </script>
-    </header>
-    <div id="gdbFloatWindow">
-        <div class="window-header" id="dragHandle">
-            <span class="window-title">GDB</span>
-            <span class="close-btn" onclick="toggleGdbWindow()">&times;</span>
-        </div>
-        <div class="window-content">
-            <iframe 
-                id="gdbFrame"
-                data-src="https://www.onlinegdb.com/"
-                src="https://www.onlinegdb.com/"
-                sandbox="allow-forms allow-scripts allow-same-origin allow-popups">
-            </iframe>
-        </div>
-    </div>
-    <script>
+<div style="margin-top: 40px; padding: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px;">
+<p style="color: var(--muted); margin-bottom: 16px;">📄 最後這裡提供一個用GoogleAI(Gemini)NotebookLM製作的教學綱要簡報簡報，下載起來，方便需要時做迅速的統整和複習~</p>
+<a class="download-btn" download="" href="Digital_Building_Blueprint.pdf">立即下載檔案</a>
+</div>
+</div>
+</div>
+<!-- GDB Float Window -->
+<div id="gdbFloatWindow">
+<div class="window-header" id="dragHandle">
+<span class="window-title">⌨ GDB Online</span>
+<span class="close-btn" onclick="toggleGdbWindow()">×</span>
+</div>
+<div class="window-content">
+<iframe id="gdbFrame" sandbox="allow-forms allow-scripts allow-same-origin allow-popups" src="https://www.onlinegdb.com/"></iframe>
+</div>
+</div>
+<script src="shared.js"></script>
+<script>
         const floatWindow = document.getElementById('gdbFloatWindow');
-        const iframe = document.getElementById('gdbFrame');
-        const dragHandle = document.getElementById('dragHandle');
+        const dragHandle  = document.getElementById('dragHandle');
         function toggleGdbWindow() {
-            if (floatWindow.style.display === 'flex') {
-                floatWindow.style.display = 'none';
-            } else {
-                floatWindow.style.display = 'flex';
-                if (iframe.getAttribute('src') === "") {
-                    iframe.setAttribute('src', iframe.getAttribute('data-src'));
-                }
-            }
+            floatWindow.style.display = floatWindow.style.display === 'flex' ? 'none' : 'flex';
         }
-        let isDragging = false;
-        let startX, startY, initialLeft, initialTop;
-        dragHandle.addEventListener('mousedown', function(e) {
+        let isDragging = false, startX, startY, initLeft, initTop;
+        dragHandle.addEventListener('mousedown', e => {
             isDragging = true;
-            startX = e.clientX;
-            startY = e.clientY;
-            const rect = floatWindow.getBoundingClientRect();
-            initialLeft = rect.left;
-            initialTop = rect.top;
+            startX = e.clientX; startY = e.clientY;
+            const r = floatWindow.getBoundingClientRect();
+            initLeft = r.left; initTop = r.top;
             floatWindow.classList.add('is-dragging');
         });
-        document.addEventListener('mousemove', function(e) {
-            if (isDragging) {
-                const dx = e.clientX - startX;
-                const dy = e.clientY - startY;
-                floatWindow.style.left = `${initialLeft + dx}px`;
-                floatWindow.style.top = `${initialTop + dy}px`;
-                floatWindow.style.right = 'auto'; 
-            }
+        document.addEventListener('mousemove', e => {
+            if (!isDragging) return;
+            floatWindow.style.left = `${initLeft + e.clientX - startX}px`;
+            floatWindow.style.top  = `${initTop  + e.clientY - startY}px`;
+            floatWindow.style.right = 'auto';
         });
-        document.addEventListener('mouseup', function() {
+        document.addEventListener('mouseup', () => {
             isDragging = false;
             floatWindow.classList.remove('is-dragging');
         });
     </script>
+<script src="tooltips.js"></script>
 </body>
 </html>

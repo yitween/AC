@@ -1,283 +1,257 @@
 <!DOCTYPE html>
+
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AC_CSS</title>
-    <link rel="icon" href="images/螢幕擷取畫面 2026-01-05 125529.png" sizes="48x48" type="image/png">
-    <style>
-        body {
-            background-color: rgb(20, 20, 20);
-            color: white;
-            font-family: "Microsoft JhengHei", sans-serif;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AC — CSS</title>
+<link href="螢幕擷取畫面 2026-01-05 125529.png" rel="icon" sizes="48x48" type="image/png"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="shared.css" rel="stylesheet"/>
+<style>
+        /* ── GDB FLOAT WINDOW ── */
+        #gdbFloatWindow {
+            display: none; position: fixed;
+            top: 100px; right: 50px;
+            width: 600px; height: 500px;
+            background: #1e1e1e;
+            border: 1px solid #444; border-radius: 10px;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.6);
+            z-index: 2000; flex-direction: column;
+            overflow: hidden; resize: both;
+            min-width: 320px; min-height: 250px;
+            max-width: 95vw; max-height: 95vh;
         }
-        .back-button {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            text-decoration: none;
-            color: aquamarine;
-            border: 1px solid aquamarine;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: all 0.3s;
-            z-index: 1000;
+        .window-header {
+            height: 40px; background: #2a2a2a;
+            display: flex; align-items: center;
+            justify-content: space-between;
+            padding: 0 14px; cursor: move;
+            border-bottom: 1px solid #444;
+            user-select: none; flex-shrink: 0;
         }
-        .back-button:hover {
-            background-color: aquamarine;
-            color: black;
+        .window-title {
+            color: #ccc; font-weight: 700; font-size: 0.85rem;
+            font-family: 'JetBrains Mono', monospace;
         }
-        .content {
-            max-width: 800px;
-            text-align: center;
-            margin-top: 50px;
+        .close-btn {
+            color: #888; font-size: 22px; cursor: pointer;
+            line-height: 1; transition: color 0.2s;
         }
-        h1 { color: aquamarine; font-size: 3rem; margin-bottom: 10px; }
-        p { font-size: 1.2rem; line-height: 1.6; color: #ddd; }
-        .big-logo {
-            width: 150px;
-            height: 150px;
-            object-fit: contain;
-            margin-bottom: 20px;
+        .close-btn:hover { color: #f87171; }
+        .window-content { flex: 1; height: calc(100% - 40px); }
+        .window-content iframe { width: 100%; height: 100%; border: none; }
+        .is-dragging iframe { pointer-events: none; }
+        /* ── PAGE HERO ── */
+        .page-hero {
+            display: flex; align-items: center; gap: 20px;
+            margin-bottom: 24px;
         }
-        html {
-            scroll-behavior: smooth;
+        .page-hero img {
+            width: 72px; height: 72px; object-fit: contain;
+            border-radius: 12px; background: rgba(255,255,255,0.04);
+            padding: 8px; border: 1px solid var(--border);
+            box-shadow: none; margin: 0;
         }
-        .sidebar {
-            width: 200px;
-            height: 100vh;
-            position: fixed; 
-            top: 0;
-            left: 0;
-            background-color: #faa11cd0;
-            padding: 20px;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            overflow-y: auto;
+        .page-hero h1 {
+            font-size: clamp(1.8rem, 4vw, 2.4rem);
+            color: var(--accent); font-weight: 700; margin: 0;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 0.03em;
         }
-        .sidebar ul {
-            list-style: none;
-            padding: 0;
+        /* ── DOWNLOAD BUTTON ── */
+        .download-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            margin-top: 32px; padding: 12px 24px;
+            background: #1d4ed8; color: #fff;
+            text-decoration: none; border-radius: 8px;
+            font-weight: 700; font-size: 0.9rem;
+            transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
         }
-        .sidebar li {
-            margin-bottom: 15px;
+        .download-btn::before { content: '⬇'; }
+        .download-btn:hover {
+            background: #2563eb; transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(29,78,216,0.35);
         }
-        .sidebar a {
-            text-decoration: none;
-            color: #333;
-            display: block;
-            padding: 8px 12px;
-            border-left: 4px solid transparent; 
-            transition: all 0.3s;
+        .download-btn:active { transform: translateY(0); }
+        /* ── GDB INLINE BTN ── */
+        .gdb-inline {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 16px; background: transparent;
+            color: var(--accent); border: 1px solid var(--accent);
+            border-radius: 6px; cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700; font-size: 0.85rem;
+            transition: background 0.2s, color 0.2s, transform 0.15s;
+            margin-left: 8px;
         }
-        .sidebar a:hover {
-            background-color: #faa11cd0;
+        .gdb-inline:hover {
+            background: var(--accent); color: #111;
+            transform: translateY(-1px);
         }
-        .sidebar a.active {
-            color: #007bff;    
-            font-weight: bold;
-            border-left: 4px solid #007bff;
-            background-color: #faa11cd0;
-        }
-        .content {
-            margin-left: 240px;
-            padding: 40px;
-            max-width: 800px;
-        }
-        section {
-            min-height: 80vh; 
-            padding-top: 20px;
-            border-bottom: 1px solid #faa11cd0;
-        }
-        h2 {
-            margin-top: 0;
-        }
-        .nav-menu {
-            display: flex;
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            align-items: center;
-        }
-        .nav-menu li {
-            margin-left: 20px;
-        }
-        .nav-menu a {
-            text-decoration: none;
-            color: #ccc;
-            font-size: 1rem;
-            padding: 5px 10px;
-            border-radius: 4px;
-            transition: all 0.3s;
-        }
-        .nav-menu a:hover {
-            color: white;
-            background-color: rgba(255,255,255,0.1);
-        }
+        .gdb-inline:active { transform: translateY(0); }
     </style>
-    <ul class="nav-menu">
-        <li>
-            <button class="gdb-btn" onclick="toggleGdbWindow()">
-                GDB
-            </button>
-        </li>
-    </ul>
-</head>
+<style>
+/* ── TOOLTIP ── */
+[data-tip] {
+    position: relative;
+    cursor: help;
+    text-decoration: underline dotted currentColor;
+    text-underline-offset: 3px;
+}
+[data-tip]::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e1e2e;
+    color: #e0e0e0;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    white-space: normal;
+    width: max-content;
+    max-width: 260px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(127,255,212,0.25);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    transform: translateX(-50%) translateY(4px);
+    z-index: 9999;
+}
+[data-tip]:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+/* arrow */
+[data-tip]::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 2px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: rgba(127,255,212,0.25);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.18s ease;
+    z-index: 9999;
+}
+[data-tip]:hover::before { opacity: 1; }
+</style></head>
 <body>
-    <a href="index.html" class="back-button">← 回首頁</a>
-    <nav class="sidebar">
-        <div style="height: 30px;"></div>
-        <h3>章節目錄</h3>
-        <ul>
-            <li><a href="#section1" class="nav-link">1. 引入與選取</a></li>
-            <li><a href="#section2" class="nav-link">2. 盒模型</a></li>
-            <li><a href="#section3" class="nav-link">3. 定位與顯示</a></li>
-            <li><a href="#section4" class="nav-link">4. 排版系統</a></li>
-            <li><a href="#section5" class="nav-link">5. 響應式與動畫</a></li>
-        </ul>
-    </nav>
-    <header>
-        <div class="content">
-        <img src="csslogo-removebg-preview.png" class="big-logo">
-        <h1>CSS</h1>
-        <button class="gdb-btn" onclick="toggleGdbWindow()">
-            GDB
-        </button>
-        <hr style="border-color: #333; margin: 20px 0;">
-        <div style="height: 50px;"></div>
-        <center>
-            <p style="color:#ddd;font-size:2rem"><B><I>Try Code Here!</I></B></p>
-        </center>
-        <div style="height: 30px;"></div>
-        <div style="max-width: 90%; margin: 0 auto; box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);">
-            <iframe 
-                src="https://www.onlinegdb.com/" 
-                width="100%" 
-                height="600px" 
-                frameborder="0" 
-                style="border-radius: 10px; border: 1px solid #333;"
-                allowfullscreen>
-            </iframe>
-        </div>
-        <div style="height: 30px;"></div>
-        <main class="content">
-            <section id="section1">
-                <h2>1. 引入與選取</h2>
-                <p>CSS（Cascading Style Sheets）負責網頁的<span style="color:#ffee00fa">外觀與樣式</span>，包含顏色、字型、版面排列等，和HTML的分工是「HTML定義內容，CSS定義外觀」。引入CSS有三種方式：<span style="color:#ffae00">外部樣式表</span>（最推薦，用&lt;link rel="stylesheet" href="style.css"&gt;引入獨立的.css檔）、<span style="color:#ffae00">內部樣式</span>（在HTML的&lt;head&gt;裡用&lt;style&gt;標籤）、<span style="color:#ffae00">行內樣式</span>（直接在HTML標籤加style屬性，不推薦，難以維護）。</p>
-                <p>CSS的語法是：<span style="color:#ffae00">選取器</span> { <span style="color:#fa6dff">屬性</span>: <span style="color:#00eeff">值</span>; }。<span style="color:#fa6dff">「選取器（Selector）」</span>決定要套用樣式的對象，基本選取器有：<span style="color:#ffae00">元素選取器</span>（直接寫標籤名，例如p）、<span style="color:#ffae00">類別選取器</span>（.class名，一個元素可以有多個class，用空格分開）、<span style="color:#ffae00">ID選取器</span>（#id名，一頁只能有一個相同的id）。</p>
-                <p>進階選取器：<span style="color:#ffae00">後代選取器</span>（A B，選A內所有B）、<span style="color:#ffae00">子代選取器</span>（A &gt; B，只選A的直接子元素B）、<span style="color:#ffae00">相鄰兄弟</span>（A + B）、<span style="color:#ffae00">群組選取器</span>（A, B，同時選A和B）。<span style="color:#fa6dff">「偽類（Pseudo-class）」</span>讓你選特定狀態：<span style="color:#ffae00">:hover</span>（滑鼠移過）、<span style="color:#ffae00">:active</span>（點擊時）、<span style="color:#ffae00">:focus</span>（聚焦時）、<span style="color:#ffae00">:nth-child(n)</span>（第n個子元素）。</p>
-                <p>CSS有<span style="color:#fa6dff">「優先權（Specificity）」</span>規則，決定多個樣式衝突時誰優先：ID選取器 &gt; 類別選取器 &gt; 元素選取器；後面的樣式覆蓋前面的（層疊性）；<span style="color:#ffae00">!important</span>強制最高優先權（但盡量少用，會讓樣式難以維護）。</p>
+<nav class="top-nav">
+<a class="back" href="index.html">← 回首頁</a>
+<ul class="nav-menu">
+<li><a href="index.html">首頁</a></li>
+<li><a href="guide.html">網站導覽</a></li>
+<li><a href="about.html">關於我們</a></li>
+<li><a href="others.html">其他</a></li>
+<li><button class="gdb-inline" onclick="toggleGdbWindow()">⌨ GDB</button></li>
+</ul>
+</nav>
+<div class="layout">
+<nav class="sidebar">
+<h3>章節目錄</h3>
+<ul>
+<li><a href="#section1">1. 引入與選取</a></li>
+<li><a href="#section2">2. 盒模型</a></li>
+<li><a href="#section3">3. 定位與顯示</a></li>
+<li><a href="#section4">4. 排版系統</a></li>
+<li><a href="#section5">5. 響應式與動畫</a></li>
+</ul>
+</nav>
+<div class="main-content">
+<div class="page-hero">
+<img alt="CSS" src="csslogo-removebg-preview.png"/>
+<h1>CSS</h1>
+</div>
+<hr class="page-divider"/>
+<section id="section1">
+<h2>1. 引入與選取</h2>
+<p>CSS（Cascading Style Sheets）負責網頁的<span style="color:#ffee00fa">外觀與樣式</span>，包含顏色、字型、版面排列等，和HTML的分工是「HTML定義內容，CSS定義外觀」。引入CSS有三種方式：<span data-tip="獨立的 .css 檔案，透過 link 標籤引入 HTML 文件" style="color:#ffae00">外部樣式表</span>（最推薦，用&lt;link rel="stylesheet" href="style.css"&gt;引入獨立的.css檔）、<span data-tip="寫在 HTML &lt;style&gt; 標籤內的 CSS，只影響當頁" style="color:#ffae00">內部樣式</span>（在HTML的&lt;head&gt;裡用&lt;style&gt;標籤）、<span data-tip="直接寫在 HTML 標籤 style 屬性中的 CSS，優先級最高" style="color:#ffae00">行內樣式</span>（直接在HTML標籤加style屬性，不推薦，難以維護）。</p>
+<p>CSS的語法是：<span data-tip="CSS 指定要套用樣式的 HTML 元素的模式語法" style="color:#ffae00">選取器</span> { <span data-tip="物件的資料成員，描述物件的狀態或特徵" style="color:#fa6dff">屬性</span>: <span style="color:#00eeff">值</span>; }。<span data-tip="CSS 選取器，指定樣式要套用到哪些 HTML 元素" style="color:#fa6dff">「選取器（Selector）」</span>決定要套用樣式的對象，基本選取器有：<span data-tip="CSS 以 HTML 標籤名稱選取對應元素" style="color:#ffae00">元素選取器</span>（直接寫標籤名，例如p）、<span data-tip="CSS 以 . 前綴選取特定 class 屬性的所有元素" style="color:#ffae00">類別選取器</span>（.class名，一個元素可以有多個class，用空格分開）、<span data-tip="CSS 選取器，用 # 前綴選取特定 id 屬性的唯一元素" style="color:#ffae00">ID選取器</span>（#id名，一頁只能有一個相同的id）。</p>
+<p>進階選取器：<span data-tip="CSS 空格選取器，選取元素下所有層級的子孫元素" style="color:#ffae00">後代選取器</span>（A B，選A內所有B）、<span data-tip="CSS &gt; 選取器，只選取直接子元素而非所有後代" style="color:#ffae00">子代選取器</span>（A &gt; B，只選A的直接子元素B）、<span data-tip="CSS + 選取器，選取緊接在指定元素之後的同層元素" style="color:#ffae00">相鄰兄弟</span>（A + B）、<span data-tip="CSS , 選取器，同時選取多種元素套用相同樣式" style="color:#ffae00">群組選取器</span>（A, B，同時選A和B）。<span data-tip="CSS 選取器，選取元素特定狀態（:hover、:focus 等）" style="color:#fa6dff">「偽類（Pseudo-class）」</span>讓你選特定狀態：<span data-tip="CSS 偽類，滑鼠懸停在元素上時套用的樣式" style="color:#ffae00">:hover</span>（滑鼠移過）、<span data-tip="CSS 偽類，元素被按下（激活）時套用的樣式" style="color:#ffae00">:active</span>（點擊時）、<span data-tip="CSS 偽類，元素獲得鍵盤焦點時套用的樣式" style="color:#ffae00">:focus</span>（聚焦時）、<span data-tip="CSS 偽類選取器，選取父元素下第 n 個子元素" style="color:#ffae00">:nth-child(n)</span>（第n個子元素）。</p>
+<p>CSS有<span data-tip="CSS 選取器的優先級計算規則，決定哪條樣式最終生效" style="color:#fa6dff">「優先權（Specificity）」</span>規則，決定多個樣式衝突時誰優先：ID選取器 &gt; 類別選取器 &gt; 元素選取器；後面的樣式覆蓋前面的（層疊性）；<span data-tip="CSS 最高優先級宣告，強制覆蓋其他所有樣式規則" style="color:#ffae00">!important</span>強制最高優先權（但盡量少用，會讓樣式難以維護）。</p>
 </section>
-            <section id="section2">
-                <h2>2. 盒模型</h2>
-                <p>CSS的<span style="color:#fa6dff">「盒模型（Box Model）」</span>是CSS最核心的概念，每個HTML元素都是一個矩形盒子，由內到外分四層：<span style="color:#ffae00">content</span>（內容，你的文字或圖片）、<span style="color:#ffae00">padding</span>（內距，內容和邊框之間的空間）、<span style="color:#ffae00">border</span>（邊框）、<span style="color:#ffae00">margin</span>（外距，和其他元素之間的空間）。</p>
-                <p>設定padding和margin都可以用一到四個值：一個值（四邊相同）、兩個值（上下 左右）、三個值（上 左右 下）、四個值（上 右 下 左，順時針）。也可以個別指定：<span style="color:#ffae00">padding-top</span>、<span style="color:#ffae00">margin-left</span>等。border的設定：<span style="color:#ffae00">border: 2px solid red</span>（厚度 樣式 顏色）。</p>
-                <p>重要！CSS預設的<span style="color:#ffae00">box-sizing</span>是<span style="color:#ffae00">content-box</span>，設定width只算content的寬度，加上padding和border後實際佔用的寬度會更大，讓排版很難預測。建議在CSS開頭加：<span style="color:#ffae00">*, *::before, *::after { box-sizing: border-box; }</span>，這樣width就包含padding和border，直觀得多！</p>
-                <p>顏色的設定方式有：關鍵字（<span style="color:#ffae00">red</span>、<span style="color:#ffae00">aquamarine</span>）；十六進制（<span style="color:#ffae00">#ff0000</span>，縮寫<span style="color:#ffae00">#f00</span>）；RGB（<span style="color:#ffae00">rgb(255, 0, 0)</span>）；RGBA（<span style="color:#ffae00">rgba(255, 0, 0, 0.5)</span>，第四個值是透明度0-1）；HSL（<span style="color:#ffae00">hsl(色相, 飽和度%, 亮度%)</span>）。字型大小常用px（像素）、rem（相對於根元素字型大小，推薦）、em（相對於父元素字型大小）。</p>
+<section id="section2">
+<h2>2. 盒模型</h2>
+<p>CSS的<span data-tip="CSS 元素由 content、padding、border、margin 組成的模型" style="color:#fa6dff">「盒模型（Box Model）」</span>是CSS最核心的概念，每個HTML元素都是一個矩形盒子，由內到外分四層：<span data-tip="CSS 偽元素屬性，定義 ::before 或 ::after 插入的內容" style="color:#ffae00">content</span>（內容，你的文字或圖片）、<span data-tip="CSS 內邊距屬性，設定元素內容與邊框之間的空白距離" style="color:#ffae00">padding</span>（內距，內容和邊框之間的空間）、<span data-tip="CSS 屬性，設定元素的邊框樣式、寬度與顏色" style="color:#ffae00">border</span>（邊框）、<span data-tip="CSS 外邊距屬性，設定元素外側的空白距離" style="color:#ffae00">margin</span>（外距，和其他元素之間的空間）。</p>
+<p>設定padding和margin都可以用一到四個值：一個值（四邊相同）、兩個值（上下 左右）、三個值（上 左右 下）、四個值（上 右 下 左，順時針）。也可以個別指定：<span data-tip="CSS 屬性，設定元素頂部內邊距的距離" style="color:#ffae00">padding-top</span>、<span data-tip="CSS 屬性，設定元素左側外邊距的距離" style="color:#ffae00">margin-left</span>等。border的設定：<span style="color:#ffae00">border: 2px solid red</span>（厚度 樣式 顏色）。</p>
+<p>重要！CSS預設的<span data-tip="CSS 屬性，控制元素寬高的計算是否包含 padding 和 border" style="color:#ffae00">box-sizing</span>是<span data-tip="CSS box-sizing 預設值，寬高不包含 padding 和 border" style="color:#ffae00">content-box</span>，設定width只算content的寬度，加上padding和border後實際佔用的寬度會更大，讓排版很難預測。建議在CSS開頭加：<span style="color:#ffae00">*, *::before, *::after { box-sizing: border-box; }</span>，這樣width就包含padding和border，直觀得多！</p>
+<p>顏色的設定方式有：關鍵字（<span style="color:#ffae00">red</span>、<span style="color:#ffae00">aquamarine</span>）；十六進制（<span data-tip="CSS 十六進位色碼，代表純紅色 RGB(255,0,0)" style="color:#ffae00">#ff0000</span>，縮寫<span data-tip="CSS 短縮十六進位色碼，等同紅色 #ff0000" style="color:#ffae00">#f00</span>）；RGB（<span style="color:#ffae00">rgb(255, 0, 0)</span>）；RGBA（<span style="color:#ffae00">rgba(255, 0, 0, 0.5)</span>，第四個值是透明度0-1）；HSL（<span style="color:#ffae00">hsl(色相, 飽和度%, 亮度%)</span>）。字型大小常用px（像素）、rem（相對於根元素字型大小，推薦）、em（相對於父元素字型大小）。</p>
 </section>
-            <section id="section3">
-                <h2>3. 定位與顯示</h2>
-                <p>CSS的<span style="color:#ffae00">display</span>屬性控制元素的顯示模式：<span style="color:#ffae00">block</span>（區塊，獨占一行）、<span style="color:#ffae00">inline</span>（行內，不能設寬高）、<span style="color:#ffae00">inline-block</span>（行內但可設寬高）、<span style="color:#ffae00">none</span>（隱藏，不佔空間）、<span style="color:#ffae00">flex</span>和<span style="color:#ffae00">grid</span>（後面會詳說）。<span style="color:#ffae00">visibility: hidden</span>也是隱藏，但還是佔著空間，和display: none不同。</p>
-                <p>CSS的<span style="color:#fa6dff">「定位（Position）」</span>控制元素怎麼放：<span style="color:#ffae00">static</span>（預設，按照文件流排列）；<span style="color:#ffae00">relative</span>（相對定位，相對自己原本位置偏移，其他元素不受影響）；<span style="color:#ffae00">absolute</span>（絕對定位，相對於最近的非static父元素定位，脫離文件流）；<span style="color:#ffae00">fixed</span>（固定在視窗，捲動頁面也不動）；<span style="color:#ffae00">sticky</span>（滾到指定位置後固定住，常用來做固定navbar）。</p>
-                <p>定位後用<span style="color:#ffae00">top</span>、<span style="color:#ffae00">right</span>、<span style="color:#ffae00">bottom</span>、<span style="color:#ffae00">left</span>設定偏移量。<span style="color:#ffae00">z-index</span>控制元素的堆疊順序，數字越大越在上面，只對非static定位的元素有效。</p>
-                <p>讓元素完全置中是CSS的經典難題，現代最簡單的方式：對父元素設 <span style="color:#ffae00">display: flex; justify-content: center; align-items: center;</span>，子元素就會水平垂直置中，這個技巧幾乎每個CSS開發者都會用到！</p>
+<section id="section3">
+<h2>3. 定位與顯示</h2>
+<p>CSS的<span data-tip="CSS 屬性，控制元素的顯示類型（block、flex、grid 等）" style="color:#ffae00">display</span>屬性控制元素的顯示模式：<span style="color:#ffae00">block</span>（區塊，獨占一行）、<span data-tip="CSS display 值，元素以行內方式排列不換行" style="color:#ffae00">inline</span>（行內，不能設寬高）、<span data-tip="CSS display 值，行內排列但可設定寬高" style="color:#ffae00">inline-block</span>（行內但可設寬高）、<span data-tip="CSS 值，隱藏元素且不佔版面空間" style="color:#ffae00">none</span>（隱藏，不佔空間）、<span data-tip="CSS display 值或 flex 屬性，啟用或設定彈性排版" style="color:#ffae00">flex</span>和<span data-tip="CSS display 值，啟用二維網格排版系統" style="color:#ffae00">grid</span>（後面會詳說）。<span data-tip="CSS 屬性，隱藏元素但仍佔據版面空間" style="color:#ffae00">visibility: hidden</span>也是隱藏，但還是佔著空間，和display: none不同。</p>
+<p>CSS的<span data-tip="CSS position 屬性，控制元素的定位方式" style="color:#fa6dff">「定位（Position）」</span>控制元素怎麼放：<span data-tip="靜態修飾詞，讓成員屬於類別本身而非特定實例" style="color:#ffae00">static</span>（預設，按照文件流排列）；<span data-tip="CSS 定位值，元素相對自身原始位置偏移" style="color:#ffae00">relative</span>（相對定位，相對自己原本位置偏移，其他元素不受影響）；<span style="color:#ffae00">absolute</span>（絕對定位，相對於最近的非static父元素定位，脫離文件流）；<span data-tip="CSS 定位值，元素相對於瀏覽器視窗固定不隨捲動移動" style="color:#ffae00">fixed</span>（固定在視窗，捲動頁面也不動）；<span data-tip="CSS 定位值，滾動到指定位置後固定在畫面上" style="color:#ffae00">sticky</span>（滾到指定位置後固定住，常用來做固定navbar）。</p>
+<p>定位後用<span data-tip="Linux 動態行程監控指令，即時顯示 CPU 與記憶體使用狀況" style="color:#ffae00">top</span>、<span data-tip="CSS 定位屬性，設定元素距父容器右側的距離" style="color:#ffae00">right</span>、<span data-tip="CSS 定位屬性，設定元素距父容器底部的距離" style="color:#ffae00">bottom</span>、<span data-tip="CSS 定位屬性，設定元素距父容器左側的距離" style="color:#ffae00">left</span>設定偏移量。<span data-tip="CSS 屬性，控制定位元素的堆疊順序（數字越大越前面）" style="color:#ffae00">z-index</span>控制元素的堆疊順序，數字越大越在上面，只對非static定位的元素有效。</p>
+<p>讓元素完全置中是CSS的經典難題，現代最簡單的方式：對父元素設 <span style="color:#ffae00">display: flex; justify-content: center; align-items: center;</span>，子元素就會水平垂直置中，這個技巧幾乎每個CSS開發者都會用到！</p>
 </section>
-            <section id="section4">
-                <h2>4. 排版系統</h2>
-                <p><span style="color:#fa6dff">「Flexbox（彈性盒子）」</span>是目前最常用的一維排版系統，在父元素設<span style="color:#ffae00">display: flex</span>後，子元素就會自動沿主軸排列。關鍵屬性：<span style="color:#ffae00">flex-direction</span>設定主軸方向（row水平、column垂直）；<span style="color:#ffae00">justify-content</span>控制主軸對齊（flex-start、center、space-between、space-around）；<span style="color:#ffae00">align-items</span>控制交叉軸對齊（stretch、center、flex-start）。</p>
-                <p>子元素也有Flexbox屬性：<span style="color:#ffae00">flex: 1</span>讓元素平均分配剩餘空間；<span style="color:#ffae00">flex-shrink: 0</span>防止元素被壓縮；<span style="color:#ffae00">align-self</span>覆蓋父元素的align-items，單獨設定這個子元素的對齊方式；<span style="color:#ffae00">order</span>改變元素的排列順序（預設都是0）。</p>
-                <p><span style="color:#fa6dff">「Grid（網格）」</span>是二維排版系統，可以同時控制行和列，適合整頁的版面配置。在父元素設<span style="color:#ffae00">display: grid</span>，然後用<span style="color:#ffae00">grid-template-columns</span>定義欄的寬度，例如：<span style="color:#ffae00">grid-template-columns: 1fr 1fr 1fr</span>（三欄均分，fr是fraction的縮寫）；<span style="color:#ffae00">gap</span>設定格子間的間距；子元素用<span style="color:#ffae00">grid-column</span>和<span style="color:#ffae00">grid-row</span>指定佔哪些格子。</p>
-                <p>Flexbox適合一維（導覽列、卡片列表），Grid適合二維（整頁layout），實務上常兩者混用——Grid做外層大版面，Flexbox做內部元件排列。這兩個系統是現代CSS排版的核心，一定要熟練！</p>
+<section id="section4">
+<h2>4. 排版系統</h2>
+<p><span data-tip="CSS 一維排版模型，讓容器內元素可彈性伸縮與對齊" style="color:#fa6dff">「Flexbox（彈性盒子）」</span>是目前最常用的一維排版系統，在父元素設<span data-tip="CSS 宣告，啟用 Flexbox 彈性排版模式" style="color:#ffae00">display: flex</span>後，子元素就會自動沿主軸排列。關鍵屬性：<span data-tip="Flexbox 屬性，設定主軸方向（橫排或直排）" style="color:#ffae00">flex-direction</span>設定主軸方向（row水平、column垂直）；<span data-tip="CSS Flexbox/Grid 屬性，控制主軸方向上的對齊方式" style="color:#ffae00">justify-content</span>控制主軸對齊（flex-start、center、space-between、space-around）；<span data-tip="Flexbox CSS 屬性，控制容器內元素在交叉軸的對齊方式" style="color:#ffae00">align-items</span>控制交叉軸對齊（stretch、center、flex-start）。</p>
+<p>子元素也有Flexbox屬性：<span data-tip="Flexbox 子元素設定，讓元素填滿剩餘空間" style="color:#ffae00">flex: 1</span>讓元素平均分配剩餘空間；<span style="color:#ffae00">flex-shrink: 0</span>防止元素被壓縮；<span data-tip="Flexbox CSS 屬性，覆蓋個別元素在交叉軸的對齊方式" style="color:#ffae00">align-self</span>覆蓋父元素的align-items，單獨設定這個子元素的對齊方式；<span style="color:#ffae00">order</span>改變元素的排列順序（預設都是0）。</p>
+<p><span data-tip="CSS Grid 或資料結構，以行列組成的二維結構" style="color:#fa6dff">「Grid（網格）」</span>是二維排版系統，可以同時控制行和列，適合整頁的版面配置。在父元素設<span data-tip="CSS 宣告，啟用 Grid 網格排版模式" style="color:#ffae00">display: grid</span>，然後用<span data-tip="CSS Grid 屬性，定義網格每欄的寬度與數量" style="color:#ffae00">grid-template-columns</span>定義欄的寬度，例如：<span style="color:#ffae00">grid-template-columns: 1fr 1fr 1fr</span>（三欄均分，fr是fraction的縮寫）；<span data-tip="CSS Flexbox/Grid 屬性，設定子元素之間的間距" style="color:#ffae00">gap</span>設定格子間的間距；子元素用<span data-tip="CSS Grid 屬性，設定元素跨越的欄位範圍" style="color:#ffae00">grid-column</span>和<span data-tip="CSS Grid 屬性，設定元素跨越的列範圍" style="color:#ffae00">grid-row</span>指定佔哪些格子。</p>
+<p>Flexbox適合一維（導覽列、卡片列表），Grid適合二維（整頁layout），實務上常兩者混用——Grid做外層大版面，Flexbox做內部元件排列。這兩個系統是現代CSS排版的核心，一定要熟練！</p>
 </section>
-            <section id="section5">
-                <h2>5. 響應式與動畫</h2>
-                <p><span style="color:#fa6dff">「響應式設計（Responsive Design）」</span>讓網頁在不同螢幕尺寸（手機、平板、桌機）都能良好顯示。核心工具是<span style="color:#ffae00">Media Query</span>，根據螢幕寬度套用不同樣式：<span style="color:#ffae00">@media</span> (max-width: 768px) { ... } 表示螢幕寬度在768px以下時套用這裡面的樣式，可以在手機上把多欄變成單欄、調整字型大小等。</p>
-                <p>響應式設計的最佳實踐是<span style="color:#ffee00fa">Mobile First</span>：先寫手機版樣式，再用<span style="color:#ffae00">min-width</span>的Media Query逐步擴展到大螢幕，這樣程式碼更精簡。常見斷點（Breakpoints）：小手機&lt;480px、手機&lt;768px、平板&lt;1024px、桌機以上。字型大小建議用<span style="color:#ffae00">rem</span>，讓使用者可以透過瀏覽器設定調整基礎字型大小。</p>
-                <p>CSS的<span style="color:#fa6dff">「過渡（Transition）」</span>讓樣式的改變有動畫效果：<span style="color:#ffae00">transition: all 0.3s ease</span>，表示所有屬性在0.3秒內平滑過渡，常用在hover效果。可以指定特定屬性：<span style="color:#ffae00">transition: background-color 0.3s, transform 0.5s</span>，也可以指定緩動函式（ease、linear、ease-in-out）。</p>
-                <p><span style="color:#fa6dff">「動畫（Animation）」</span>比transition更強大，用<span style="color:#ffae00">@keyframes</span>定義關鍵影格，再用<span style="color:#ffae00">animation</span>屬性套用：<span style="color:#ffae00">@keyframes</span> fadeIn { from { opacity: 0; } to { opacity: 1; } } 定義淡入效果，元素加上 <span style="color:#ffae00">animation: fadeIn 1s ease</span> 即可。<span style="color:#ffae00">transform</span>屬性可以做位移（translate）、旋轉（rotate）、縮放（scale）等幾何變換，搭配transition和animation可以做出各種精緻效果。</p>
-                <p>恭喜完成CSS基礎！CSS是越用越有感的技術，建議多複製喜歡的網站設計來拆解模仿，打開瀏覽器開發者工具直接改樣式看效果，是進步最快的方式。CSS好，網頁就好看，加油！🎨</p>
+<section id="section5">
+<h2>5. 響應式與動畫</h2>
+<p><span data-tip="網頁依螢幕尺寸自動調整版面的設計方式" style="color:#fa6dff">「響應式設計（Responsive Design）」</span>讓網頁在不同螢幕尺寸（手機、平板、桌機）都能良好顯示。核心工具是<span data-tip="CSS 媒體查詢，依螢幕尺寸或裝置類型套用不同樣式" style="color:#ffae00">Media Query</span>，根據螢幕寬度套用不同樣式：<span data-tip="CSS 媒體查詢規則，依螢幕條件套用不同樣式" style="color:#ffae00">@media</span> (max-width: 768px) { ... } 表示螢幕寬度在768px以下時套用這裡面的樣式，可以在手機上把多欄變成單欄、調整字型大小等。</p>
+<p>響應式設計的最佳實踐是<span style="color:#ffee00fa">Mobile First</span>：先寫手機版樣式，再用<span data-tip="CSS 屬性，設定元素寬度的最小限制值" style="color:#ffae00">min-width</span>的Media Query逐步擴展到大螢幕，這樣程式碼更精簡。常見斷點（Breakpoints）：小手機&lt;480px、手機&lt;768px、平板&lt;1024px、桌機以上。字型大小建議用<span data-tip="CSS 相對長度單位，相對於根元素（html）的字型大小" style="color:#ffae00">rem</span>，讓使用者可以透過瀏覽器設定調整基礎字型大小。</p>
+<p>CSS的<span data-tip="CSS 屬性變化時的平滑動畫效果" style="color:#fa6dff">「過渡（Transition）」</span>讓樣式的改變有動畫效果：<span data-tip="CSS 過渡動畫宣告，所有屬性變化以 0.3 秒 ease 緩動呈現" style="color:#ffae00">transition: all 0.3s ease</span>，表示所有屬性在0.3秒內平滑過渡，常用在hover效果。可以指定特定屬性：<span style="color:#ffae00">transition: background-color 0.3s, transform 0.5s</span>，也可以指定緩動函式（ease、linear、ease-in-out）。</p>
+<p><span data-tip="CSS 動畫效果，讓元素屬性隨時間平滑變化" style="color:#fa6dff">「動畫（Animation）」</span>比transition更強大，用<span data-tip="CSS 動畫規則，定義動畫各時間點的樣式變化" style="color:#ffae00">@keyframes</span>定義關鍵影格，再用<span data-tip="CSS 屬性，套用預先定義的 @keyframes 動畫效果" style="color:#ffae00">animation</span>屬性套用：<span data-tip="CSS 動畫規則，定義動畫各時間點的樣式變化" style="color:#ffae00">@keyframes</span> fadeIn { from { opacity: 0; } to { opacity: 1; } } 定義淡入效果，元素加上 <span style="color:#ffae00">animation: fadeIn 1s ease</span> 即可。<span data-tip="CSS 屬性，對元素套用平移、旋轉、縮放等幾何變換" style="color:#ffae00">transform</span>屬性可以做位移（translate）、旋轉（rotate）、縮放（scale）等幾何變換，搭配transition和animation可以做出各種精緻效果。</p>
+<p>恭喜完成CSS基礎！CSS是越用越有感的技術，建議多複製喜歡的網站設計來拆解模仿，打開瀏覽器開發者工具直接改樣式看效果，是進步最快的方式。CSS好，網頁就好看，加油！🎨</p>
 </section>
-        </main>
-        <div style="height: 60px;"></div> 
-        <p>最後這裡提供一個用GoogleAI(Gemini)NotebookLM製作的教學綱要簡報簡報，下載起來，方便需要時做迅速的統整和複習~</p>
-        <a href="C  _基礎與實踐藍圖.pdf" download class="download-btn">立即下載檔案</a>
-    <script>
-        const navLinks = document.querySelectorAll('.nav-link');
-        const sections = document.querySelectorAll('section');
-        window.addEventListener('scroll', () => {
-            let current = '';
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                const sectionHeight = section.clientHeight;
-                if (window.pageYOffset >= (sectionTop - 100)) {
-                    current = section.getAttribute('id');
-                }
-            });
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href').includes(current)) {
-                    link.classList.add('active');
-                }
-            });
-        });
-    </script>
-    </header>
-    <div id="gdbFloatWindow">
-        <div class="window-header" id="dragHandle">
-            <span class="window-title">GDB</span>
-            <span class="close-btn" onclick="toggleGdbWindow()">&times;</span>
-        </div>
-        <div class="window-content">
-            <iframe 
-                id="gdbFrame"
-                data-src="https://www.onlinegdb.com/"
-                src="https://www.onlinegdb.com/"
-                sandbox="allow-forms allow-scripts allow-same-origin allow-popups">
-            </iframe>
-        </div>
-    </div>
-    <script>
+<div style="margin-top: 40px; padding: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px;">
+<p style="color: var(--muted); margin-bottom: 16px;">📄 最後這裡提供一個用GoogleAI(Gemini)NotebookLM製作的教學綱要簡報簡報，下載起來，方便需要時做迅速的統整和複習~</p>
+<a class="download-btn" download="" href="C  _基礎與實踐藍圖.pdf">立即下載檔案</a>
+</div>
+</div>
+</div>
+<!-- GDB Float Window -->
+<div id="gdbFloatWindow">
+<div class="window-header" id="dragHandle">
+<span class="window-title">⌨ GDB Online</span>
+<span class="close-btn" onclick="toggleGdbWindow()">×</span>
+</div>
+<div class="window-content">
+<iframe id="gdbFrame" sandbox="allow-forms allow-scripts allow-same-origin allow-popups" src="https://www.onlinegdb.com/"></iframe>
+</div>
+</div>
+<script src="shared.js"></script>
+<script>
         const floatWindow = document.getElementById('gdbFloatWindow');
-        const iframe = document.getElementById('gdbFrame');
-        const dragHandle = document.getElementById('dragHandle');
+        const dragHandle  = document.getElementById('dragHandle');
         function toggleGdbWindow() {
-            if (floatWindow.style.display === 'flex') {
-                floatWindow.style.display = 'none';
-            } else {
-                floatWindow.style.display = 'flex';
-                if (iframe.getAttribute('src') === "") {
-                    iframe.setAttribute('src', iframe.getAttribute('data-src'));
-                }
-            }
+            floatWindow.style.display = floatWindow.style.display === 'flex' ? 'none' : 'flex';
         }
-        let isDragging = false;
-        let startX, startY, initialLeft, initialTop;
-        dragHandle.addEventListener('mousedown', function(e) {
+        let isDragging = false, startX, startY, initLeft, initTop;
+        dragHandle.addEventListener('mousedown', e => {
             isDragging = true;
-            startX = e.clientX;
-            startY = e.clientY;
-            const rect = floatWindow.getBoundingClientRect();
-            initialLeft = rect.left;
-            initialTop = rect.top;
+            startX = e.clientX; startY = e.clientY;
+            const r = floatWindow.getBoundingClientRect();
+            initLeft = r.left; initTop = r.top;
             floatWindow.classList.add('is-dragging');
         });
-        document.addEventListener('mousemove', function(e) {
-            if (isDragging) {
-                const dx = e.clientX - startX;
-                const dy = e.clientY - startY;
-                floatWindow.style.left = `${initialLeft + dx}px`;
-                floatWindow.style.top = `${initialTop + dy}px`;
-                floatWindow.style.right = 'auto'; 
-            }
+        document.addEventListener('mousemove', e => {
+            if (!isDragging) return;
+            floatWindow.style.left = `${initLeft + e.clientX - startX}px`;
+            floatWindow.style.top  = `${initTop  + e.clientY - startY}px`;
+            floatWindow.style.right = 'auto';
         });
-        document.addEventListener('mouseup', function() {
+        document.addEventListener('mouseup', () => {
             isDragging = false;
             floatWindow.classList.remove('is-dragging');
         });
     </script>
+<script src="tooltips.js"></script>
 </body>
 </html>

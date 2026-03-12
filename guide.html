@@ -3,210 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AC_GUIDE</title>
+    <title>AC — 網站導覽</title>
     <link rel="icon" href="螢幕擷取畫面 2026-01-05 125529.png" sizes="48x48" type="image/png">
-    <style>
-        body {
-            background-color: rgb(20, 20, 20);
-            color: white;
-            font-family: "Microsoft JhengHei", sans-serif;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .back-button {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            text-decoration: none;
-            color: aquamarine;
-            border: 1px solid aquamarine;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: all 0.3s;
-            z-index: 1000;
-        }
-        .back-button:hover {
-            background-color: aquamarine;
-            color: black;
-        }
-        .content {
-            max-width: 800px;
-            text-align: center;
-            margin-top: 50px;
-        }
-        h1 { color: aquamarine; font-size: 3rem; margin-bottom: 10px; }
-        p { font-size: 1.2rem; line-height: 1.6; color: #ddd; }
-        .big-logo {
-            width: 150px;
-            height: 150px;
-            object-fit: contain;
-            margin-bottom: 20px;
-        }
-        html {
-            scroll-behavior: smooth;
-        }
-        .sidebar {
-            width: 200px;
-            height: 100vh;
-            position: fixed; 
-            top: 0;
-            left: 0;
-            background-color: #faa11cd0;
-            padding: 20px;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            overflow-y: auto;
-        }
-        .sidebar ul {
-            list-style: none;
-            padding: 0;
-        }
-        .sidebar li {
-            margin-bottom: 15px;
-        }
-        .sidebar a {
-            text-decoration: none;
-            color: #333;
-            display: block;
-            padding: 8px 12px;
-            border-left: 4px solid transparent; 
-            transition: all 0.3s;
-        }
-        .sidebar a:hover {
-            background-color: #faa11cd0;
-        }
-        .sidebar a.active {
-            color: #007bff;    
-            font-weight: bold;
-            border-left: 4px solid #007bff;
-            background-color: #faa11cd0;
-        }
-        .content {
-            margin-left: 240px;
-            padding: 40px;
-            max-width: 800px;
-        }
-        section {
-            min-height: 80vh; 
-            padding-top: 20px;
-            border-bottom: 1px solid #faa11cd0;
-        }
-        h2 {
-            margin-top: 0;
-        }
-        .nav-menu {
-            display: flex;
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-        .nav-menu li {
-            margin-left: 20px;
-        }
-        .nav-menu a {
-            text-decoration: none;
-            color: #ccc;
-            font-size: 1rem;
-            padding: 5px 10px;
-            border-radius: 4px;
-            transition: all 0.3s;
-        }
-        .nav-menu a:hover {
-            color: white;
-            background-color: rgba(255,255,255,0.1);
-        }
-        .nav-menu a.active {
-            color: #fff;
-            background-color: #007bff; 
-            font-weight: bold;
-        }
-        section img {
-            max-width: 100%;  
-            height: auto;   
-            display: block;   
-            margin: 10px auto;
-            border-radius: 5px; 
-            box-shadow: 0 4px 6px rgb(248, 243, 243);
-        }
-    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="shared.css">
 </head>
 <body>
-    <ul class="nav-menu">
-            <li><a href="index.html" class="nav-link">首頁</a></li>
-            <li><a href="guide.html" class="nav-link">網站導覽</a></li>
-            <li><a href="about.html" class="nav-link">關於我們</a></li>
-            <li><a href="others.html" class="nav-link">其他</a></li>
-        </ul>
-    <a href="index.html" class="back-button">← 回首頁</a>
-    <nav class="sidebar">
-        <div style="height: 30px;"></div>
-        <h3>章節目錄</h3>
-        <ul>
-            <li><a href="#section1" class="nav-link">1. 架構簡介</a></li>
-            <li><a href="#section2" class="nav-link">2. 語言學習</a></li>
-            <li><a href="#section3" class="nav-link">3. 實戰應用</a></li>
-            <li><a href="#section4" class="nav-link">4. 聯絡我們</a></li>
+
+    <nav class="top-nav">
+        <a href="index.html" class="back">← 回首頁</a>
+        <ul class="nav-menu">
+            <li><a href="index.html">首頁</a></li>
+            <li><a href="guide.html">網站導覽</a></li>
+            <li><a href="about.html">關於我們</a></li>
+            <li><a href="others.html">其他</a></li>
         </ul>
     </nav>
-    <header>
-        <div class="content">
-        <h1>網站導覽</h1>
-        <hr style="border-color: #333; margin: 20px 0;">
-        <div style="height: 30px;"></div>
-        <main class="content">
+
+    <div class="layout">
+        <nav class="sidebar">
+            <h3>章節目錄</h3>
+            <ul>
+                <li><a href="#section1">1. 架構簡介</a></li>
+                <li><a href="#section2">2. 語言學習</a></li>
+                <li><a href="#section3">3. 實戰應用</a></li>
+                <li><a href="#section4">4. 聯絡我們</a></li>
+            </ul>
+        </nav>
+
+        <div class="main-content">
+            <h1 class="page-title">網站導覽</h1>
+            <hr class="page-divider">
+
             <section id="section1">
                 <h2>1. 架構簡介</h2>
-                <img src="導覽1.png">
-                <p>在首頁、網頁導覽、關於我們、其他可以在上方切換頁面</p>
-                <div style="height: 30px;"></div>
-                <img src="導覽3.png">
-                <p>側邊目錄記錄所有小章節，可以點擊以移動到該章節</p>
-                <div style="height: 30px;"></div>
-                <img src="導覽5.png">
-                <p>有些頁面有內嵌GDB，學習玩一個段落後可以馬上實作練習!</p>
-                <div style="height: 30px;"></div>
+                <img src="導覽1.png" alt="頁面切換示意">
+                <p>在首頁、網站導覽、關於我們、其他可以在上方切換頁面。</p>
+                <img src="導覽3.png" alt="側邊目錄示意">
+                <p>側邊目錄記錄所有小章節，可以點擊以移動到該章節。</p>
+                <img src="導覽5.png" alt="內嵌 GDB 示意">
+                <p>有些頁面有內嵌 GDB，學完一個段落後可以馬上實作練習！</p>
             </section>
+
             <section id="section2">
                 <h2>2. 語言學習</h2>
-                <img src="導覽2.png">
-                <p>首頁往下滑可選擇要學的程式語言，每個語言都有一小段簡介</p>
-                <div style="height: 30px;"></div>
+                <img src="導覽2.png" alt="語言選擇示意">
+                <p>首頁往下滑可選擇要學的程式語言，每個語言都有一小段簡介。</p>
             </section>
+
             <section id="section3">
                 <h2>3. 實戰應用</h2>
-                <img src="導覽4.png">
-                <p>語言學習往下滑可選擇要學的實戰應用，每個出路都有一小段簡介</p>
-                <div style="height: 30px;"></div>
+                <img src="導覽4.png" alt="實戰應用示意">
+                <p>語言學習往下滑可選擇要學的實戰應用，每個方向都有一小段簡介。</p>
             </section>
+
             <section id="section4">
                 <h2>4. 聯絡我們</h2>
-                <img src="導覽6.png">
-                <p>首頁最底有QRcode和連結，若有任何問題歡迎私訊</p>
-                <div style="height: 30px;"></div>
+                <img src="導覽6.png" alt="聯絡方式示意">
+                <p>首頁最底有 QR code 和連結，若有任何問題歡迎私訊。</p>
             </section>
-        </main>
-    <script>
-        const navLinks = document.querySelectorAll('.nav-link');
-        const sections = document.querySelectorAll('section');
-        window.addEventListener('scroll', () => {
-            let current = '';
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                const sectionHeight = section.clientHeight;
-                if (window.pageYOffset >= (sectionTop - 100)) {
-                    current = section.getAttribute('id');
-                }
-            });
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href').includes(current)) {
-                    link.classList.add('active');
-                }
-            });
-        });
-    </script>
-    </header>
+        </div>
+    </div>
+
+    <script src="shared.js"></script>
 </body>
 </html>
