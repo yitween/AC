@@ -1,199 +1,257 @@
 <!DOCTYPE html>
+
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AC_BACKEND</title>
-    <link rel="icon" href="螢幕擷取畫面 2026-01-05 125529.png" sizes="48x48" type="image/png">
-    <style>
-        body {
-            background-color: rgb(20, 20, 20);
-            color: white;
-            font-family: "Microsoft JhengHei", sans-serif;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AC — BACKEND</title>
+<link href="螢幕擷取畫面 2026-01-05 125529.png" rel="icon" sizes="48x48" type="image/png"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="shared.css" rel="stylesheet"/>
+<style>
+        /* ── GDB FLOAT WINDOW ── */
+        #gdbFloatWindow {
+            display: none; position: fixed;
+            top: 100px; right: 50px;
+            width: 600px; height: 500px;
+            background: #1e1e1e;
+            border: 1px solid #444; border-radius: 10px;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.6);
+            z-index: 2000; flex-direction: column;
+            overflow: hidden; resize: both;
+            min-width: 320px; min-height: 250px;
+            max-width: 95vw; max-height: 95vh;
         }
-        .back-button {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            text-decoration: none;
-            color: aquamarine;
-            border: 1px solid aquamarine;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: all 0.3s;
-            z-index: 1000;
+        .window-header {
+            height: 40px; background: #2a2a2a;
+            display: flex; align-items: center;
+            justify-content: space-between;
+            padding: 0 14px; cursor: move;
+            border-bottom: 1px solid #444;
+            user-select: none; flex-shrink: 0;
         }
-        .back-button:hover {
-            background-color: aquamarine;
-            color: black;
+        .window-title {
+            color: #ccc; font-weight: 700; font-size: 0.85rem;
+            font-family: 'JetBrains Mono', monospace;
         }
-        .content {
-            max-width: 800px;
-            text-align: center;
-            margin-top: 50px;
+        .close-btn {
+            color: #888; font-size: 22px; cursor: pointer;
+            line-height: 1; transition: color 0.2s;
         }
-        h1 { color: aquamarine; font-size: 3rem; margin-bottom: 10px; }
-        p { font-size: 1.2rem; line-height: 1.6; color: #ddd; }
-        .big-logo {
-            width: 150px;
-            height: 150px;
-            object-fit: contain;
-            margin-bottom: 20px;
+        .close-btn:hover { color: #f87171; }
+        .window-content { flex: 1; height: calc(100% - 40px); }
+        .window-content iframe { width: 100%; height: 100%; border: none; }
+        .is-dragging iframe { pointer-events: none; }
+        /* ── PAGE HERO ── */
+        .page-hero {
+            display: flex; align-items: center; gap: 20px;
+            margin-bottom: 24px;
         }
-        html {
-            scroll-behavior: smooth;
+        .page-hero img {
+            width: 72px; height: 72px; object-fit: contain;
+            border-radius: 12px; background: rgba(255,255,255,0.04);
+            padding: 8px; border: 1px solid var(--border);
+            box-shadow: none; margin: 0;
         }
-        .sidebar {
-            width: 200px;
-            height: 100vh;
-            position: fixed; 
-            top: 0;
-            left: 0;
-            background-color: #faa11cd0;
-            padding: 20px;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            overflow-y: auto;
+        .page-hero h1 {
+            font-size: clamp(1.8rem, 4vw, 2.4rem);
+            color: var(--accent); font-weight: 700; margin: 0;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 0.03em;
         }
-        .sidebar ul {
-            list-style: none;
-            padding: 0;
+        /* ── DOWNLOAD BUTTON ── */
+        .download-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            margin-top: 32px; padding: 12px 24px;
+            background: #1d4ed8; color: #fff;
+            text-decoration: none; border-radius: 8px;
+            font-weight: 700; font-size: 0.9rem;
+            transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
         }
-        .sidebar li {
-            margin-bottom: 15px;
+        .download-btn::before { content: '⬇'; }
+        .download-btn:hover {
+            background: #2563eb; transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(29,78,216,0.35);
         }
-        .sidebar a {
-            text-decoration: none;
-            color: #333;
-            display: block;
-            padding: 8px 12px;
-            border-left: 4px solid transparent; 
-            transition: all 0.3s;
+        .download-btn:active { transform: translateY(0); }
+        /* ── GDB INLINE BTN ── */
+        .gdb-inline {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 16px; background: transparent;
+            color: var(--accent); border: 1px solid var(--accent);
+            border-radius: 6px; cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700; font-size: 0.85rem;
+            transition: background 0.2s, color 0.2s, transform 0.15s;
+            margin-left: 8px;
         }
-        .sidebar a:hover {
-            background-color: #faa11cd0;
+        .gdb-inline:hover {
+            background: var(--accent); color: #111;
+            transform: translateY(-1px);
         }
-        .sidebar a.active {
-            color: #007bff;    
-            font-weight: bold;
-            border-left: 4px solid #007bff;
-            background-color: #faa11cd0;
-        }
-        .content {
-            margin-left: 240px;
-            padding: 40px;
-            max-width: 800px;
-        }
-        section {
-            min-height: 80vh; 
-            padding-top: 20px;
-            border-bottom: 1px solid #faa11cd0;
-        }
-        h2 {
-            margin-top: 0;
-        }
+        .gdb-inline:active { transform: translateY(0); }
     </style>
-</head>
+<style>
+/* ── TOOLTIP ── */
+[data-tip] {
+    position: relative;
+    cursor: help;
+    text-decoration: underline dotted currentColor;
+    text-underline-offset: 3px;
+}
+[data-tip]::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e1e2e;
+    color: #e0e0e0;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    white-space: normal;
+    width: max-content;
+    max-width: 260px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(127,255,212,0.25);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    transform: translateX(-50%) translateY(4px);
+    z-index: 9999;
+}
+[data-tip]:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+/* arrow */
+[data-tip]::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 2px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: rgba(127,255,212,0.25);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.18s ease;
+    z-index: 9999;
+}
+[data-tip]:hover::before { opacity: 1; }
+</style></head>
 <body>
-    <a href="index.html" class="back-button">← 回首頁</a>
-    <nav class="sidebar">
-        <div style="height: 30px;"></div>
-        <h3>章節目錄</h3>
-        <ul>
-            <li><a href="#section1" class="nav-link">1. 後端是什麼</a></li>
-            <li><a href="#section2" class="nav-link">2. 資料庫設計與 SQL</a></li>
-            <li><a href="#section3" class="nav-link">3. 後端框架：Flask 與 Node.js</a></li>
-            <li><a href="#section4" class="nav-link">4. 伺服器部署與維運</a></li>
-            <li><a href="#section5" class="nav-link">5. 實作專案：RESTful API 後端</a></li>
-        </ul>
-    </nav>
-    <header>
-        <div class="content">
-        <img src="b.png" class="big-logo">
-        <h1>BACKEND</h1>
-        <hr style="border-color: #333; margin: 20px 0;">
-        <div style="height: 50px;"></div>
-        <center>
-            <p style="color:#ddd;font-size:2rem"><B><I>Try Code Here!</I></B></p>
-        </center>
-        <div style="height: 30px;"></div>
-        <div style="max-width: 90%; margin: 0 auto; box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);">
-            <iframe 
-                src="https://www.onlinegdb.com/" 
-                width="100%" 
-                height="600px" 
-                frameborder="0" 
-                style="border-radius: 10px; border: 1px solid #333;"
-                allowfullscreen>
-            </iframe>
-        </div>
-        <div style="height: 50px;"></div>
-        <main class="content">
-            <section id="section1">
-                <h2>1. 後端是什麼</h2>
-                <p><span style="color:#fa6dff">「後端（Backend）」</span>是使用者看不見的部分——伺服器、資料庫、API——負責處理業務邏輯、儲存資料、和前端溝通。前端負責「呈現」，後端負責「運算和儲存」，兩者透過<span style="color:#ffae00">HTTP API</span>溝通，這就是現代Web應用的基本架構。</p>
-                <p><span style="color:#fa6dff">「API（Application Programming Interface）」</span>是前後端的橋樑，最常見的是<span style="color:#ffae00">REST API</span>：用不同的HTTP方法對應不同操作——<span style="color:#ffae00">GET</span>（查詢）、<span style="color:#ffae00">POST</span>（新增）、<span style="color:#ffae00">PUT/PATCH</span>（修改）、<span style="color:#ffae00">DELETE</span>（刪除）；資料格式用<span style="color:#ffae00">JSON</span>傳遞；URL設計語意清楚，例如<span style="color:#00eeff">/api/users/123</span>代表id=123的使用者。</p>
-                <p>後端開發最常用的資料庫是<span style="color:#fa6dff">「關聯式資料庫（RDBMS）」</span>：<span style="color:#ffae00">MySQL</span>（最廣泛使用）、<span style="color:#ffae00">PostgreSQL</span>（功能更強，支援JSON欄位、地理資訊等）、<span style="color:#ffae00">SQLite</span>（輕量，適合小型專案和開發測試）。資料以<span style="color:#ffee00fa">表格（Table）</span>形式儲存，表格之間靠<span style="color:#ffae00">外鍵（Foreign Key）</span>關聯，用<span style="color:#ffae00">SQL</span>語言操作。</p>
-                <p>非關聯式資料庫（NoSQL）在某些場景更適合：<span style="color:#ffae00">MongoDB</span>（文件型，存JSON，schema彈性）適合資料結構多變；<span style="color:#ffae00">Redis</span>（鍵值型，記憶體儲存，超快速）適合快取（Cache）、Session儲存、排行榜；選什麼資料庫要根據專案需求決定，沒有絕對的好壞。</p>
-                <p>後端的三層架構：<span style="color:#ffae00">路由層（Router）</span>接收請求並分配到對應的處理函式；<span style="color:#ffae00">業務邏輯層（Service）</span>處理核心功能；<span style="color:#ffae00">資料存取層（Repository/DAO）</span>負責和資料庫溝通。這種分層設計讓程式碼職責清楚、容易測試和維護，是企業級後端的標準結構。</p>
+<nav class="top-nav">
+<a class="back" href="index.html">← 回首頁</a>
+<ul class="nav-menu">
+<li><a href="index.html">首頁</a></li>
+<li><a href="guide.html">網站導覽</a></li>
+<li><a href="about.html">關於我們</a></li>
+<li><a href="others.html">其他</a></li>
+<li><button class="gdb-inline" onclick="toggleGdbWindow()">⌨ GDB</button></li>
+</ul>
+</nav>
+<div class="layout">
+<nav class="sidebar">
+<h3>章節目錄</h3>
+<ul>
+<li><a href="#section1">1. 後端是什麼</a></li>
+<li><a href="#section2">2. 資料庫設計與 SQL</a></li>
+<li><a href="#section3">3. 後端框架：Flask 與 Node.js</a></li>
+<li><a href="#section4">4. 伺服器部署與維運</a></li>
+<li><a href="#section5">5. 實作專案：RESTful API 後端</a></li>
+</ul>
+</nav>
+<div class="main-content">
+<div class="page-hero">
+<img alt="BACKEND" src="b.png"/>
+<h1>BACKEND</h1>
+</div>
+<hr class="page-divider"/>
+<section id="section1">
+<h2>1. 後端是什麼</h2>
+<p><span data-tip="伺服器端程式，處理業務邏輯、資料庫與 API" style="color:#fa6dff">「後端（Backend）」</span>是使用者看不見的部分——伺服器、資料庫、API——負責處理業務邏輯、儲存資料、和前端溝通。前端負責「呈現」，後端負責「運算和儲存」，兩者透過<span data-tip="透過 HTTP 協定提供的程式介面，使用 GET/POST 等方法交換資料" style="color:#ffae00">HTTP API</span>溝通，這就是現代Web應用的基本架構。</p>
+<p><span data-tip="應用程式介面，定義軟體元件之間溝通的規則與方法" style="color:#fa6dff">「API（Application Programming Interface）」</span>是前後端的橋樑，最常見的是<span data-tip="遵循 REST 架構風格的 HTTP API，以資源為中心設計端點" style="color:#ffae00">REST API</span>：用不同的HTTP方法對應不同操作——<span data-tip="HTTP 請求方法，從伺服器讀取資源，不應改變伺服器狀態" style="color:#ffae00">GET</span>（查詢）、<span data-tip="HTTP 請求方法，向伺服器提交資料，通常用於新增資源" style="color:#ffae00">POST</span>（新增）、<span style="color:#ffae00">PUT/PATCH</span>（修改）、<span data-tip="SQL 指令，刪除資料表中符合條件的列" style="color:#ffae00">DELETE</span>（刪除）；資料格式用<span data-tip="輕量級資料交換格式，以鍵值對和陣列組成，易於人讀和機器解析" style="color:#ffae00">JSON</span>傳遞；URL設計語意清楚，例如<span style="color:#00eeff">/api/users/123</span>代表id=123的使用者。</p>
+<p>後端開發最常用的資料庫是<span data-tip="以關聯模型組織資料的資料庫管理系統（MySQL、PostgreSQL）" style="color:#fa6dff">「關聯式資料庫（RDBMS）」</span>：<span data-tip="最廣泛使用的開源關聯式資料庫管理系統" style="color:#ffae00">MySQL</span>（最廣泛使用）、<span data-tip="功能強大的開源關聯式資料庫，支援 JSON、全文搜尋等進階功能" style="color:#ffae00">PostgreSQL</span>（功能更強，支援JSON欄位、地理資訊等）、<span data-tip="輕量級嵌入式關聯式資料庫，無需獨立伺服器，常用於開發測試" style="color:#ffae00">SQLite</span>（輕量，適合小型專案和開發測試）。資料以<span style="color:#ffee00fa">表格（Table）</span>形式儲存，表格之間靠<span data-tip="資料庫欄位，引用其他資料表的主鍵建立關聯" style="color:#ffae00">外鍵（Foreign Key）</span>關聯，用<span data-tip="結構化查詢語言，用於關聯式資料庫的資料定義、查詢與操作" style="color:#ffae00">SQL</span>語言操作。</p>
+<p>非關聯式資料庫（NoSQL）在某些場景更適合：<span data-tip="NoSQL 文件型資料庫，以 JSON 格式儲存資料，結構彈性" style="color:#ffae00">MongoDB</span>（文件型，存JSON，schema彈性）適合資料結構多變；<span data-tip="高效能記憶體鍵值資料庫，常用於快取、Session 與訊息佇列" style="color:#ffae00">Redis</span>（鍵值型，記憶體儲存，超快速）適合快取（Cache）、Session儲存、排行榜；選什麼資料庫要根據專案需求決定，沒有絕對的好壞。</p>
+<p>後端的三層架構：<span data-tip="Web 框架中處理 URL 與對應處理函式映射的層" style="color:#ffae00">路由層（Router）</span>接收請求並分配到對應的處理函式；<span data-tip="應用程式中處理商業規則與流程的程式碼層" style="color:#ffae00">業務邏輯層（Service）</span>處理核心功能；<span data-tip="應用程式中專門負責資料庫 CRUD 操作的程式碼層" style="color:#ffae00">資料存取層（Repository/DAO）</span>負責和資料庫溝通。這種分層設計讓程式碼職責清楚、容易測試和維護，是企業級後端的標準結構。</p>
 </section>
-            <section id="section2">
-                <h2>2. 資料庫設計與 SQL</h2>
-                <p>好的<span style="color:#fa6dff">「資料庫設計」</span>是後端的根基。設計原則：<span style="color:#ffae00">正規化（Normalization）</span>——避免資料重複，每個資訊只存一個地方，用外鍵關聯；每張表加上<span style="color:#ffae00">id</span>作為主鍵（Primary Key），通常設為auto-increment；時間欄位加<span style="color:#ffae00">created_at</span>和<span style="color:#ffae00">updated_at</span>，追蹤資料的建立和修改時間。</p>
-                <p>資料表關係有三種：<span style="color:#ffae00">一對多（1:N）</span>——一個使用者有多篇文章（users.id ← posts.user_id）；<span style="color:#ffae00">多對多（M:N）</span>——學生和課程，需要第三張「中間表」（student_courses）；<span style="color:#ffae00">一對一（1:1）</span>——使用者和個人資料，通常可以合併成一張表，除非有效能考量才分開。</p>
-                <p>後端常用的SQL進階技巧：<span style="color:#ffae00">JOIN</span>連接多張表查詢；<span style="color:#ffae00">INDEX（索引）</span>加在常被WHERE查詢的欄位，大幅提升查詢速度（例如<span style="color:#ffae00">CREATE INDEX idx_email ON users(email);</span>）；<span style="color:#ffae00">Transaction（交易）</span>確保多個SQL操作全部成功或全部回滾，例如轉帳：扣款和入帳必須同時成功，用<span style="color:#ffae00">BEGIN; ... COMMIT;</span>或<span style="color:#ffae00">ROLLBACK;</span>。</p>
-                <p><span style="color:#fa6dff">「ORM（Object-Relational Mapping）」</span>讓你用程式語言操作資料庫，不用直接寫SQL。Python的<span style="color:#ffae00">SQLAlchemy</span>（或Django ORM）讓你用Python class代表資料表，用物件的方式新增查詢，例如：<span style="color:#ffae00">User.query.filter_by(email='a@b.com').first()</span>。ORM更安全（自動防範SQL Injection）、更好維護，是現代後端的主流做法。</p>
-                <p>SQL資安：<span style="color:#fa6dff">「SQL Injection」</span>是最常見的資安漏洞，攻擊者透過輸入惡意SQL破壞資料庫。永遠<span style="color:#ffee00fa">不要</span>用字串拼接SQL：<span style="color:#ffae00">f"SELECT * FROM users WHERE name='{user_input}'"</span>，這非常危險！要用<span style="color:#ffee00fa">參數化查詢（Parameterized Query）</span>：<span style="color:#ffae00">cursor.execute("SELECT * FROM users WHERE name=?", (user_input,))</span>，或直接用ORM。</p>
+<section id="section2">
+<h2>2. 資料庫設計與 SQL</h2>
+<p>好的<span data-tip="規劃資料表結構、欄位型態與關聯的資料庫架構設計" style="color:#fa6dff">「資料庫設計」</span>是後端的根基。設計原則：<span data-tip="資料庫設計消除冗餘，或機器學習的特徵縮放" style="color:#ffae00">正規化（Normalization）</span>——避免資料重複，每個資訊只存一個地方，用外鍵關聯；每張表加上<span data-tip="HTML 唯一識別屬性，或 CSS ID 選取器的目標" style="color:#ffae00">id</span>作為主鍵（Primary Key），通常設為auto-increment；時間欄位加<span style="color:#ffae00">created_at</span>和<span style="color:#ffae00">updated_at</span>，追蹤資料的建立和修改時間。</p>
+<p>資料表關係有三種：<span data-tip="資料庫最常見的關聯，一筆記錄對應多筆相關記錄" style="color:#ffae00">一對多（1:N）</span>——一個使用者有多篇文章（users.id ← posts.user_id）；<span data-tip="資料庫關聯，雙方各自可對應多筆對方記錄，需中間表" style="color:#ffae00">多對多（M:N）</span>——學生和課程，需要第三張「中間表」（student_courses）；<span data-tip="資料庫關聯，一個實體對應另一個實體唯一記錄" style="color:#ffae00">一對一（1:1）</span>——使用者和個人資料，通常可以合併成一張表，除非有效能考量才分開。</p>
+<p>後端常用的SQL進階技巧：<span data-tip="SQL 合併查詢，依條件將兩個資料表的資料合併顯示" style="color:#ffae00">JOIN</span>連接多張表查詢；<span data-tip="資料庫索引，建立輔助查詢結構以大幅加速特定欄位的搜尋" style="color:#ffae00">INDEX（索引）</span>加在常被WHERE查詢的欄位，大幅提升查詢速度（例如<span style="color:#ffae00">CREATE INDEX idx_email ON users(email);</span>）；<span data-tip="資料庫交易，確保一系列操作全部成功或全部回滾的原子單元" style="color:#ffae00">Transaction（交易）</span>確保多個SQL操作全部成功或全部回滾，例如轉帳：扣款和入帳必須同時成功，用<span data-tip="SQL 交易語法，將多個操作包在一個不可分割的交易單元中" style="color:#ffae00">BEGIN; ... COMMIT;</span>或<span data-tip="SQL 交易指令，撤銷目前交易中的所有操作回到原始狀態" style="color:#ffae00">ROLLBACK;</span>。</p>
+<p><span data-tip="將資料庫表格對應到程式物件，讓開發者以物件操作資料庫" style="color:#fa6dff">「ORM（Object-Relational Mapping）」</span>讓你用程式語言操作資料庫，不用直接寫SQL。Python的<span data-tip="Python ORM 框架，提供物件操作資料庫與原生 SQL 混用能力" style="color:#ffae00">SQLAlchemy</span>（或Django ORM）讓你用Python class代表資料表，用物件的方式新增查詢，例如：<span style="color:#ffae00">User.query.filter_by(email='<a class="__cf_email__" data-cfemail="86e7c6e4a8e5e9eb" href="/cdn-cgi/l/email-protection">[email protected]</a>').first()</span>。ORM更安全（自動防範SQL Injection）、更好維護，是現代後端的主流做法。</p>
+<p>SQL資安：<span data-tip="SQL 注入攻擊，透過惡意輸入竄改資料庫查詢邏輯" style="color:#fa6dff">「SQL Injection」</span>是最常見的資安漏洞，攻擊者透過輸入惡意SQL破壞資料庫。永遠<span style="color:#ffee00fa">不要</span>用字串拼接SQL：<span style="color:#ffae00">f"SELECT * FROM users WHERE name='{user_input}'"</span>，這非常危險！要用<span style="color:#ffee00fa">參數化查詢（Parameterized Query）</span>：<span style="color:#ffae00">cursor.execute("SELECT * FROM users WHERE name=?", (user_input,))</span>，或直接用ORM。</p>
 </section>
-            <section id="section3">
-                <h2>3. 後端框架：Flask 與 Node.js</h2>
-                <p>Python的<span style="color:#ffae00">Flask</span>是輕量後端框架，適合學習和小型專案。安裝：<span style="color:#ffae00">pip install flask</span>。最簡單的Flask應用：<span style="color:#ffae00">from flask import Flask, jsonify, request</span>；<span style="color:#ffae00">app = Flask(__name__)</span>；<span style="color:#ffae00">@app.route('/api/hello', methods=['GET'])</span>裝飾器定義路由；函式裡回傳<span style="color:#ffae00">jsonify({'message': 'Hello'})</span>；最後<span style="color:#ffae00">app.run(debug=True)</span>啟動。</p>
-                <p>Flask處理不同HTTP方法：<span style="color:#ffae00">request.args.get('key')</span>取URL參數（GET的?key=value）；<span style="color:#ffae00">request.json</span>取POST/PUT的JSON body；<span style="color:#ffae00">request.headers</span>取header（例如Authorization token）。回應狀態碼：<span style="color:#ffae00">return jsonify(data), 201</span>（創建成功）；<span style="color:#ffae00">return jsonify({'error': 'Not found'}), 404</span>。</p>
-                <p><span style="color:#fa6dff">「使用者認證（Authentication）」</span>是後端核心功能：常用<span style="color:#ffae00">JWT（JSON Web Token）</span>，使用者登入後伺服器產生一個Token，之後每次請求把Token放在Header（<span style="color:#ffae00">Authorization: Bearer &lt;token&gt;</span>），伺服器驗證Token的有效性。密碼<span style="color:#ffee00fa">絕對不能明文儲存</span>，要用<span style="color:#ffae00">bcrypt</span>做雜湊（Hash）再存到資料庫。</p>
-                <p><span style="color:#fa6dff">「中介層（Middleware）」</span>讓你在請求到達路由之前做統一處理：身份驗證（每個需要登入的路由都要檢查Token，用middleware一次處理，不用每個函式都寫）；CORS設定（允許前端跨域存取API，用<span style="color:#ffae00">flask-cors</span>套件）；請求Log記錄（每次API呼叫都記下時間、路徑、狀態碼）。</p>
-                <p>Node.js的<span style="color:#ffae00">Express</span>是JS後端的主流選擇，語法和Flask類似：<span style="color:#ffae00">app.get('/api/users', (req, res) =&gt; { res.json(users) })</span>。Node.js的異步特性讓它在高並發場景效能優異，搭配<span style="color:#ffae00">MongoDB</span>是MEAN/MERN Stack的組合，很多新創公司的技術棧。</p>
+<section id="section3">
+<h2>3. 後端框架：Flask 與 Node.js</h2>
+<p>Python的<span data-tip="Python 輕量級 Web 框架，快速建立 RESTful API 與網頁應用" style="color:#ffae00">Flask</span>是輕量後端框架，適合學習和小型專案。安裝：<span style="color:#ffae00">pip install flask</span>。最簡單的Flask應用：<span style="color:#ffae00">from flask import Flask, jsonify, request</span>；<span style="color:#ffae00">app = Flask(__name__)</span>；<span style="color:#ffae00">@app.route('/api/hello', methods=['GET'])</span>裝飾器定義路由；函式裡回傳<span style="color:#ffae00">jsonify({'message': 'Hello'})</span>；最後<span style="color:#ffae00">app.run(debug=True)</span>啟動。</p>
+<p>Flask處理不同HTTP方法：<span style="color:#ffae00">request.args.get('key')</span>取URL參數（GET的?key=value）；<span style="color:#ffae00">request.json</span>取POST/PUT的JSON body；<span style="color:#ffae00">request.headers</span>取header（例如Authorization token）。回應狀態碼：<span style="color:#ffae00">return jsonify(data), 201</span>（創建成功）；<span style="color:#ffae00">return jsonify({'error': 'Not found'}), 404</span>。</p>
+<p><span data-tip="驗證使用者身份的機制（帳密、JWT、OAuth 等）" style="color:#fa6dff">「使用者認證（Authentication）」</span>是後端核心功能：常用<span data-tip="開放標準的身份驗證令牌格式，以 JSON 傳遞使用者資訊" style="color:#ffae00">JWT（JSON Web Token）</span>，使用者登入後伺服器產生一個Token，之後每次請求把Token放在Header（<span style="color:#ffae00">Authorization: Bearer &lt;token&gt;</span>），伺服器驗證Token的有效性。密碼<span style="color:#ffee00fa">絕對不能明文儲存</span>，要用<span data-tip="密碼雜湊函式庫，將密碼以安全方式加密儲存" style="color:#ffae00">bcrypt</span>做雜湊（Hash）再存到資料庫。</p>
+<p><span data-tip="Web 框架中處理請求與回應之間的功能層" style="color:#fa6dff">「中介層（Middleware）」</span>讓你在請求到達路由之前做統一處理：身份驗證（每個需要登入的路由都要檢查Token，用middleware一次處理，不用每個函式都寫）；CORS設定（允許前端跨域存取API，用<span style="color:#ffae00">flask-cors</span>套件）；請求Log記錄（每次API呼叫都記下時間、路徑、狀態碼）。</p>
+<p>Node.js的<span data-tip="Node.js 輕量級 Web 框架，用於快速建立 API 與網頁伺服器" style="color:#ffae00">Express</span>是JS後端的主流選擇，語法和Flask類似：<span style="color:#ffae00">app.get('/api/users', (req, res) =&gt; { res.json(users) })</span>。Node.js的異步特性讓它在高並發場景效能優異，搭配<span data-tip="NoSQL 文件型資料庫，以 JSON 格式儲存資料，結構彈性" style="color:#ffae00">MongoDB</span>是MEAN/MERN Stack的組合，很多新創公司的技術棧。</p>
 </section>
-            <section id="section4">
-                <h2>4. 伺服器部署與維運</h2>
-                <p>程式寫好了，要把它部署到<span style="color:#fa6dff">「伺服器」</span>上才能讓別人存取。常見的雲端平台：<span style="color:#ffae00">Heroku</span>（免費方案易用，適合學習）、<span style="color:#ffae00">Railway / Render</span>（現代替代方案）、<span style="color:#ffae00">AWS / GCP / Azure</span>（企業級，功能最強但複雜）、<span style="color:#ffae00">DigitalOcean</span>（便宜、開發者友善）。</p>
-                <p>生產環境的Flask不應該用內建的開發伺服器，要用<span style="color:#ffae00">Gunicorn</span>（WSGI伺服器）：<span style="color:#ffae00">pip install gunicorn</span>；啟動：<span style="color:#ffae00">gunicorn -w 4 -b 0.0.0.0:8000 app:app</span>（4個worker行程，監聽8000埠）。前面再加一個<span style="color:#ffae00">Nginx</span>反向代理，處理靜態檔案、SSL終止、負載平衡，這是業界標準的部署架構。</p>
-                <p><span style="color:#fa6dff">「Docker」</span>讓部署更標準化：把應用程式和所有依賴打包成<span style="color:#ffae00">容器（Container）</span>，「在我電腦上跑得好好的」的問題就消失了——任何有Docker的機器都能跑一樣的容器。建立<span style="color:#ffae00">Dockerfile</span>定義容器內容，<span style="color:#ffae00">docker-compose.yml</span>同時啟動後端app + 資料庫 + Redis的整組服務，是現代開發的標準工作流程。</p>
-                <p>資料庫維護：定期<span style="color:#ffae00">備份（Backup）</span>——<span style="color:#ffae00">mysqldump -u root -p mydb &gt; backup.sql</span>，配合Cron排程自動每天備份；資料量大時要做<span style="color:#ffae00">讀寫分離</span>（主庫寫、從庫讀）或<span style="color:#ffae00">分片（Sharding）</span>；用<span style="color:#ffae00">Migration工具</span>（Flask-Migrate、Alembic）管理資料庫schema版本，不要直接手動改生產資料庫！</p>
-                <p>後端監控：<span style="color:#ffae00">Sentry</span>自動捕捉程式例外錯誤並發警報；<span style="color:#ffae00">Prometheus + Grafana</span>監控API回應時間、錯誤率、資料庫查詢速度等指標；設定適當的<span style="color:#ffae00">Health Check</span>端點（<span style="color:#00eeff">/api/health</span>），讓負載平衡器知道服務是否正常。這些是進入企業後端開發必學的工具。</p>
+<section id="section4">
+<h2>4. 伺服器部署與維運</h2>
+<p>程式寫好了，要把它部署到<span data-tip="接收並處理客戶端請求、提供服務的電腦或程式" style="color:#fa6dff">「伺服器」</span>上才能讓別人存取。常見的雲端平台：<span data-tip="雲端平台即服務（PaaS），簡化應用程式部署與擴展" style="color:#ffae00">Heroku</span>（免費方案易用，適合學習）、<span style="color:#ffae00">Railway / Render</span>（現代替代方案）、<span data-tip="三大主流雲端服務平台，提供伺服器、資料庫、AI 等服務" style="color:#ffae00">AWS / GCP / Azure</span>（企業級，功能最強但複雜）、<span data-tip="雲端主機服務商，以簡單易用的 VPS（Droplet）著名" style="color:#ffae00">DigitalOcean</span>（便宜、開發者友善）。</p>
+<p>生產環境的Flask不應該用內建的開發伺服器，要用<span data-tip="Python WSGI HTTP 伺服器，用於部署 Flask/Django 應用" style="color:#ffae00">Gunicorn</span>（WSGI伺服器）：<span style="color:#ffae00">pip install gunicorn</span>；啟動：<span style="color:#ffae00">gunicorn -w 4 -b 0.0.0.0:8000 app:app</span>（4個worker行程，監聽8000埠）。前面再加一個<span data-tip="高效能 Web 伺服器與反向代理，常用於靜態資源服務與負載均衡" style="color:#ffae00">Nginx</span>反向代理，處理靜態檔案、SSL終止、負載平衡，這是業界標準的部署架構。</p>
+<p><span data-tip="容器化平台，將應用程式及其依賴封裝為可移植的映像" style="color:#fa6dff">「Docker」</span>讓部署更標準化：把應用程式和所有依賴打包成<span data-tip="Docker 容器，或泛指儲存元素的資料結構" style="color:#ffae00">容器（Container）</span>，「在我電腦上跑得好好的」的問題就消失了——任何有Docker的機器都能跑一樣的容器。建立<span data-tip="定義 Docker 映像建置步驟的設定檔" style="color:#ffae00">Dockerfile</span>定義容器內容，<span data-tip="Docker Compose 設定檔，定義多容器應用的服務與網路" style="color:#ffae00">docker-compose.yml</span>同時啟動後端app + 資料庫 + Redis的整組服務，是現代開發的標準工作流程。</p>
+<p>資料庫維護：定期<span data-tip="將資料複製保存以防意外遺失的操作" style="color:#ffae00">備份（Backup）</span>——<span style="color:#ffae00">mysqldump -u root -p mydb &gt; backup.sql</span>，配合Cron排程自動每天備份；資料量大時要做<span data-tip="資料庫架構，讀取用副本、寫入用主節點以提升效能" style="color:#ffae00">讀寫分離</span>（主庫寫、從庫讀）或<span data-tip="資料庫水平分割，將資料分散到多個伺服器以擴展容量" style="color:#ffae00">分片（Sharding）</span>；用<span data-tip="資料庫遷移工具，以程式碼版本控制資料庫結構變更" style="color:#ffae00">Migration工具</span>（Flask-Migrate、Alembic）管理資料庫schema版本，不要直接手動改生產資料庫！</p>
+<p>後端監控：<span data-tip="應用程式錯誤監控平台，即時捕捉並追蹤線上環境的例外" style="color:#ffae00">Sentry</span>自動捕捉程式例外錯誤並發警報；<span data-tip="監控組合，Prometheus 收集指標資料，Grafana 視覺化呈現" style="color:#ffae00">Prometheus + Grafana</span>監控API回應時間、錯誤率、資料庫查詢速度等指標；設定適當的<span style="color:#ffae00">Health Check</span>端點（<span style="color:#00eeff">/api/health</span>），讓負載平衡器知道服務是否正常。這些是進入企業後端開發必學的工具。</p>
 </section>
-            <section id="section5">
-                <h2>5. 實作專案：RESTful API 後端</h2>
-                <p>做一個完整的<span style="color:#fa6dff">「RESTful API」</span>後端！題材：「任務管理系統」——使用者可以註冊登入、建立任務、標記完成、查詢自己的任務清單。這包含了後端最核心的CRUD和認證功能。</p>
-                <p>API設計：<span style="color:#ffae00">POST /api/auth/register</span>（註冊）、<span style="color:#ffae00">POST /api/auth/login</span>（登入，回傳JWT token）；<span style="color:#ffae00">GET /api/tasks</span>（查詢我的任務）、<span style="color:#ffae00">POST /api/tasks</span>（新增任務）、<span style="color:#ffae00">PUT /api/tasks/:id</span>（修改任務）、<span style="color:#ffae00">DELETE /api/tasks/:id</span>（刪除任務）。除了auth，其他端點都需要JWT驗證。</p>
-                <p>資料庫設計：<span style="color:#ffae00">users</span>表（id, email, password_hash, created_at）；<span style="color:#ffae00">tasks</span>表（id, user_id, title, description, is_done, due_date, created_at, updated_at），user_id是外鍵關聯users。用<span style="color:#ffae00">SQLAlchemy</span>定義Model，<span style="color:#ffae00">Flask-Migrate</span>管理migration。</p>
-                <p>用<span style="color:#ffae00">Postman</span>或<span style="color:#ffae00">Insomnia</span>測試API：可以儲存所有的測試請求、設定環境變數（把Token存起來，所有請求自動帶上）、建立自動化測試集，是後端開發的重要工具。寫完API後也可以用<span style="color:#ffae00">pytest</span>寫自動化測試，確保功能正確、之後改Code時不會壞掉。</p>
-                <p>完成後部署到<span style="color:#ffae00">Railway</span>或<span style="color:#ffae00">Render</span>（免費方案可用），讓前端夥伴能實際連線測試。把API文件用<span style="color:#ffae00">Swagger / OpenAPI</span>（Flask用<span style="color:#ffae00">flask-restx</span>自動產生）整理好，讓別人知道怎麼用你的API，這是後端工程師的專業素養！🚀</p>
+<section id="section5">
+<h2>5. 實作專案：RESTful API 後端</h2>
+<p>做一個完整的<span data-tip="符合 REST 設計原則的 API，使用 HTTP 方法操作資源" style="color:#fa6dff">「RESTful API」</span>後端！題材：「任務管理系統」——使用者可以註冊登入、建立任務、標記完成、查詢自己的任務清單。這包含了後端最核心的CRUD和認證功能。</p>
+<p>API設計：<span style="color:#ffae00">POST /api/auth/register</span>（註冊）、<span style="color:#ffae00">POST /api/auth/login</span>（登入，回傳JWT token）；<span style="color:#ffae00">GET /api/tasks</span>（查詢我的任務）、<span style="color:#ffae00">POST /api/tasks</span>（新增任務）、<span style="color:#ffae00">PUT /api/tasks/:id</span>（修改任務）、<span style="color:#ffae00">DELETE /api/tasks/:id</span>（刪除任務）。除了auth，其他端點都需要JWT驗證。</p>
+<p>資料庫設計：<span style="color:#ffae00">users</span>表（id, email, password_hash, created_at）；<span data-tip="REST API 中代表任務資源的端點名稱" style="color:#ffae00">tasks</span>表（id, user_id, title, description, is_done, due_date, created_at, updated_at），user_id是外鍵關聯users。用<span data-tip="Python ORM 框架，提供物件操作資料庫與原生 SQL 混用能力" style="color:#ffae00">SQLAlchemy</span>定義Model，<span data-tip="Flask 擴充套件，整合 Alembic 管理資料庫結構遷移" style="color:#ffae00">Flask-Migrate</span>管理migration。</p>
+<p>用<span data-tip="API 開發與測試工具，可視覺化發送 HTTP 請求並檢視回應" style="color:#ffae00">Postman</span>或<span style="color:#ffae00">Insomnia</span>測試API：可以儲存所有的測試請求、設定環境變數（把Token存起來，所有請求自動帶上）、建立自動化測試集，是後端開發的重要工具。寫完API後也可以用<span data-tip="Python 測試框架，自動探索並執行測試函式" style="color:#ffae00">pytest</span>寫自動化測試，確保功能正確、之後改Code時不會壞掉。</p>
+<p>完成後部署到<span data-tip="簡易雲端部署平台，支援多種語言與框架一鍵部署" style="color:#ffae00">Railway</span>或<span data-tip="雲端平台，提供靜態網站、Web 服務、資料庫免費托管" style="color:#ffae00">Render</span>（免費方案可用），讓前端夥伴能實際連線測試。把API文件用<span data-tip="API 文件規範與工具，自動生成互動式 API 測試介面" style="color:#ffae00">Swagger / OpenAPI</span>（Flask用<span style="color:#ffae00">flask-restx</span>自動產生）整理好，讓別人知道怎麼用你的API，這是後端工程師的專業素養！🚀</p>
 </section>
-        </main>
-    <script>
-        const navLinks = document.querySelectorAll('.nav-link');
-        const sections = document.querySelectorAll('section');
-        window.addEventListener('scroll', () => {
-            let current = '';
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                const sectionHeight = section.clientHeight;
-                if (window.pageYOffset >= (sectionTop - 100)) {
-                    current = section.getAttribute('id');
-                }
-            });
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href').includes(current)) {
-                    link.classList.add('active');
-                }
-            });
+</div>
+</div>
+<!-- GDB Float Window -->
+<div id="gdbFloatWindow">
+<div class="window-header" id="dragHandle">
+<span class="window-title">⌨ GDB Online</span>
+<span class="close-btn" onclick="toggleGdbWindow()">×</span>
+</div>
+<div class="window-content">
+<iframe id="gdbFrame" sandbox="allow-forms allow-scripts allow-same-origin allow-popups" src="https://www.onlinegdb.com/"></iframe>
+</div>
+</div>
+<script src="shared.js"></script>
+<script>
+        const floatWindow = document.getElementById('gdbFloatWindow');
+        const dragHandle  = document.getElementById('dragHandle');
+        function toggleGdbWindow() {
+            floatWindow.style.display = floatWindow.style.display === 'flex' ? 'none' : 'flex';
+        }
+        let isDragging = false, startX, startY, initLeft, initTop;
+        dragHandle.addEventListener('mousedown', e => {
+            isDragging = true;
+            startX = e.clientX; startY = e.clientY;
+            const r = floatWindow.getBoundingClientRect();
+            initLeft = r.left; initTop = r.top;
+            floatWindow.classList.add('is-dragging');
+        });
+        document.addEventListener('mousemove', e => {
+            if (!isDragging) return;
+            floatWindow.style.left = `${initLeft + e.clientX - startX}px`;
+            floatWindow.style.top  = `${initTop  + e.clientY - startY}px`;
+            floatWindow.style.right = 'auto';
+        });
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+            floatWindow.classList.remove('is-dragging');
         });
     </script>
-    </header>
+<script src="tooltips.js"></script>
 </body>
 </html>
