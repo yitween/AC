@@ -1,199 +1,257 @@
 <!DOCTYPE html>
+
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AC_AI</title>
-    <link rel="icon" href="螢幕擷取畫面 2026-01-05 125529.png" sizes="48x48" type="image/png">
-    <style>
-        body {
-            background-color: rgb(20, 20, 20);
-            color: white;
-            font-family: "Microsoft JhengHei", sans-serif;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AC — AI</title>
+<link href="螢幕擷取畫面 2026-01-05 125529.png" rel="icon" sizes="48x48" type="image/png"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="shared.css" rel="stylesheet"/>
+<style>
+        /* ── GDB FLOAT WINDOW ── */
+        #gdbFloatWindow {
+            display: none; position: fixed;
+            top: 100px; right: 50px;
+            width: 600px; height: 500px;
+            background: #1e1e1e;
+            border: 1px solid #444; border-radius: 10px;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.6);
+            z-index: 2000; flex-direction: column;
+            overflow: hidden; resize: both;
+            min-width: 320px; min-height: 250px;
+            max-width: 95vw; max-height: 95vh;
         }
-        .back-button {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            text-decoration: none;
-            color: aquamarine;
-            border: 1px solid aquamarine;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: all 0.3s;
-            z-index: 1000;
+        .window-header {
+            height: 40px; background: #2a2a2a;
+            display: flex; align-items: center;
+            justify-content: space-between;
+            padding: 0 14px; cursor: move;
+            border-bottom: 1px solid #444;
+            user-select: none; flex-shrink: 0;
         }
-        .back-button:hover {
-            background-color: aquamarine;
-            color: black;
+        .window-title {
+            color: #ccc; font-weight: 700; font-size: 0.85rem;
+            font-family: 'JetBrains Mono', monospace;
         }
-        .content {
-            max-width: 800px;
-            text-align: center;
-            margin-top: 50px;
+        .close-btn {
+            color: #888; font-size: 22px; cursor: pointer;
+            line-height: 1; transition: color 0.2s;
         }
-        h1 { color: aquamarine; font-size: 3rem; margin-bottom: 10px; }
-        p { font-size: 1.2rem; line-height: 1.6; color: #ddd; }
-        .big-logo {
-            width: 150px;
-            height: 150px;
-            object-fit: contain;
-            margin-bottom: 20px;
+        .close-btn:hover { color: #f87171; }
+        .window-content { flex: 1; height: calc(100% - 40px); }
+        .window-content iframe { width: 100%; height: 100%; border: none; }
+        .is-dragging iframe { pointer-events: none; }
+        /* ── PAGE HERO ── */
+        .page-hero {
+            display: flex; align-items: center; gap: 20px;
+            margin-bottom: 24px;
         }
-        html {
-            scroll-behavior: smooth;
+        .page-hero img {
+            width: 72px; height: 72px; object-fit: contain;
+            border-radius: 12px; background: rgba(255,255,255,0.04);
+            padding: 8px; border: 1px solid var(--border);
+            box-shadow: none; margin: 0;
         }
-        .sidebar {
-            width: 200px;
-            height: 100vh;
-            position: fixed; 
-            top: 0;
-            left: 0;
-            background-color: #faa11cd0;
-            padding: 20px;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            overflow-y: auto;
+        .page-hero h1 {
+            font-size: clamp(1.8rem, 4vw, 2.4rem);
+            color: var(--accent); font-weight: 700; margin: 0;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 0.03em;
         }
-        .sidebar ul {
-            list-style: none;
-            padding: 0;
+        /* ── DOWNLOAD BUTTON ── */
+        .download-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            margin-top: 32px; padding: 12px 24px;
+            background: #1d4ed8; color: #fff;
+            text-decoration: none; border-radius: 8px;
+            font-weight: 700; font-size: 0.9rem;
+            transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
         }
-        .sidebar li {
-            margin-bottom: 15px;
+        .download-btn::before { content: '⬇'; }
+        .download-btn:hover {
+            background: #2563eb; transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(29,78,216,0.35);
         }
-        .sidebar a {
-            text-decoration: none;
-            color: #333;
-            display: block;
-            padding: 8px 12px;
-            border-left: 4px solid transparent; 
-            transition: all 0.3s;
+        .download-btn:active { transform: translateY(0); }
+        /* ── GDB INLINE BTN ── */
+        .gdb-inline {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 16px; background: transparent;
+            color: var(--accent); border: 1px solid var(--accent);
+            border-radius: 6px; cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700; font-size: 0.85rem;
+            transition: background 0.2s, color 0.2s, transform 0.15s;
+            margin-left: 8px;
         }
-        .sidebar a:hover {
-            background-color: #faa11cd0;
+        .gdb-inline:hover {
+            background: var(--accent); color: #111;
+            transform: translateY(-1px);
         }
-        .sidebar a.active {
-            color: #007bff;    
-            font-weight: bold;
-            border-left: 4px solid #007bff;
-            background-color: #faa11cd0;
-        }
-        .content {
-            margin-left: 240px;
-            padding: 40px;
-            max-width: 800px;
-        }
-        section {
-            min-height: 80vh; 
-            padding-top: 20px;
-            border-bottom: 1px solid #faa11cd0;
-        }
-        h2 {
-            margin-top: 0;
-        }
+        .gdb-inline:active { transform: translateY(0); }
     </style>
-</head>
+<style>
+/* ── TOOLTIP ── */
+[data-tip] {
+    position: relative;
+    cursor: help;
+    text-decoration: underline dotted currentColor;
+    text-underline-offset: 3px;
+}
+[data-tip]::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e1e2e;
+    color: #e0e0e0;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    white-space: normal;
+    width: max-content;
+    max-width: 260px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(127,255,212,0.25);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    transform: translateX(-50%) translateY(4px);
+    z-index: 9999;
+}
+[data-tip]:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+/* arrow */
+[data-tip]::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 2px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: rgba(127,255,212,0.25);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.18s ease;
+    z-index: 9999;
+}
+[data-tip]:hover::before { opacity: 1; }
+</style></head>
 <body>
-    <a href="index.html" class="back-button">← 回首頁</a>
-    <nav class="sidebar">
-        <div style="height: 30px;"></div>
-        <h3>章節目錄</h3>
-        <ul>
-            <li><a href="#section1" class="nav-link">1. AI 與機器學習概論</a></li>
-            <li><a href="#section2" class="nav-link">2. 資料處理與特徵工程</a></li>
-            <li><a href="#section3" class="nav-link">3. 傳統機器學習算法</a></li>
-            <li><a href="#section4" class="nav-link">4. 深度學習與神經網路</a></li>
-            <li><a href="#section5" class="nav-link">5. 實作專案：影像分類 AI</a></li>
-        </ul>
-    </nav>
-    <header>
-        <div class="content">
-        <img src="AI.png" class="big-logo">
-        <h1>AI</h1>
-        <div style="height: 50px;"></div>
-        <center>
-            <p style="color:#ddd;font-size:2rem"><B><I>Try Code Here!</I></B></p>
-        </center>
-        <div style="height: 30px;"></div>
-        <div style="max-width: 90%; margin: 0 auto; box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);">
-            <iframe 
-                src="https://www.onlinegdb.com/" 
-                width="100%" 
-                height="600px" 
-                frameborder="0" 
-                style="border-radius: 10px; border: 1px solid #333;"
-                allowfullscreen>
-            </iframe>
-        </div>
-        <hr style="border-color: #333; margin: 20px 0;">
-        <div style="height: 50px;"></div>
-        <main class="content">
-            <section id="section1">
-                <h2>1. AI 與機器學習概論</h2>
-                <p><span style="color:#fa6dff">「人工智慧（AI）」</span>是讓電腦展現類似人類智慧的技術；<span style="color:#fa6dff">「機器學習（Machine Learning）」</span>是AI的子集，讓電腦從資料中<span style="color:#ffee00fa">自動學習規律</span>，不需要人工編寫所有規則；<span style="color:#fa6dff">「深度學習（Deep Learning）」</span>是機器學習的子集，用多層神經網路處理複雜問題（圖像、語音、語言）。Python是AI領域的首選語言，幾乎所有主流AI框架都以Python為主。</p>
-                <p>機器學習的三大類型：<span style="color:#ffae00">監督式學習（Supervised Learning）</span>——有標記的訓練資料（輸入+正確答案），學習輸入到輸出的映射，例如圖片分類（輸入：圖片，輸出：貓/狗）；<span style="color:#ffae00">非監督式學習（Unsupervised Learning）</span>——沒有標記，讓模型自己找資料的結構，例如分群（Clustering）；<span style="color:#ffae00">強化學習（Reinforcement Learning）</span>——讓agent在環境中行動、獲得獎勵，學習最佳策略，例如AlphaGo。</p>
-                <p>必備的Python套件：<span style="color:#ffae00">NumPy</span>（數值計算，矩陣運算的基礎）；<span style="color:#ffae00">Pandas</span>（資料處理，讀CSV、清洗、分析）；<span style="color:#ffae00">Matplotlib / Seaborn</span>（資料視覺化）；<span style="color:#ffae00">Scikit-learn</span>（傳統機器學習算法的完整工具箱）；<span style="color:#ffae00">PyTorch</span>（深度學習框架，學術界首選）；<span style="color:#ffae00">TensorFlow / Keras</span>（深度學習框架，工業界廣用）。全部用pip安裝，或用<span style="color:#ffae00">Anaconda</span>一鍵建立AI開發環境。</p>
-                <p>用<span style="color:#ffae00">Jupyter Notebook</span>（或Google Colab）開發AI：在瀏覽器中分格執行程式碼、即時看圖表、記錄思路，是AI/資料科學的標準工作環境。Google Colab提供免費GPU，讓沒有高效能電腦的人也能訓練深度學習模型，是入門AI的最佳起點。</p>
-                <p>AI倫理與限制：現在的AI（包含GPT、Gemini等大型語言模型）是<span style="color:#ffee00fa">統計模式匹配</span>，不是真正的「理解」；AI會有偏見（反映訓練資料的偏見）；AI生成的內容可能不正確（幻覺問題）；學習AI不只是學技術，也要思考它的社會影響和使用倫理，這是現代AI工程師的重要素養。</p>
+<nav class="top-nav">
+<a class="back" href="index.html">← 回首頁</a>
+<ul class="nav-menu">
+<li><a href="index.html">首頁</a></li>
+<li><a href="guide.html">網站導覽</a></li>
+<li><a href="about.html">關於我們</a></li>
+<li><a href="others.html">其他</a></li>
+<li><button class="gdb-inline" onclick="toggleGdbWindow()">⌨ GDB</button></li>
+</ul>
+</nav>
+<div class="layout">
+<nav class="sidebar">
+<h3>章節目錄</h3>
+<ul>
+<li><a href="#section1">1. AI 與機器學習概論</a></li>
+<li><a href="#section2">2. 資料處理與特徵工程</a></li>
+<li><a href="#section3">3. 傳統機器學習算法</a></li>
+<li><a href="#section4">4. 深度學習與神經網路</a></li>
+<li><a href="#section5">5. 實作專案：影像分類 AI</a></li>
+</ul>
+</nav>
+<div class="main-content">
+<div class="page-hero">
+<img alt="AI" src="AI.png"/>
+<h1>AI</h1>
+</div>
+<hr class="page-divider"/>
+<section id="section1">
+<h2>1. AI 與機器學習概論</h2>
+<p><span data-tip="讓電腦模擬人類智慧行為的技術領域" style="color:#fa6dff">「人工智慧（AI）」</span>是讓電腦展現類似人類智慧的技術；<span data-tip="讓電腦從資料中自動學習規律的 AI 技術" style="color:#fa6dff">「機器學習（Machine Learning）」</span>是AI的子集，讓電腦從資料中<span style="color:#ffee00fa">自動學習規律</span>，不需要人工編寫所有規則；<span data-tip="使用多層神經網路自動學習資料特徵的機器學習方法" style="color:#fa6dff">「深度學習（Deep Learning）」</span>是機器學習的子集，用多層神經網路處理複雜問題（圖像、語音、語言）。Python是AI領域的首選語言，幾乎所有主流AI框架都以Python為主。</p>
+<p>機器學習的三大類型：<span data-tip="使用帶標籤訓練資料讓模型學習輸入到輸出的映射" style="color:#ffae00">監督式學習（Supervised Learning）</span>——有標記的訓練資料（輸入+正確答案），學習輸入到輸出的映射，例如圖片分類（輸入：圖片，輸出：貓/狗）；<span data-tip="使用無標籤資料讓模型自行發現資料的結構或群集" style="color:#ffae00">非監督式學習（Unsupervised Learning）</span>——沒有標記，讓模型自己找資料的結構，例如分群（Clustering）；<span data-tip="AI 透過環境回饋學習最佳行動策略的機器學習方法" style="color:#ffae00">強化學習（Reinforcement Learning）</span>——讓agent在環境中行動、獲得獎勵，學習最佳策略，例如AlphaGo。</p>
+<p>必備的Python套件：<span data-tip="Python 科學運算基礎函式庫，提供高效的多維陣列運算" style="color:#ffae00">NumPy</span>（數值計算，矩陣運算的基礎）；<span data-tip="Python 資料分析函式庫，提供 DataFrame 結構處理表格資料" style="color:#ffae00">Pandas</span>（資料處理，讀CSV、清洗、分析）；<span data-tip="Python 資料視覺化函式庫，繪製各類統計圖表" style="color:#ffae00">Matplotlib / Seaborn</span>（資料視覺化）；<span data-tip="Python 機器學習函式庫，提供分類、回歸、聚類等豐富演算法" style="color:#ffae00">Scikit-learn</span>（傳統機器學習算法的完整工具箱）；<span data-tip="Facebook 開發的深度學習框架，以動態計算圖和 Pythonic 風格著稱" style="color:#ffae00">PyTorch</span>（深度學習框架，學術界首選）；<span data-tip="Google 深度學習框架，Keras 是其高階 API，建模簡單直觀" style="color:#ffae00">TensorFlow / Keras</span>（深度學習框架，工業界廣用）。全部用pip安裝，或用<span data-tip="Python 科學運算發行版，內建 conda 套件管理器與常用函式庫" style="color:#ffae00">Anaconda</span>一鍵建立AI開發環境。</p>
+<p>用<span data-tip="互動式 Python 開發環境，以儲存格形式執行程式並即時顯示結果" style="color:#ffae00">Jupyter Notebook</span>（或Google Colab）開發AI：在瀏覽器中分格執行程式碼、即時看圖表、記錄思路，是AI/資料科學的標準工作環境。Google Colab提供免費GPU，讓沒有高效能電腦的人也能訓練深度學習模型，是入門AI的最佳起點。</p>
+<p>AI倫理與限制：現在的AI（包含GPT、Gemini等大型語言模型）是<span style="color:#ffee00fa">統計模式匹配</span>，不是真正的「理解」；AI會有偏見（反映訓練資料的偏見）；AI生成的內容可能不正確（幻覺問題）；學習AI不只是學技術，也要思考它的社會影響和使用倫理，這是現代AI工程師的重要素養。</p>
 </section>
-            <section id="section2">
-                <h2>2. 資料處理與特徵工程</h2>
-                <p>「垃圾進、垃圾出（Garbage In, Garbage Out）」——AI模型的好壞70%取決於資料品質，<span style="color:#fa6dff">「資料前處理（Data Preprocessing）」</span>是AI專案最重要也最花時間的步驟。<span style="color:#ffae00">Pandas</span>是處理表格資料的核心工具：<span style="color:#ffae00">pd.read_csv('data.csv')</span>讀取資料；<span style="color:#ffae00">df.head()</span>查看前幾行；<span style="color:#ffae00">df.info()</span>查看欄位型態和缺失值；<span style="color:#ffae00">df.describe()</span>統計摘要。</p>
-                <p>處理缺失值：<span style="color:#ffae00">df.dropna()</span>刪除含缺失值的行（資料量夠多才用）；<span style="color:#ffae00">df['col'].fillna(df['col'].mean())</span>用均值填補（連續值）；<span style="color:#ffae00">df['col'].fillna(df['col'].mode()[0])</span>用眾數填補（類別值）。處理異常值：用<span style="color:#ffae00">箱型圖（boxplot）</span>視覺化發現離群值，根據業務理解決定是刪除、修正還是保留。</p>
-                <p><span style="color:#fa6dff">「特徵工程（Feature Engineering）」</span>是把原始資料轉換成對模型有用的特徵：數值標準化（<span style="color:#ffae00">StandardScaler</span>把資料縮放到均值0、標準差1；<span style="color:#ffae00">MinMaxScaler</span>縮放到0-1）；類別特徵轉數字（<span style="color:#ffae00">One-Hot Encoding</span>：pd.get_dummies()，把「紅/藍/綠」變成三個0/1欄位）；時間特徵拆分（從datetime萃取年、月、日、星期幾作為獨立特徵）。</p>
-                <p>資料探索（EDA）：在建模前充分了解資料。<span style="color:#ffae00">Seaborn</span>的<span style="color:#ffae00">heatmap(df.corr())</span>查看特徵相關性（高度相關的特徵可能是多餘的）；<span style="color:#ffae00">sns.pairplot(df)</span>一次畫所有特徵兩兩之間的散佈圖；<span style="color:#ffae00">df.groupby('label').mean()</span>看不同類別的特徵均值差異。EDA的目的是找到有意義的模式，指導特徵選擇和模型設計。</p>
-                <p>訓練/測試資料分割：<span style="color:#ffae00">from sklearn.model_selection import train_test_split</span>；<span style="color:#ffae00">X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</span>，把20%資料留作測試，確保模型在沒見過的資料上的效能才是真實能力。避免<span style="color:#ffee00fa">資料洩漏（Data Leakage）</span>——前處理（如標準化）要在訓練集上fit，再transform測試集，不能用整個資料集fit。</p>
+<section id="section2">
+<h2>2. 資料處理與特徵工程</h2>
+<p>「垃圾進、垃圾出（Garbage In, Garbage Out）」——AI模型的好壞70%取決於資料品質，<span data-tip="清理、轉換原始資料使其適合模型訓練" style="color:#fa6dff">「資料前處理（Data Preprocessing）」</span>是AI專案最重要也最花時間的步驟。<span data-tip="Python 資料分析函式庫，提供 DataFrame 結構處理表格資料" style="color:#ffae00">Pandas</span>是處理表格資料的核心工具：<span style="color:#ffae00">pd.read_csv('data.csv')</span>讀取資料；<span style="color:#ffae00">df.head()</span>查看前幾行；<span style="color:#ffae00">df.info()</span>查看欄位型態和缺失值；<span style="color:#ffae00">df.describe()</span>統計摘要。</p>
+<p>處理缺失值：<span style="color:#ffae00">df.dropna()</span>刪除含缺失值的行（資料量夠多才用）；<span style="color:#ffae00">df['col'].fillna(df['col'].mean())</span>用均值填補（連續值）；<span style="color:#ffae00">df['col'].fillna(df['col'].mode()[0])</span>用眾數填補（類別值）。處理異常值：用<span style="color:#ffae00">箱型圖（boxplot）</span>視覺化發現離群值，根據業務理解決定是刪除、修正還是保留。</p>
+<p><span data-tip="從原始資料中創建或轉換有用特徵以提升模型表現" style="color:#fa6dff">「特徵工程（Feature Engineering）」</span>是把原始資料轉換成對模型有用的特徵：數值標準化（<span data-tip="Scikit-learn 特徵標準化工具，將數值轉換為均值 0、標準差 1" style="color:#ffae00">StandardScaler</span>把資料縮放到均值0、標準差1；<span data-tip="Scikit-learn 特徵縮放工具，將數值縮放至 [0,1] 區間" style="color:#ffae00">MinMaxScaler</span>縮放到0-1）；類別特徵轉數字（<span data-tip="特徵工程技術，將類別變數轉為二進位向量表示" style="color:#ffae00">One-Hot Encoding</span>：pd.get_dummies()，把「紅/藍/綠」變成三個0/1欄位）；時間特徵拆分（從datetime萃取年、月、日、星期幾作為獨立特徵）。</p>
+<p>資料探索（EDA）：在建模前充分了解資料。<span data-tip="Python 統計視覺化函式庫，以 Matplotlib 為基礎提供美觀圖表" style="color:#ffae00">Seaborn</span>的<span style="color:#ffae00">heatmap(df.corr())</span>查看特徵相關性（高度相關的特徵可能是多餘的）；<span style="color:#ffae00">sns.pairplot(df)</span>一次畫所有特徵兩兩之間的散佈圖；<span style="color:#ffae00">df.groupby('label').mean()</span>看不同類別的特徵均值差異。EDA的目的是找到有意義的模式，指導特徵選擇和模型設計。</p>
+<p>訓練/測試資料分割：<span style="color:#ffae00">from sklearn.model_selection import train_test_split</span>；<span style="color:#ffae00">X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</span>，把20%資料留作測試，確保模型在沒見過的資料上的效能才是真實能力。避免<span style="color:#ffee00fa">資料洩漏（Data Leakage）</span>——前處理（如標準化）要在訓練集上fit，再transform測試集，不能用整個資料集fit。</p>
 </section>
-            <section id="section3">
-                <h2>3. 傳統機器學習算法</h2>
-                <p>Scikit-learn提供了完整的傳統ML算法，所有算法都有統一的介面：<span style="color:#ffae00">model.fit(X_train, y_train)</span>訓練；<span style="color:#ffae00">model.predict(X_test)</span>預測；<span style="color:#ffae00">model.score(X_test, y_test)</span>評分。這讓你可以快速嘗試不同算法。</p>
-                <p>常用分類算法：<span style="color:#ffae00">Logistic Regression</span>（邏輯迴歸，基本但強大，可解釋性高）；<span style="color:#ffae00">Decision Tree</span>（決策樹，直觀可視化，容易過擬合）；<span style="color:#ffae00">Random Forest</span>（隨機森林，多棵決策樹集成，效能好，是很多問題的好起點）；<span style="color:#ffae00">SVM</span>（支援向量機，在高維資料表現好）；<span style="color:#ffae00">K-Nearest Neighbors</span>（KNN，直觀但大資料集慢）；<span style="color:#ffae00">Gradient Boosting（XGBoost/LightGBM）</span>（競賽中最常拿第一的算法，強力推薦）。</p>
-                <p>評估分類模型：<span style="color:#ffae00">Accuracy</span>（準確率，資料不平衡時會有誤導）；<span style="color:#ffae00">Precision/Recall/F1-Score</span>（更全面，用<span style="color:#ffae00">classification_report(y_test, y_pred)</span>一次看）；<span style="color:#ffae00">混淆矩陣（Confusion Matrix）</span>視覺化模型哪裡錯得多；<span style="color:#ffae00">ROC-AUC</span>（不同閾值下的表現，越接近1越好）。</p>
-                <p>迴歸問題（預測連續值）：<span style="color:#ffae00">Linear Regression</span>（線性迴歸，基礎）；<span style="color:#ffae00">Ridge/Lasso</span>（加入正則化，防止過擬合）；<span style="color:#ffae00">Random Forest Regressor</span>；評估用<span style="color:#ffae00">MAE</span>（平均絕對誤差）、<span style="color:#ffae00">RMSE</span>（均方根誤差）、<span style="color:#ffae00">R²</span>（解釋變異比例，1是完美）。</p>
-                <p><span style="color:#fa6dff">「超參數調整（Hyperparameter Tuning）」</span>：模型有很多可以調整的參數（例如Random Forest的樹的數量、深度），不同值效果差很多。用<span style="color:#ffae00">GridSearchCV</span>或<span style="color:#ffae00">RandomizedSearchCV</span>自動搜尋最佳參數組合，搭配<span style="color:#ffae00">交叉驗證（Cross-Validation）</span>評估，讓模型選擇更可靠。</p>
+<section id="section3">
+<h2>3. 傳統機器學習算法</h2>
+<p>Scikit-learn提供了完整的傳統ML算法，所有算法都有統一的介面：<span style="color:#ffae00">model.fit(X_train, y_train)</span>訓練；<span style="color:#ffae00">model.predict(X_test)</span>預測；<span style="color:#ffae00">model.score(X_test, y_test)</span>評分。這讓你可以快速嘗試不同算法。</p>
+<p>常用分類算法：<span data-tip="邏輯回歸，用 sigmoid 函式進行二元分類的統計模型" style="color:#ffae00">Logistic Regression</span>（邏輯迴歸，基本但強大，可解釋性高）；<span data-tip="決策樹機器學習模型，以樹狀規則結構進行分類或回歸" style="color:#ffae00">Decision Tree</span>（決策樹，直觀可視化，容易過擬合）；<span data-tip="隨機森林，由多棵決策樹組成的整合學習模型，抗過擬合" style="color:#ffae00">Random Forest</span>（隨機森林，多棵決策樹集成，效能好，是很多問題的好起點）；<span data-tip="支援向量機，尋找最大邊界的分類超平面，適用高維資料" style="color:#ffae00">SVM</span>（支援向量機，在高維資料表現好）；<span data-tip="K 最近鄰分類演算法，依距離最近的 K 個樣本決定類別" style="color:#ffae00">K-Nearest Neighbors</span>（KNN，直觀但大資料集慢）；<span data-tip="整合學習方法，逐步訓練弱學習器修正前一輪的錯誤" style="color:#ffae00">Gradient Boosting（XGBoost/LightGBM）</span>（競賽中最常拿第一的算法，強力推薦）。</p>
+<p>評估分類模型：<span data-tip="機器學習評估指標，正確預測數佔總預測數的比例" style="color:#ffae00">Accuracy</span>（準確率，資料不平衡時會有誤導）；<span style="color:#ffae00">Precision/Recall/F1-Score</span>（更全面，用<span style="color:#ffae00">classification_report(y_test, y_pred)</span>一次看）；<span data-tip="分類模型評估工具，顯示預測結果與真實標籤的對應" style="color:#ffae00">混淆矩陣（Confusion Matrix）</span>視覺化模型哪裡錯得多；<span data-tip="分類模型評估指標，AUC 越接近 1 代表模型區分能力越強" style="color:#ffae00">ROC-AUC</span>（不同閾值下的表現，越接近1越好）。</p>
+<p>迴歸問題（預測連續值）：<span data-tip="線性回歸，預測連續數值的最基本監督式學習模型" style="color:#ffae00">Linear Regression</span>（線性迴歸，基礎）；<span data-tip="正則化線性回歸，分別使用 L2/L1 懲罰項控制模型複雜度" style="color:#ffae00">Ridge/Lasso</span>（加入正則化，防止過擬合）；<span style="color:#ffae00">Random Forest Regressor</span>；評估用<span data-tip="平均絕對誤差，回歸模型評估指標，預測值與真實值差的絕對值平均" style="color:#ffae00">MAE</span>（平均絕對誤差）、<span data-tip="均方根誤差，回歸模型評估指標，對大誤差敏感" style="color:#ffae00">RMSE</span>（均方根誤差）、<span style="color:#ffae00">R²</span>（解釋變異比例，1是完美）。</p>
+<p><span data-tip="搜尋最佳模型訓練設定（學習率、層數等）的過程" style="color:#fa6dff">「超參數調整（Hyperparameter Tuning）」</span>：模型有很多可以調整的參數（例如Random Forest的樹的數量、深度），不同值效果差很多。用<span data-tip="Scikit-learn 工具，窮舉所有超參數組合找出最佳設定" style="color:#ffae00">GridSearchCV</span>或<span data-tip="Scikit-learn 工具，隨機採樣超參數組合，比窮舉搜尋更有效率" style="color:#ffae00">RandomizedSearchCV</span>自動搜尋最佳參數組合，搭配<span data-tip="將資料分成多份輪流做訓練與測試，評估模型泛化能力" style="color:#ffae00">交叉驗證（Cross-Validation）</span>評估，讓模型選擇更可靠。</p>
 </section>
-            <section id="section4">
-                <h2>4. 深度學習與神經網路</h2>
-                <p><span style="color:#fa6dff">「神經網路（Neural Network）」</span>模仿人腦神經元的連接方式，由多層<span style="color:#ffae00">神經元（Neuron）</span>組成，每個神經元對輸入做加權求和，再通過<span style="color:#fa6dff">「激活函式（Activation Function）」</span>增加非線性能力。常用激活函式：<span style="color:#ffae00">ReLU</span>（f(x)=max(0,x)，深層網路首選）；<span style="color:#ffae00">Sigmoid</span>（輸出0-1，二元分類輸出層）；<span style="color:#ffae00">Softmax</span>（多分類輸出層，所有輸出加總為1）。</p>
-                <p>用<span style="color:#ffae00">PyTorch</span>建立簡單神經網路：<span style="color:#ffae00">import torch.nn as nn</span>；定義一個繼承<span style="color:#ffae00">nn.Module</span>的class，在<span style="color:#ffae00">__init__</span>裡定義各層（<span style="color:#ffae00">nn.Linear(in, out)</span>是全連接層），在<span style="color:#ffae00">forward()</span>裡定義資料怎麼流過各層。訓練：定義<span style="color:#ffae00">loss function</span>（<span style="color:#ffae00">nn.CrossEntropyLoss</span>分類、<span style="color:#ffae00">nn.MSELoss</span>迴歸）和<span style="color:#ffae00">optimizer</span>（<span style="color:#ffae00">torch.optim.Adam</span>最常用），然後反覆做forward pass → 計算loss → backward pass（自動微分）→ optimizer.step()更新權重。</p>
-                <p><span style="color:#fa6dff">「卷積神經網路（CNN）」</span>是處理圖像的核心架構：卷積層（<span style="color:#ffae00">nn.Conv2d</span>）用濾波器掃描圖片提取局部特徵；池化層（<span style="color:#ffae00">nn.MaxPool2d</span>）降低維度；全連接層做最終分類。CNN的特點是<span style="color:#ffee00fa">位置不變性</span>——貓在圖片左上角或右下角都能認出。ImageNet上訓練好的模型（ResNet、VGG、EfficientNet）可以用<span style="color:#ffae00">遷移學習（Transfer Learning）</span>微調，讓少量資料也能做出好的圖像分類器。</p>
-                <p><span style="color:#fa6dff">「Transformer與大型語言模型（LLM）」</span>：2017年的Transformer架構徹底改變了NLP（自然語言處理），<span style="color:#ffae00">Attention機制</span>讓模型可以關注句子中任意位置的關係。GPT、BERT、T5等大型語言模型都基於Transformer。用Python的<span style="color:#ffae00">Hugging Face transformers</span>套件，可以用幾行程式載入並使用這些預訓練模型做情感分析、文字生成、問答等任務，而不需要從零訓練。</p>
-                <p>防止<span style="color:#fa6dff">「過擬合（Overfitting）」</span>：神經網路太強，容易把訓練資料的雜訊也記起來，導致測試資料表現差。解決方案：<span style="color:#ffae00">Dropout</span>（訓練時隨機丟棄一些神經元）；<span style="color:#ffae00">Batch Normalization</span>（對每層輸出做標準化，讓訓練更穩定）；<span style="color:#ffae00">Early Stopping</span>（監控驗證集loss，不再下降就停止訓練）；<span style="color:#ffae00">資料增強（Data Augmentation）</span>（對圖片隨機翻轉、旋轉、裁切，增加訓練資料的多樣性）。</p>
+<section id="section4">
+<h2>4. 深度學習與神經網路</h2>
+<p><span data-tip="由多層神經元組成的深度學習模型" style="color:#fa6dff">「神經網路（Neural Network）」</span>模仿人腦神經元的連接方式，由多層<span data-tip="神經網路基本單元，接收輸入、加權求和後通過激活函式輸出" style="color:#ffae00">神經元（Neuron）</span>組成，每個神經元對輸入做加權求和，再通過<span data-tip="神經網路引入非線性的函式（ReLU、Sigmoid 等）" style="color:#fa6dff">「激活函式（Activation Function）」</span>增加非線性能力。常用激活函式：<span data-tip="深度學習激活函式，Rectified Linear Unit，f(x) = max(0, x)" style="color:#ffae00">ReLU</span>（f(x)=max(0,x)，深層網路首選）；<span data-tip="S 形激活函式，將輸出壓縮到 (0,1) 區間，常用於二元分類" style="color:#ffae00">Sigmoid</span>（輸出0-1，二元分類輸出層）；<span data-tip="多類別分類激活函式，將輸出轉為機率分佈，所有值加總為 1" style="color:#ffae00">Softmax</span>（多分類輸出層，所有輸出加總為1）。</p>
+<p>用<span data-tip="Facebook 開發的深度學習框架，以動態計算圖和 Pythonic 風格著稱" style="color:#ffae00">PyTorch</span>建立簡單神經網路：<span style="color:#ffae00">import torch.nn as nn</span>；定義一個繼承<span data-tip="PyTorch 神經網路基礎類別，所有模型必須繼承此類" style="color:#ffae00">nn.Module</span>的class，在<span data-tip="Python 類別建構子，建立物件時自動呼叫進行初始化" style="color:#ffae00">__init__</span>裡定義各層（<span data-tip="PyTorch 全連接層，將輸入維度映射到輸出維度" style="color:#ffae00">nn.Linear(in, out)</span>是全連接層），在<span style="color:#ffae00">forward()</span>裡定義資料怎麼流過各層。訓練：定義<span style="color:#ffae00">loss function</span>（<span style="color:#ffae00">nn.CrossEntropyLoss</span>分類、<span style="color:#ffae00">nn.MSELoss</span>迴歸）和<span data-tip="深度學習優化器，依梯度更新模型權重（如 Adam、SGD）" style="color:#ffae00">optimizer</span>（<span style="color:#ffae00">torch.optim.Adam</span>最常用），然後反覆做forward pass → 計算loss → backward pass（自動微分）→ optimizer.step()更新權重。</p>
+<p><span data-tip="深度學習模型，以卷積運算提取影像空間特徵" style="color:#fa6dff">「卷積神經網路（CNN）」</span>是處理圖像的核心架構：卷積層（<span data-tip="PyTorch 二維卷積層，提取影像空間特徵" style="color:#ffae00">nn.Conv2d</span>）用濾波器掃描圖片提取局部特徵；池化層（<span style="color:#ffae00">nn.MaxPool2d</span>）降低維度；全連接層做最終分類。CNN的特點是<span style="color:#ffee00fa">位置不變性</span>——貓在圖片左上角或右下角都能認出。ImageNet上訓練好的模型（ResNet、VGG、EfficientNet）可以用<span data-tip="利用預訓練模型的知識微調解決新問題，節省訓練時間" style="color:#ffae00">遷移學習（Transfer Learning）</span>微調，讓少量資料也能做出好的圖像分類器。</p>
+<p><span data-tip="基於 Self-Attention 的神經網路架構，GPT、BERT 等 LLM 的基礎" style="color:#fa6dff">「Transformer與大型語言模型（LLM）」</span>：2017年的Transformer架構徹底改變了NLP（自然語言處理），<span data-tip="Transformer 模型核心，讓模型聚焦在輸入序列的重要部分" style="color:#ffae00">Attention機制</span>讓模型可以關注句子中任意位置的關係。GPT、BERT、T5等大型語言模型都基於Transformer。用Python的<span data-tip="開源 NLP 函式庫，提供大量預訓練語言模型" style="color:#ffae00">Hugging Face transformers</span>套件，可以用幾行程式載入並使用這些預訓練模型做情感分析、文字生成、問答等任務，而不需要從零訓練。</p>
+<p>防止<span data-tip="模型過度適應訓練資料，導致泛化能力差" style="color:#fa6dff">「過擬合（Overfitting）」</span>：神經網路太強，容易把訓練資料的雜訊也記起來，導致測試資料表現差。解決方案：<span data-tip="深度學習正則化技術，訓練時隨機關閉部分神經元防止過擬合" style="color:#ffae00">Dropout</span>（訓練時隨機丟棄一些神經元）；<span data-tip="深度學習技術，對每批次資料做標準化以加速訓練、穩定梯度" style="color:#ffae00">Batch Normalization</span>（對每層輸出做標準化，讓訓練更穩定）；<span data-tip="訓練技巧，驗證集損失不再改善時提前停止以防過擬合" style="color:#ffae00">Early Stopping</span>（監控驗證集loss，不再下降就停止訓練）；<span data-tip="訓練時對資料做旋轉、翻轉等變換以增加多樣性防過擬合" style="color:#ffae00">資料增強（Data Augmentation）</span>（對圖片隨機翻轉、旋轉、裁切，增加訓練資料的多樣性）。</p>
 </section>
-            <section id="section5">
-                <h2>5. 實作專案：影像分類 AI</h2>
-                <p>整合所學做一個<span style="color:#fa6dff">「影像分類AI」</span>完整專案！以<span style="color:#ffae00">CIFAR-10</span>（10類物體：飛機、汽車、鳥、貓...）或自己蒐集的資料集為目標，訓練一個CNN分類器。用Google Colab（免費GPU）進行，整個流程從資料到部署一氣呵成。</p>
-                <p>資料準備：<span style="color:#ffae00">torchvision.datasets.CIFAR10</span>自動下載CIFAR-10；建立<span style="color:#ffae00">DataLoader</span>做批次訓練（batch_size=64）；做資料增強（<span style="color:#ffae00">transforms.RandomHorizontalFlip()</span>、<span style="color:#ffae00">transforms.RandomCrop()</span>）讓模型更有泛化能力；正規化圖片像素值（除以255，或用CIFAR-10的均值/標準差）。</p>
-                <p>模型設計：先試簡單的CNN（2-3個卷積塊+全連接層），了解基本流程；再試遷移學習——載入<span style="color:#ffae00">torchvision.models.resnet18(pretrained=True)</span>，只修改最後的全連接層（輸出改成10類），凍結前面的卷積層或只用低學習率微調，通常比自訓CNN準確率高很多，訓練也快。</p>
-                <p>訓練監控：用<span style="color:#ffae00">TensorBoard</span>或<span style="color:#ffae00">Weights &amp; Biases（wandb）</span>記錄每個epoch的loss和accuracy，畫成圖形即時監控訓練狀態，發現過擬合（訓練準確率高但驗證準確率低）或欠擬合（兩者都低）及時調整策略。</p>
-                <p>部署：訓練好的模型用<span style="color:#ffae00">torch.save(model.state_dict(), 'model.pth')</span>儲存；用<span style="color:#ffae00">Flask</span>建立一個API，接收上傳的圖片，推論後回傳預測類別和信心分數；用<span style="color:#ffae00">Gradio</span>套件可以更快速地建立一個漂亮的web介面（拖曳圖片直接看分類結果），一行程式就能分享給別人試用。完成後把連結分享給朋友，AI夢想實現的瞬間真的很有成就感！🤖</p>
+<section id="section5">
+<h2>5. 實作專案：影像分類 AI</h2>
+<p>整合所學做一個<span data-tip="AI 模型自動識別圖片內容並分類的應用" style="color:#fa6dff">「影像分類AI」</span>完整專案！以<span data-tip="常用的影像分類資料集，包含 10 類共 6 萬張 32x32 彩色圖片" style="color:#ffae00">CIFAR-10</span>（10類物體：飛機、汽車、鳥、貓...）或自己蒐集的資料集為目標，訓練一個CNN分類器。用Google Colab（免費GPU）進行，整個流程從資料到部署一氣呵成。</p>
+<p>資料準備：<span style="color:#ffae00">torchvision.datasets.CIFAR10</span>自動下載CIFAR-10；建立<span data-tip="PyTorch 工具，自動批次載入訓練資料並支援多執行緒" style="color:#ffae00">DataLoader</span>做批次訓練（batch_size=64）；做資料增強（<span style="color:#ffae00">transforms.RandomHorizontalFlip()</span>、<span style="color:#ffae00">transforms.RandomCrop()</span>）讓模型更有泛化能力；正規化圖片像素值（除以255，或用CIFAR-10的均值/標準差）。</p>
+<p>模型設計：先試簡單的CNN（2-3個卷積塊+全連接層），了解基本流程；再試遷移學習——載入<span style="color:#ffae00">torchvision.models.resnet18(pretrained=True)</span>，只修改最後的全連接層（輸出改成10類），凍結前面的卷積層或只用低學習率微調，通常比自訓CNN準確率高很多，訓練也快。</p>
+<p>訓練監控：用<span data-tip="TensorFlow 視覺化工具，監控模型訓練過程的損失與指標" style="color:#ffae00">TensorBoard</span>或<span style="color:#ffae00">Weights &amp; Biases（wandb）</span>記錄每個epoch的loss和accuracy，畫成圖形即時監控訓練狀態，發現過擬合（訓練準確率高但驗證準確率低）或欠擬合（兩者都低）及時調整策略。</p>
+<p>部署：訓練好的模型用<span style="color:#ffae00">torch.save(model.state_dict(), 'model.pth')</span>儲存；用<span data-tip="Python 輕量級 Web 框架，快速建立 RESTful API 與網頁應用" style="color:#ffae00">Flask</span>建立一個API，接收上傳的圖片，推論後回傳預測類別和信心分數；用<span data-tip="Python 函式庫，快速為 AI 模型建立互動式網頁展示介面" style="color:#ffae00">Gradio</span>套件可以更快速地建立一個漂亮的web介面（拖曳圖片直接看分類結果），一行程式就能分享給別人試用。完成後把連結分享給朋友，AI夢想實現的瞬間真的很有成就感！🤖</p>
 </section>
-        </main>
-    <script>
-        const navLinks = document.querySelectorAll('.nav-link');
-        const sections = document.querySelectorAll('section');
-        window.addEventListener('scroll', () => {
-            let current = '';
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                const sectionHeight = section.clientHeight;
-                if (window.pageYOffset >= (sectionTop - 100)) {
-                    current = section.getAttribute('id');
-                }
-            });
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href').includes(current)) {
-                    link.classList.add('active');
-                }
-            });
+</div>
+</div>
+<!-- GDB Float Window -->
+<div id="gdbFloatWindow">
+<div class="window-header" id="dragHandle">
+<span class="window-title">⌨ GDB Online</span>
+<span class="close-btn" onclick="toggleGdbWindow()">×</span>
+</div>
+<div class="window-content">
+<iframe id="gdbFrame" sandbox="allow-forms allow-scripts allow-same-origin allow-popups" src="https://www.onlinegdb.com/"></iframe>
+</div>
+</div>
+<script src="shared.js"></script>
+<script>
+        const floatWindow = document.getElementById('gdbFloatWindow');
+        const dragHandle  = document.getElementById('dragHandle');
+        function toggleGdbWindow() {
+            floatWindow.style.display = floatWindow.style.display === 'flex' ? 'none' : 'flex';
+        }
+        let isDragging = false, startX, startY, initLeft, initTop;
+        dragHandle.addEventListener('mousedown', e => {
+            isDragging = true;
+            startX = e.clientX; startY = e.clientY;
+            const r = floatWindow.getBoundingClientRect();
+            initLeft = r.left; initTop = r.top;
+            floatWindow.classList.add('is-dragging');
+        });
+        document.addEventListener('mousemove', e => {
+            if (!isDragging) return;
+            floatWindow.style.left = `${initLeft + e.clientX - startX}px`;
+            floatWindow.style.top  = `${initTop  + e.clientY - startY}px`;
+            floatWindow.style.right = 'auto';
+        });
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+            floatWindow.classList.remove('is-dragging');
         });
     </script>
-    </header>
+<script src="tooltips.js"></script>
 </body>
 </html>
