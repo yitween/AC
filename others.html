@@ -9,41 +9,105 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="shared.css">
     <style>
-        /* coming-soon card */
-        .coming-soon {
-            display: inline-flex; align-items: center; gap: 10px;
-            background: rgba(250,161,28,0.1);
-            border: 1px dashed rgba(250,161,28,0.4);
-            border-radius: 8px; padding: 14px 20px;
-            color: #faa11c; font-size: 0.95rem;
-            margin-top: 8px;
+        /* ── 題庫選題器 ── */
+        .quiz-picker {
+            display: flex; flex-direction: column; gap: 16px;
+            max-width: 520px;
         }
-        .meme-card {
-            background: var(--surface); border: 1px solid var(--border);
-            border-radius: 16px; padding: 32px;
-            display: flex; flex-direction: column; align-items: center; gap: 20px;
-            max-width: 640px; margin: 0 auto;
-        }
-        .meme-card img { max-width: 100%; border-radius: 10px; }
-        .meme-card .quote {
-            font-size: 1.1rem; color: var(--accent);
-            font-style: italic; text-align: center;
-        }
-        .contact-qr {
-            display: flex; gap: 16px; flex-wrap: wrap; align-items: center;
-        }
-        .contact-qr img {
-            width: 130px; border-radius: 8px;
-            background: #ccc; padding: 4px;
-        }
-        .contact-qr a {
-            color: var(--accent); text-decoration: none;
+        .quiz-picker label {
+            font-size: 0.88rem; color: var(--muted);
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.9rem;
-            transition: opacity 0.2s;
+            letter-spacing: 0.05em;
         }
-        .contact-qr a:hover { opacity: 0.75; }
-        .coming-soon::before { content: '🚧'; font-size: 1.2rem; }
+        .quiz-row {
+            display: flex; gap: 10px; align-items: center;
+        }
+        .quiz-select {
+            flex: 1;
+            appearance: none;
+            background: var(--surface);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 40px 10px 14px;
+            font-size: 0.92rem;
+            font-family: 'Noto Sans TC', sans-serif;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237fffd4' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+        }
+        .quiz-select:hover,
+        .quiz-select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(127,255,212,0.12);
+        }
+        .quiz-select option {
+            background: #1a1a1a;
+            color: var(--text);
+        }
+        .go-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 10px 20px;
+            background: var(--accent); color: #111;
+            border: none; border-radius: 8px;
+            font-weight: 700; font-size: 0.88rem;
+            font-family: 'JetBrains Mono', monospace;
+            cursor: pointer; white-space: nowrap;
+            transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+        }
+        .go-btn:hover {
+            opacity: 0.85;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(127,255,212,0.25);
+        }
+        .go-btn:active { transform: translateY(0); }
+
+        /* ── 線上課程卡片 ── */
+        .course-card {
+            display: flex; gap: 28px; align-items: flex-start;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px; padding: 28px;
+            max-width: 580px;
+            flex-wrap: wrap;
+        }
+        .course-card img {
+            width: 180px; border-radius: 10px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+            flex-shrink: 0;
+            margin: 0;
+        }
+        .course-info {
+            display: flex; flex-direction: column;
+            gap: 12px; justify-content: center; flex: 1;
+        }
+        .course-info h3 {
+            font-size: 1.1rem; color: var(--text); font-weight: 700;
+        }
+        .course-info p {
+            font-size: 0.9rem; color: var(--muted);
+            line-height: 1.7; margin: 0;
+        }
+        .course-link {
+            display: inline-flex; align-items: center; gap: 8px;
+            margin-top: 4px; padding: 10px 20px;
+            background: #1d4ed8; color: #fff;
+            text-decoration: none; border-radius: 8px;
+            font-weight: 700; font-size: 0.88rem;
+            font-family: 'JetBrains Mono', monospace;
+            width: fit-content;
+            transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+        }
+        .course-link:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(29,78,216,0.35);
+        }
+        .course-link:active { transform: translateY(0); }
+        .course-link::before { content: '▶'; font-size: 0.75em; }
     </style>
 </head>
 <body>
@@ -71,38 +135,64 @@
             <h1 class="page-title">其他</h1>
             <hr class="page-divider">
 
+            <!-- ── 1. 輔助題庫 ── -->
             <section id="section1">
                 <h2>1. 輔助題庫</h2>
-                <label for="fruits">請選擇一個水果：</label>
-                    <select name="quentions" id="quentions">
-                      <option value="one"><a href="https://zerojudge.tw/ShowProblem?problemid=a001" target="_blank" rel="noopener">課後題目連結(1)</a></option>
-                      <option value="two"><a href="https://zerojudge.tw/ShowProblem?problemid=a002" target="_blank" rel="noopener">課後題目連結(2)</a></option>
-                      <option value="three"><a href="https://zerojudge.tw/ShowProblem?problemid=a006" target="_blank" rel="noopener">課後題目連結(3)</a></option>
-                      <option value="four"><a href="https://zerojudge.tw/ShowProblem?problemid=c005" target="_blank" rel="noopener">課後題目連結(4)</a></option>
-                      <option value="five"><a href="https://zerojudge.tw/ShowProblem?problemid=a003" target="_blank" rel="noopener">課後題目連結(5)</a></option>
-                      <option value="six"><a href="https://zerojudge.tw/ShowProblem?problemid=a015" target="_blank" rel="noopener">課後題目連結(6)</a></option>
-                      <option value="seven"><a href="https://zerojudge.tw/ShowProblem?problemid=a022" target="_blank" rel="noopener">課後題目連結(7)</a></option>
-                      <option value="eight"><a href="https://zerojudge.tw/ShowProblem?problemid=a104" target="_blank" rel="noopener">課後題目連結(8)</a></option>
-                      <option value="nine"><a href="https://zerojudge.tw/ShowProblem?problemid=a009" target="_blank" rel="noopener">課後題目連結(9)</a></option>
-                      <option value="ten"><a href="https://zerojudge.tw/ShowProblem?problemid=c022" target="_blank" rel="noopener">課後題目連結(10)</a></option>
-                      <option value="twelve"><a href="https://zerojudge.tw/ShowProblem?problemid=a004" target="_blank" rel="noopener">課後題目連結(12)</a></option>
-                      <option value="thirteen"><a href="https://zerojudge.tw/ShowProblem?problemid=a005" target="_blank" rel="noopener">課後題目連結(13)</a></option>
-                      <option value="forteen"><a href="https://zerojudge.tw/ShowProblem?problemid=a024" target="_blank" rel="noopener">課後題目連結(14)</a></option>
-                      <option value="fifteen"><a href="https://zerojudge.tw/ShowProblem?problemid=d067" target="_blank" rel="noopener">課後題目連結(15)</a></option>
-                    </select>
+                <p>選擇題目後點擊「前往題目」，將在新分頁開啟 ZeroJudge 對應題目。</p>
+
+                <div class="quiz-picker">
+                    <label for="questions">選擇課後練習題目</label>
+                    <div class="quiz-row">
+                        <select class="quiz-select" id="questions">
+                            <option value="https://zerojudge.tw/ShowProblem?problemid=a001">課後題目（1）— a001</option>
+                            <option value="https://zerojudge.tw/ShowProblem?problemid=a002">課後題目（2）— a002</option>
+                            <option value="https://zerojudge.tw/ShowProblem?problemid=a006">課後題目（3）— a006</option>
+                            <option value="https://zerojudge.tw/ShowProblem?problemid=c005">課後題目（4）— c005</option>
+                            <option value="https://zerojudge.tw/ShowProblem?problemid=a003">課後題目（5）— a003</option>
+                            <option value="https://zerojudge.tw/ShowProblem?problemid=a015">課後題目（6）— a015</option>
+                            <option value="https://zerojudge.tw/ShowProblem?problemid=a022">課後題目（7）— a022</option>
+                            <option value="https://zerojudge.tw/ShowProblem?problemid=a104">課後題目（8）— a104</option>
+                            <option value="https://zerojudge.tw/ShowProblem?problemid=a009">課後題目（9）— a009</option>
+                            <option value="https://zerojudge.tw/ShowProblem?problemid=c022">課後題目（10）— c022</option>
+                            <option value="https://zerojudge.tw/ShowProblem?problemid=a004">課後題目（12）— a004</option>
+                            <option value="https://zerojudge.tw/ShowProblem?problemid=a005">課後題目（13）— a005</option>
+                            <option value="https://zerojudge.tw/ShowProblem?problemid=a024">課後題目（14）— a024</option>
+                            <option value="https://zerojudge.tw/ShowProblem?problemid=d067">課後題目（15）— d067</option>
+                        </select>
+                        <button class="go-btn" onclick="goToQuestion()">前往題目 →</button>
+                    </div>
+                </div>
             </section>
+
+            <!-- ── 2. 線上課程 ── -->
             <section id="section2">
                 <h2>2. 線上課程</h2>
-                <div class="meme-card">
-                    <img src="Green_Black_Modern_Schedule_Poster-removebg-preview.png" alt="coding meme">
-                </div>
-                <div class="contact-qr">
-                    <a href="https://meet.google.com/opm-hmad-unz" target="_blank" rel="noopener">課程連結</a>
+                <div class="course-card">
+                    <img src="Green_Black_Modern_Schedule_Poster-removebg-preview.png" alt="課程時間表">
+                    <div class="course-info">
+                        <h3>程式設計社線上課程</h3>
+                        <p>透過 Google Meet 進行的線上教學課程，歡迎社員準時參加。</p>
+                        <a class="course-link"
+                           href="https://meet.google.com/opm-hmad-unz"
+                           target="_blank" rel="noopener">
+                            加入課程
+                        </a>
+                    </div>
                 </div>
             </section>
         </div>
     </div>
 
     <script src="shared.js"></script>
+    <script>
+        function goToQuestion() {
+            const url = document.getElementById('questions').value;
+            if (url) window.open(url, '_blank', 'noopener');
+        }
+        // 按 Enter 也可觸發
+        document.getElementById('questions').addEventListener('keydown', e => {
+            if (e.key === 'Enter') goToQuestion();
+        });
+    </script>
 </body>
 </html>
