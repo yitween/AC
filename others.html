@@ -18,6 +18,31 @@
             color: #faa11c; font-size: 0.95rem;
             margin-top: 8px;
         }
+        .meme-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 16px; padding: 32px;
+            display: flex; flex-direction: column; align-items: center; gap: 20px;
+            max-width: 640px; margin: 0 auto;
+        }
+        .meme-card img { max-width: 100%; border-radius: 10px; }
+        .meme-card .quote {
+            font-size: 1.1rem; color: var(--accent);
+            font-style: italic; text-align: center;
+        }
+        .contact-qr {
+            display: flex; gap: 16px; flex-wrap: wrap; align-items: center;
+        }
+        .contact-qr img {
+            width: 130px; border-radius: 8px;
+            background: #ccc; padding: 4px;
+        }
+        .contact-qr a {
+            color: var(--accent); text-decoration: none;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            transition: opacity 0.2s;
+        }
+        .contact-qr a:hover { opacity: 0.75; }
         .coming-soon::before { content: '🚧'; font-size: 1.2rem; }
     </style>
 </head>
@@ -48,12 +73,32 @@
 
             <section id="section1">
                 <h2>1. 輔助題庫</h2>
-                <div class="coming-soon">敬請期待，內容建置中</div>
+                <label for="fruits">請選擇一個水果：</label>
+                    <select name="quentions" id="quentions">
+                      <option value="one"><a href="https://zerojudge.tw/ShowProblem?problemid=a001" target="_blank" rel="noopener">課後題目連結(1)</a></option>
+                      <option value="two"><a href="https://zerojudge.tw/ShowProblem?problemid=a002" target="_blank" rel="noopener">課後題目連結(2)</a></option>
+                      <option value="three"><a href="https://zerojudge.tw/ShowProblem?problemid=a006" target="_blank" rel="noopener">課後題目連結(3)</a></option>
+                      <option value="four"><a href="https://zerojudge.tw/ShowProblem?problemid=c005" target="_blank" rel="noopener">課後題目連結(4)</a></option>
+                      <option value="five"><a href="https://zerojudge.tw/ShowProblem?problemid=a003" target="_blank" rel="noopener">課後題目連結(5)</a></option>
+                      <option value="six"><a href="https://zerojudge.tw/ShowProblem?problemid=a015" target="_blank" rel="noopener">課後題目連結(6)</a></option>
+                      <option value="seven"><a href="https://zerojudge.tw/ShowProblem?problemid=a022" target="_blank" rel="noopener">課後題目連結(7)</a></option>
+                      <option value="eight"><a href="https://zerojudge.tw/ShowProblem?problemid=a104" target="_blank" rel="noopener">課後題目連結(8)</a></option>
+                      <option value="nine"><a href="https://zerojudge.tw/ShowProblem?problemid=a009" target="_blank" rel="noopener">課後題目連結(9)</a></option>
+                      <option value="ten"><a href="https://zerojudge.tw/ShowProblem?problemid=c022" target="_blank" rel="noopener">課後題目連結(10)</a></option>
+                      <option value="twelve"><a href="https://zerojudge.tw/ShowProblem?problemid=a004" target="_blank" rel="noopener">課後題目連結(12)</a></option>
+                      <option value="thirteen"><a href="https://zerojudge.tw/ShowProblem?problemid=a005" target="_blank" rel="noopener">課後題目連結(13)</a></option>
+                      <option value="forteen"><a href="https://zerojudge.tw/ShowProblem?problemid=a024" target="_blank" rel="noopener">課後題目連結(14)</a></option>
+                      <option value="fifteen"><a href="https://zerojudge.tw/ShowProblem?problemid=d067" target="_blank" rel="noopener">課後題目連結(15)</a></option>
+                    </select>
             </section>
-
             <section id="section2">
                 <h2>2. 線上課程</h2>
-                <div class="coming-soon">敬請期待，內容建置中</div>
+                <div class="meme-card">
+                    <img src="Green_Black_Modern_Schedule_Poster-removebg-preview.png" alt="coding meme">
+                </div>
+                <div class="contact-qr">
+                    <a href="https://meet.google.com/opm-hmad-unz" target="_blank" rel="noopener">課程連結</a>
+                </div>
             </section>
         </div>
     </div>
