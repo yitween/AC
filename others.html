@@ -67,22 +67,32 @@
 
         /* ── 線上課程卡片 ── */
         .course-card {
-            display: flex; gap: 280px; align-items: flex-start;
+            display: flex;
+            gap: 40px; 
+            align-items: center;
             background: var(--surface);
-            border: 10px solid var(--border);
-            border-radius: 160px; padding: 280px;
-            max-width: 5800px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 900px; 
+            margin: 20px auto;
             flex-wrap: wrap;
         }
+        
         .course-card img {
-            width: 18000px; border-radius: 1000px;
-            box-shadow: 0 40px 160px rgba(0,0,0,0.4);
+            width: 400px; 
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.3);
             flex-shrink: 0;
-            margin: 0;
         }
+        
         .course-info {
-            display: flex; flex-direction: column;
-            gap: 120px; justify-content: center; flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            flex: 1;
+            min-width: 300px;
         }
         .course-info h3 {
             font-size: 1.1rem; color: var(--text); font-weight: 700;
@@ -105,6 +115,10 @@
             background: #2563eb;
             transform: translateY(-1px);
             box-shadow: 0 4px 14px rgba(29,78,216,0.35);
+        }
+        .course-card img:hover {
+            transform: scale(1.05); /* 建議放大 1.05 倍即可，2 倍會擋住文字 */
+            transition: transform 0.3s ease;
         }
         .course-link:active { transform: translateY(0); }
         .course-link::before { content: '▶'; font-size: 0.75em; }
