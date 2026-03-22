@@ -5,7 +5,7 @@
     --surface2: rgba(255,255,255,0.05);
     --border: rgba(250,161,28,0.35);
     --accent: #7fffd4;
-    --sidebar-bg: rgba(250,161,28,0.85);
+    --sidebar-bg: rgba(250,161,28,0.92);
     --text: #e0e0e0;
     --muted: #888;
     --nav-h: 52px;
@@ -23,15 +23,18 @@ body {
     line-height: 1.7;
 }
 
-/* ── TOP NAV (subpages – simple bar without logo) ── */
+/* ════════════════════════════════════════
+   TOP NAV
+════════════════════════════════════════ */
 .top-nav {
     position: sticky; top: 0;
-    background: rgba(17,17,17,0.9);
+    background: rgba(17,17,17,0.92);
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(255,255,255,0.08);
     z-index: 900;
     display: flex; align-items: center;
-    padding: 0 20px;
+    padding: 0 16px;
     height: var(--nav-h);
     gap: 4px;
 }
@@ -42,8 +45,30 @@ body {
     font-size: 0.85rem; font-weight: 700;
     transition: background 0.2s, color 0.2s;
     margin-right: auto;
+    white-space: nowrap;
 }
 .top-nav a.back:hover { background: var(--accent); color: #111; }
+
+/* ── 漢堡按鈕（PC 隱藏，手機顯示） ── */
+.hamburger {
+    display: none;
+    flex-direction: column; justify-content: center;
+    gap: 5px; cursor: pointer;
+    background: none; border: none;
+    padding: 6px; border-radius: 6px;
+    transition: background 0.2s;
+    flex-shrink: 0;
+}
+.hamburger:hover { background: rgba(255,255,255,0.07); }
+.hamburger span {
+    display: block; width: 22px; height: 2px;
+    background: var(--text); border-radius: 2px;
+    transition: transform 0.25s, opacity 0.25s;
+    transform-origin: center;
+}
+.hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
 .nav-menu {
     display: flex; list-style: none; gap: 2px;
@@ -53,17 +78,36 @@ body {
     font-size: 0.88rem; padding: 5px 10px;
     border-radius: 5px;
     transition: color 0.2s, background 0.2s;
+    white-space: nowrap;
 }
 .nav-menu a:hover { color: var(--text); background: rgba(255,255,255,0.07); }
 .nav-menu a.active { color: var(--accent); background: rgba(127,255,212,0.1); }
 
-/* ── LAYOUT ── */
+/* ── GDB inline button（子頁 navbar 用） ── */
+.gdb-inline {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 16px; background: transparent;
+    color: var(--accent); border: 1px solid var(--accent);
+    border-radius: 6px; cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700; font-size: 0.85rem;
+    transition: background 0.2s, color 0.2s, transform 0.15s;
+    white-space: nowrap;
+}
+.gdb-inline:hover { background: var(--accent); color: #111; transform: translateY(-1px); }
+.gdb-inline:active { transform: translateY(0); }
+
+/* ════════════════════════════════════════
+   LAYOUT
+════════════════════════════════════════ */
 .layout {
     display: flex; align-items: flex-start;
     min-height: calc(100vh - var(--nav-h));
 }
 
-/* ── SIDEBAR ── */
+/* ════════════════════════════════════════
+   SIDEBAR (PC)
+════════════════════════════════════════ */
 .sidebar {
     position: sticky; top: var(--nav-h);
     width: var(--sidebar-w); min-width: var(--sidebar-w);
@@ -72,6 +116,8 @@ body {
     padding: 24px 16px;
     overflow-y: auto;
     border-right: 1px solid rgba(250,161,28,0.3);
+    /* 平滑收合動畫 */
+    transition: height 0.25s ease;
 }
 .sidebar h3 {
     font-size: 0.75rem; letter-spacing: 0.12em;
@@ -95,7 +141,9 @@ body {
     background: rgba(0,0,0,0.08);
 }
 
-/* ── MAIN CONTENT ── */
+/* ════════════════════════════════════════
+   MAIN CONTENT
+════════════════════════════════════════ */
 .main-content {
     flex: 1; padding: 40px 48px;
     max-width: 860px;
@@ -112,7 +160,28 @@ body {
     margin: 16px 0 32px;
 }
 
-/* ── SECTIONS ── */
+/* ── PAGE HERO（子頁 logo + 標題） ── */
+.page-hero {
+    display: flex; align-items: center; gap: 20px;
+    margin-bottom: 24px;
+}
+.page-hero img {
+    width: 72px; height: 72px; object-fit: contain;
+    border-radius: 12px; background: rgba(255,255,255,0.04);
+    padding: 8px; border: 1px solid var(--border);
+    flex-shrink: 0;
+}
+.page-hero h1 {
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+    color: var(--accent); font-weight: 700; margin: 0;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.03em;
+    word-break: break-word;
+}
+
+/* ════════════════════════════════════════
+   SECTIONS
+════════════════════════════════════════ */
 section {
     padding: 40px 0;
     border-bottom: 1px solid rgba(250,161,28,0.2);
@@ -141,4 +210,249 @@ section img {
     max-width: 100%; height: auto; display: block;
     margin: 16px auto; border-radius: 8px;
     box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+/* ── 下載按鈕 ── */
+.download-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-top: 32px; padding: 12px 24px;
+    background: #1d4ed8; color: #fff;
+    text-decoration: none; border-radius: 8px;
+    font-weight: 700; font-size: 0.9rem;
+    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+.download-btn::before { content: '⬇'; }
+.download-btn:hover {
+    background: #2563eb; transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(29,78,216,0.35);
+}
+.download-btn:active { transform: translateY(0); }
+
+/* ════════════════════════════════════════
+   GDB FLOAT WINDOW（子頁）
+════════════════════════════════════════ */
+#gdbFloatWindow {
+    display: none; position: fixed;
+    top: 100px; right: 50px;
+    width: 600px; height: 500px;
+    background: #1e1e1e;
+    border: 1px solid #444; border-radius: 10px;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.6);
+    z-index: 2000; flex-direction: column;
+    overflow: hidden; resize: both;
+    min-width: 320px; min-height: 250px;
+    max-width: 95vw; max-height: 90vh;
+}
+.window-header {
+    height: 40px; background: #2a2a2a;
+    display: flex; align-items: center;
+    justify-content: space-between;
+    padding: 0 14px; cursor: move;
+    border-bottom: 1px solid #444;
+    user-select: none; flex-shrink: 0;
+}
+.window-title {
+    color: #ccc; font-weight: 700; font-size: 0.85rem;
+    font-family: 'JetBrains Mono', monospace;
+}
+.close-btn {
+    color: #888; font-size: 22px; cursor: pointer;
+    line-height: 1; transition: color 0.2s;
+}
+.close-btn:hover { color: #f87171; }
+.window-content { flex: 1; height: calc(100% - 40px); }
+.window-content iframe { width: 100%; height: 100%; border: none; }
+.is-dragging iframe { pointer-events: none; }
+
+/* ════════════════════════════════════════
+   TOOLTIP（hover 說明視窗）
+════════════════════════════════════════ */
+[data-tip] {
+    position: relative;
+    cursor: help;
+    text-decoration: underline dotted currentColor;
+    text-underline-offset: 3px;
+}
+[data-tip]::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    background: #1e1e2e;
+    color: #e0e0e0;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-style: normal; font-weight: 400;
+    white-space: normal;
+    width: max-content; max-width: 240px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(127,255,212,0.25);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    z-index: 9999;
+}
+[data-tip]:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+[data-tip]::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 2px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: rgba(127,255,212,0.25);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.18s ease;
+    z-index: 9999;
+}
+[data-tip]:hover::before { opacity: 1; }
+
+/* ════════════════════════════════════════
+   TABLET  ≤ 900px
+════════════════════════════════════════ */
+@media (max-width: 900px) {
+    :root { --sidebar-w: 180px; }
+    .main-content { padding: 32px 28px; }
+}
+
+/* ════════════════════════════════════════
+   MOBILE  ≤ 768px
+════════════════════════════════════════ */
+@media (max-width: 768px) {
+
+    /* ── Nav：隱藏連結列，顯示漢堡 ── */
+    .nav-menu { display: none; }
+    .hamburger { display: flex; }
+
+    /* 下拉展開選單 */
+    .nav-menu.open {
+        display: flex; flex-direction: column;
+        position: fixed;
+        top: var(--nav-h); left: 0; right: 0;
+        background: rgba(17,17,17,0.97);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        padding: 12px 16px 20px;
+        gap: 4px; z-index: 890;
+        animation: slideDown 0.2s ease;
+    }
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-8px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    .nav-menu.open li { width: 100%; }
+    .nav-menu.open a {
+        display: block; padding: 12px 16px;
+        font-size: 1rem; border-radius: 8px;
+        color: var(--text);
+    }
+    /* GDB inline 按鈕在下拉選單中改為全寬 */
+    .nav-menu.open .gdb-inline {
+        display: block; width: 100%;
+        text-align: center; padding: 12px 16px;
+        border-radius: 8px; font-size: 1rem;
+    }
+
+    /* ── Layout：垂直堆疊 ── */
+    .layout { flex-direction: column; }
+
+    /* ── Sidebar：折疊為頂部手風琴 ── */
+    .sidebar {
+        position: static;
+        width: 100%; min-width: 0;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid rgba(250,161,28,0.3);
+        padding: 0;
+        overflow: visible;
+    }
+    /* Toggle 列（由 JS 動態插入） */
+    .sidebar-toggle {
+        display: flex; align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px; cursor: pointer;
+        user-select: none;
+    }
+    .sidebar-toggle h3 {
+        font-size: 0.8rem; letter-spacing: 0.1em;
+        text-transform: uppercase; color: #333;
+        margin: 0; padding: 0; border: none;
+    }
+    .sidebar-toggle .chevron {
+        font-size: 0.75rem; color: #555;
+        transition: transform 0.25s;
+    }
+    /* 收合時隱藏連結列 */
+    .sidebar.collapsed ul { display: none; }
+    .sidebar.collapsed .chevron { transform: rotate(-90deg); }
+
+    /* Pill 式章節按鈕 */
+    .sidebar ul {
+        padding: 0 16px 14px;
+        display: flex; flex-wrap: wrap; gap: 6px;
+    }
+    .sidebar li { margin: 0; }
+    .sidebar a {
+        padding: 6px 14px;
+        border-left: none; border-radius: 20px;
+        background: rgba(0,0,0,0.12);
+        font-size: 0.82rem;
+        display: inline-block;
+    }
+    .sidebar a.active {
+        background: #1a4fad; color: #fff;
+        border-left: none;
+    }
+
+    /* ── Main content ── */
+    .main-content {
+        padding: 24px 18px;
+        max-width: 100%;
+    }
+
+    /* ── Page hero ── */
+    .page-hero { gap: 14px; margin-bottom: 16px; }
+    .page-hero img { width: 52px; height: 52px; padding: 6px; }
+    .page-hero h1 { font-size: 1.6rem; }
+
+    /* ── Sections ── */
+    section { padding: 28px 0; }
+    section h2 { font-size: 1.08rem; }
+    section p  { font-size: 0.93rem; }
+
+    /* ── Tooltip：手機停用（tap 無法 hover） ── */
+    [data-tip]::after,
+    [data-tip]::before { display: none; }
+
+    /* ── GDB 浮窗：手機全螢幕 ── */
+    #gdbFloatWindow {
+        top: var(--nav-h) !important;
+        left: 0 !important; right: 0 !important;
+        width: 100% !important;
+        height: calc(100vh - var(--nav-h)) !important;
+        resize: none; border-radius: 0;
+    }
+}
+
+/* ════════════════════════════════════════
+   SMALL MOBILE  ≤ 480px
+════════════════════════════════════════ */
+@media (max-width: 480px) {
+    .top-nav { padding: 0 12px; }
+    .top-nav a.back { padding: 5px 10px; font-size: 0.8rem; }
+    .main-content { padding: 18px 14px; }
+    .page-hero img { width: 44px; height: 44px; }
+    .page-hero h1 { font-size: 1.35rem; }
+    section h2 { font-size: 1rem; }
+    section p  { font-size: 0.88rem; }
+    .download-btn { font-size: 0.82rem; padding: 10px 18px; }
 }
