@@ -1,0 +1,106 @@
+{
+  "name": "AC - 程式設計學習平台",
+  "short_name": "AC Learning",
+  "description": "AC 是一個免費且安全的網站，幫助你全面學習編程。從 C++、Python、JavaScript 到 HTML/CSS，一應俱全。",
+  "start_url": "./index.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-or-landscape",
+  "background_color": "#ffffff",
+  "theme_color": "#2196F3",
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-192x192-maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icon-512x512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshot-narrow.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "AC 程式設計學習平台首頁"
+    },
+    {
+      "src": "screenshot-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "課程內容展示"
+    }
+  ],
+  "categories": ["education", "productivity"],
+  "shortcuts": [
+    {
+      "name": "C++ 課程",
+      "short_name": "C++",
+      "description": "學習 C++ 程式設計",
+      "url": "./cpp.html",
+      "icons": [
+        {
+          "src": "icon-cpp.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Python 課程",
+      "short_name": "Python",
+      "description": "學習 Python 程式設計",
+      "url": "./python.html",
+      "icons": [
+        {
+          "src": "icon-python.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "JavaScript 課程",
+      "short_name": "JavaScript",
+      "description": "學習 JavaScript 程式設計",
+      "url": "./js.html",
+      "icons": [
+        {
+          "src": "icon-js.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "share_target": {
+    "action": "/share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
+}

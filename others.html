@@ -5,137 +5,136 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AC — 其他</title>
     <link rel="icon" href="螢幕擷取畫面 2026-01-05 125529.png" sizes="48x48" type="image/png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#111111">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="shared.css">
     <style>
-        /* ── 題庫選題器 ── */
-        .quiz-picker {
-            display: flex; flex-direction: column; gap: 16px;
-            max-width: 520px;
-        }
+        /* ── 題庫 ── */
+        .quiz-picker { display: flex; flex-direction: column; gap: 16px; max-width: 520px; }
         .quiz-picker label {
             font-size: 0.88rem; color: var(--muted);
-            font-family: 'JetBrains Mono', monospace;
-            letter-spacing: 0.05em;
+            font-family: 'JetBrains Mono', monospace; letter-spacing: 0.05em;
         }
-        .quiz-row {
-            display: flex; gap: 10px; align-items: center;
-        }
+        .quiz-row { display: flex; gap: 10px; align-items: center; }
         .quiz-select {
-            flex: 1;
-            appearance: none;
-            background: var(--surface);
-            color: var(--text);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 10px 40px 10px 14px;
-            font-size: 0.92rem;
-            font-family: 'Noto Sans TC', sans-serif;
-            cursor: pointer;
-            outline: none;
+            flex: 1; appearance: none; background: var(--surface); color: var(--text);
+            border: 1px solid var(--border); border-radius: 8px;
+            padding: 10px 40px 10px 14px; font-size: 0.92rem;
+            font-family: 'Noto Sans TC', sans-serif; cursor: pointer; outline: none;
             transition: border-color 0.2s, box-shadow 0.2s;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237fffd4' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 14px center;
+            background-repeat: no-repeat; background-position: right 14px center;
         }
-        .quiz-select:hover,
-        .quiz-select:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(127,255,212,0.12);
+        .quiz-select:hover, .quiz-select:focus {
+            border-color: var(--accent); box-shadow: 0 0 0 3px rgba(127,255,212,0.12);
         }
-        .quiz-select option {
-            background: #1a1a1a;
-            color: var(--text);
-        }
+        .quiz-select option { background: #1a1a1a; color: var(--text); }
         .go-btn {
             display: inline-flex; align-items: center; gap: 6px;
-            padding: 10px 20px;
-            background: var(--accent); color: #111;
-            border: none; border-radius: 8px;
-            font-weight: 700; font-size: 0.88rem;
-            font-family: 'JetBrains Mono', monospace;
-            cursor: pointer; white-space: nowrap;
+            padding: 10px 20px; background: var(--accent); color: #111;
+            border: none; border-radius: 8px; font-weight: 700; font-size: 0.88rem;
+            font-family: 'JetBrains Mono', monospace; cursor: pointer; white-space: nowrap;
             transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
         }
-        .go-btn:hover {
-            opacity: 0.85;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 14px rgba(127,255,212,0.25);
-        }
+        .go-btn:hover { opacity: 0.85; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(127,255,212,0.25); }
         .go-btn:active { transform: translateY(0); }
 
-        /* ── 線上課程卡片 ── */
+        /* ── 課程卡 ── */
         .course-card {
             display: flex; gap: 28px; align-items: flex-start;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 16px; padding: 28px;
-            max-width: 580px;
-            flex-wrap: wrap;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 16px; padding: 28px; max-width: 580px; flex-wrap: wrap;
         }
-        .course-card img {
-            width: 180px; border-radius: 10px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.4);
-            flex-shrink: 0;
-            margin: 0;
-        }
-        .course-info {
-            display: flex; flex-direction: column;
-            gap: 12px; justify-content: center; flex: 1;
-        }
-        .course-info h3 {
-            font-size: 1.1rem; color: var(--text); font-weight: 700;
-        }
-        .course-info p {
-            font-size: 0.9rem; color: var(--muted);
-            line-height: 1.7; margin: 0;
-        }
+        .course-card img { width: 180px; border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.4); flex-shrink: 0; margin: 0; }
+        .course-info { display: flex; flex-direction: column; gap: 12px; justify-content: center; flex: 1; }
+        .course-info h3 { font-size: 1.1rem; color: var(--text); font-weight: 700; }
+        .course-info p { font-size: 0.9rem; color: var(--muted); line-height: 1.7; margin: 0; }
         .course-link {
             display: inline-flex; align-items: center; gap: 8px;
-            margin-top: 4px; padding: 10px 20px;
-            background: #1d4ed8; color: #fff;
-            text-decoration: none; border-radius: 8px;
-            font-weight: 700; font-size: 0.88rem;
-            font-family: 'JetBrains Mono', monospace;
-            width: fit-content;
+            margin-top: 4px; padding: 10px 20px; background: #1d4ed8; color: #fff;
+            text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 0.88rem;
+            font-family: 'JetBrains Mono', monospace; width: fit-content;
             transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
         }
-        .course-link:hover {
-            background: #2563eb;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 14px rgba(29,78,216,0.35);
-        }
-        .course-link:active { transform: translateY(0); }
         .course-link::before { content: '▶'; font-size: 0.75em; }
+        .course-link:hover { background: #2563eb; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(29,78,216,0.35); }
+        .course-link:active { transform: translateY(0); }
 
-        /* ════════════════════════════════
-           MOBILE  ≤ 768px
-        ════════════════════════════════ */
-        @media (max-width: 768px) {
-            /* 題庫：選單與按鈕垂直堆疊 */
-            .quiz-row {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .quiz-select { width: 100%; }
-            .go-btn { width: 100%; justify-content: center; }
-
-            /* 課程卡：垂直堆疊，圖片全寬 */
-            .course-card {
-                flex-direction: column;
-                gap: 16px; padding: 20px;
-            }
-            .course-card img {
-                width: 100%; max-width: 260px;
-                margin: 0 auto; display: block;
-            }
-            .course-link { width: 100%; justify-content: center; }
+        /* ── 公告區輔助說明 ── */
+        .ann-meta {
+            display: flex; align-items: center; gap: 10px;
+            margin-bottom: 16px; flex-wrap: wrap;
         }
+        .ann-meta p { margin: 0; font-size: 0.85rem; }
+        .ann-post-btn {
+            display: inline-flex; align-items: center; gap: 5px;
+            font-size: 0.78rem; color: var(--accent); text-decoration: none;
+            font-family: 'JetBrains Mono', monospace;
+            border: 1px solid rgba(127,255,212,0.3); border-radius: 20px;
+            padding: 3px 12px; transition: background 0.2s, color 0.2s;
+            white-space: nowrap;
+        }
+        .ann-post-btn:hover { background: var(--accent); color: #111; }
 
+        /* ── 安裝區 ── */
+        .install-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 14px; max-width: 640px;
+        }
+        .install-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 14px; padding: 20px 18px;
+            display: flex; flex-direction: column; gap: 10px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .install-card:hover { border-color: var(--accent); box-shadow: 0 4px 20px rgba(127,255,212,0.07); }
+        .install-icon { font-size: 1.8rem; line-height: 1; }
+        .install-card h4 { font-size: 0.97rem; font-weight: 700; color: var(--text); margin: 0; }
+        .install-card > p { font-size: 0.82rem; color: var(--muted); line-height: 1.6; margin: 0; }
+        .install-steps {
+            background: rgba(255,255,255,0.03); border-radius: 8px; padding: 10px 12px;
+        }
+        .install-steps ol { padding-left: 16px; display: flex; flex-direction: column; gap: 3px; }
+        .install-steps li { font-size: 0.79rem; color: var(--muted); line-height: 1.5; }
+        .install-steps li strong { color: var(--text); }
+        .install-note {
+            font-size: 0.76rem; color: #555; border-left: 2px solid #2a2a2a;
+            padding-left: 10px; line-height: 1.55; margin: 0;
+        }
+        .ibtn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+            padding: 9px 16px; border-radius: 8px; font-size: 0.83rem;
+            font-weight: 700; cursor: pointer; text-decoration: none;
+            font-family: 'JetBrains Mono', monospace; border: none;
+            transition: transform 0.15s, box-shadow 0.2s, opacity 0.2s;
+            margin-top: auto;
+        }
+        .ibtn:hover { transform: translateY(-1px); }
+        .ibtn:active { transform: translateY(0); }
+        .ibtn-green { background: var(--accent); color: #111; }
+        .ibtn-green:hover { box-shadow: 0 4px 14px rgba(127,255,212,0.3); }
+        .ibtn-blue { background: #1d4ed8; color: #fff; }
+        .ibtn-blue:hover { background: #2563eb; box-shadow: 0 4px 14px rgba(29,78,216,0.35); }
+        .ibtn-ghost { background: transparent; color: var(--accent); border: 1px solid rgba(127,255,212,0.3); }
+        .ibtn-ghost:hover { background: rgba(127,255,212,0.08); }
+        #pwa-install-btn { display: none; } /* 由 JS 在支援時顯示 */
+
+        /* ── RWD ── */
+        @media (max-width: 768px) {
+            .quiz-row { flex-direction: column; align-items: stretch; }
+            .quiz-select, .go-btn { width: 100%; }
+            .go-btn { justify-content: center; }
+            .course-card { flex-direction: column; gap: 16px; padding: 20px; }
+            .course-card img { width: 100%; max-width: 260px; margin: 0 auto; display: block; }
+            .course-link { width: 100%; justify-content: center; }
+            .install-grid { grid-template-columns: 1fr; }
+        }
         @media (max-width: 480px) {
             .quiz-picker { max-width: 100%; }
             .course-card { padding: 16px; border-radius: 12px; }
+            .install-card { padding: 16px 14px; }
         }
     </style>
 </head>
@@ -149,8 +148,6 @@
             <li><a href="about.html">關於我們</a></li>
             <li><a href="others.html">其他</a></li>
         </ul>
-    
-        <!-- 漢堡選單按鈕 -->
         <button class="hamburger" id="hamburger" aria-label="選單" aria-expanded="false">
             <span></span><span></span><span></span>
         </button>
@@ -160,8 +157,10 @@
         <nav class="sidebar">
             <h3>章節目錄</h3>
             <ul>
+                <li><a href="#section-announce">0. 公告</a></li>
                 <li><a href="#section1">1. 輔助題庫</a></li>
                 <li><a href="#section2">2. 線上課程</a></li>
+                <li><a href="#section3">3. 下載 App</a></li>
             </ul>
         </nav>
 
@@ -169,11 +168,29 @@
             <h1 class="page-title">其他</h1>
             <hr class="page-divider">
 
-            <!-- ── 1. 輔助題庫 ── -->
+            <!-- ════════════════════════
+                 0. 公告
+            ════════════════════════ -->
+            <section id="section-announce">
+                <h2>0. 公告</h2>
+                <div class="ann-meta">
+                    <p>由管理員透過 GitHub Issues 發布，自動同步顯示於此。</p>
+                    <a class="ann-post-btn"
+                       href="https://github.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/issues/new?labels=announcement&title=%5B%E5%85%AC%E5%91%8A%5D+&body=%23%23+%E5%85%AC%E5%91%8A%E5%85%A7%E5%AE%B9%0A%0A%EF%BC%88%E5%9C%A8%E6%AD%A4%E8%BC%B8%E5%85%A5%E5%85%A7%E5%AE%B9%EF%BC%89"
+                       target="_blank" rel="noopener" id="ann-post-link">
+                        ＋ 發布新公告
+                    </a>
+                </div>
+                <!-- announcements.js 動態插入公告卡片 -->
+                <div id="ac-announce"></div>
+            </section>
+
+            <!-- ════════════════════════
+                 1. 輔助題庫
+            ════════════════════════ -->
             <section id="section1">
                 <h2>1. 輔助題庫</h2>
                 <p>選擇題目後點擊「前往題目」，將在新分頁開啟 ZeroJudge 對應題目。</p>
-
                 <div class="quiz-picker">
                     <label for="questions">選擇課後練習題目</label>
                     <div class="quiz-row">
@@ -198,7 +215,9 @@
                 </div>
             </section>
 
-            <!-- ── 2. 線上課程 ── -->
+            <!-- ════════════════════════
+                 2. 線上課程
+            ════════════════════════ -->
             <section id="section2">
                 <h2>2. 線上課程</h2>
                 <div class="course-card">
@@ -206,27 +225,131 @@
                     <div class="course-info">
                         <h3>程式設計社線上課程</h3>
                         <p>透過 Google Meet 進行的線上教學課程，歡迎社員準時參加。</p>
-                        <a class="course-link"
-                           href="https://meet.google.com/opm-hmad-unz"
-                           target="_blank" rel="noopener">
-                            加入課程
-                        </a>
+                        <a class="course-link" href="https://meet.google.com/opm-hmad-unz"
+                           target="_blank" rel="noopener">加入課程</a>
                     </div>
                 </div>
             </section>
+
+            <!-- ════════════════════════
+                 3. 下載 App
+            ════════════════════════ -->
+            <section id="section3">
+                <h2>3. 下載 App</h2>
+                <p>本網站已支援 PWA（漸進式網頁應用程式），可安裝到任何裝置的主畫面，離線也能瀏覽學過的頁面。</p>
+
+                <div class="install-grid" style="margin-top: 20px;">
+
+                    <!-- Android -->
+                    <div class="install-card">
+                        <div class="install-icon">🤖</div>
+                        <h4>Android</h4>
+                        <p>直接從瀏覽器安裝 PWA，或使用 PWA Builder 打包為 .apk 安裝檔。</p>
+                        <button class="ibtn ibtn-green" id="pwa-install-btn">⬇ 安裝到裝置</button>
+                        <div class="install-steps">
+                            <ol>
+                                <li>用 <strong>Chrome</strong> 開啟本網站</li>
+                                <li>點右上角 <strong>⋮</strong> 選單</li>
+                                <li>選「<strong>新增至主畫面</strong>」</li>
+                                <li>確認後即完成安裝</li>
+                            </ol>
+                        </div>
+                        <a class="ibtn ibtn-blue"
+                           href="https://www.pwabuilder.com/reportcard?site=https://YOUR_GITHUB_USERNAME.github.io/YOUR_REPO_NAME/"
+                           target="_blank" rel="noopener">
+                            📦 用 PWA Builder 產生 APK
+                        </a>
+                        <p class="install-note">進入 PWA Builder → 點「Package for stores」→ 選「Android」→ 下載 .apk。</p>
+                    </div>
+
+                    <!-- iOS -->
+                    <div class="install-card">
+                        <div class="install-icon">🍎</div>
+                        <h4>iPhone / iPad</h4>
+                        <p>iOS 透過 Safari 的「加入主畫面」功能安裝，體驗近似原生 App。</p>
+                        <div class="install-steps">
+                            <ol>
+                                <li>用 <strong>Safari</strong> 開啟本網站</li>
+                                <li>點底部 <strong>分享</strong> 按鈕 ⬆</li>
+                                <li>向下捲動，選「<strong>加入主畫面</strong>」</li>
+                                <li>點右上角「<strong>新增</strong>」確認</li>
+                            </ol>
+                        </div>
+                        <p class="install-note">⚠ iOS 只有 Safari 支援加入主畫面，Chrome 和 Firefox 不適用。</p>
+                    </div>
+
+                    <!-- PC -->
+                    <div class="install-card">
+                        <div class="install-icon">🖥</div>
+                        <h4>電腦（Chrome / Edge）</h4>
+                        <p>桌機安裝後以獨立視窗開啟，沒有瀏覽器工具列。</p>
+                        <div class="install-steps">
+                            <ol>
+                                <li>用 <strong>Chrome</strong> 或 <strong>Edge</strong> 開啟</li>
+                                <li>點網址列右側的 <strong>安裝</strong> 圖示 ⊕</li>
+                                <li>或從選單選「<strong>安裝 AC Coding…</strong>」</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <!-- 離線 -->
+                    <div class="install-card">
+                        <div class="install-icon">✈️</div>
+                        <h4>離線閱讀</h4>
+                        <p>Service Worker 自動快取你瀏覽過的所有頁面，斷線後仍可讀。</p>
+                        <p class="install-note">初次需連線。GDB 編輯器與公告需要網路。</p>
+                        <a class="ibtn ibtn-ghost" href="sw.js" target="_blank" rel="noopener">
+                            查看 Service Worker 原始碼
+                        </a>
+                    </div>
+
+                </div>
+            </section>
+
         </div>
     </div>
 
     <script src="shared.js"></script>
+    <script src="announcements.js"></script>
     <script>
+        /* ── 題庫 ── */
         function goToQuestion() {
             const url = document.getElementById('questions').value;
             if (url) window.open(url, '_blank', 'noopener');
         }
-        // 按 Enter 也可觸發
         document.getElementById('questions').addEventListener('keydown', e => {
             if (e.key === 'Enter') goToQuestion();
         });
+
+        /* ── PWA 安裝 ── */
+        let deferredPrompt = null;
+        const installBtn = document.getElementById('pwa-install-btn');
+
+        window.addEventListener('beforeinstallprompt', e => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = 'inline-flex';
+        });
+        installBtn.addEventListener('click', async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                installBtn.textContent = '✓ 已安裝';
+                installBtn.disabled = true;
+            }
+            deferredPrompt = null;
+        });
+        window.addEventListener('appinstalled', () => {
+            installBtn.textContent = '✓ 已安裝';
+            installBtn.disabled = true;
+        });
+
+        /* ── Service Worker 註冊 ── */
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .catch(err => console.warn('[SW]', err));
+        }
     </script>
 </body>
 </html>
