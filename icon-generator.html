@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AC — PWA 圖示產生器</title>
+<style>
+  :root {
+    --bg: #111; --surface: #1a1a1a; --border: rgba(127,255,212,0.2);
+    --accent: #7fffd4; --text: #e0e0e0; --muted: #666;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; padding: 40px 20px; gap: 32px;
+  }
+  h1 { color: var(--accent); font-size: 1.5rem; font-weight: 700; text-align: center; }
+  .subtitle { color: var(--muted); font-size: 0.88rem; text-align: center; }
+
+  /* ── 拖曳區 ── */
+  .drop-zone {
+    width: min(460px, 100%);
+    border: 2px dashed rgba(127,255,212,0.3);
+    border-radius: 16px; padding: 40px 24px;
+    text-align: center; cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    position: relative;
+  }
+  .drop-zone.drag-over {
+    border-color: var(--accent);
+    background: rgba(127,255,212,0.05);
+  }
+  .drop-zone input[type=file] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer;
+  }
+  .drop-icon { font-size: 3rem; margin-bottom: 12px; }
+  .drop-text { color: var(--muted); font-size: 0.9rem; line-height: 1.6; }
+  .drop-text strong { color: var(--accent); }
+
+  /* ── 預覽區 ── */
+  .preview-section { display: none; flex-direction: column; align-items: center; gap: 24px; width: min(560px, 100%); }
+  .preview-section.visible { display: flex; }
+
+  .preview-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 16px; width: 100%;
+  }
+  .preview-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 20px;
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+  }
+  .preview-card canvas {
+    border-radius: 22.5%; /* Android 自適應圓角 */
+    image-rendering: pixelated;
+  }
+  .preview-card.maskable canvas {
+    /* Maskable 的安全區域示意 */
+    outline: 2px dashed rgba(127,255,212,0.3);
+    outline-offset: -2px;
+  }
+  .card-label {
+    font-size: 0.78rem; color: var(--muted);
+    font-family: monospace; text-align: center; line-height: 1.4;
+  }
+  .card-label strong { color: var(--text); display: block; font-size: 0.85rem; }
+
+  /* ── 下載按鈕 ── */
+  .dl-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 18px; border-radius: 8px;
+    font-size: 0.82rem; font-weight: 700; cursor: pointer;
+    text-decoration: none; border: none;
+    transition: transform 0.15s, box-shadow 0.2s;
+    font-family: monospace;
+  }
+  .dl-btn:hover { transform: translateY(-1px); }
+  .dl-btn.primary { background: var(--accent); color: #111; }
+  .dl-btn.primary:hover { box-shadow: 0 4px 14px rgba(127,255,212,0.3); }
+  .dl-btn.ghost {
+    background: transparent; color: var(--accent);
+    border: 1px solid rgba(127,255,212,0.3);
+  }
+  .dl-btn.ghost:hover { background: rgba(127,255,212,0.08); }
+
+  .dl-all-row {
+    display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
+  }
+
+  /* ── 步驟說明 ── */
+  .steps {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 20px 24px;
+    width: min(560px, 100%);
+  }
+  .steps h3 { color: var(--accent); font-size: 0.9rem; margin-bottom: 14px; letter-spacing: 0.08em; }
+  .steps ol { padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
+  .steps li { font-size: 0.84rem; color: var(--muted); line-height: 1.5; }
+  .steps li strong { color: var(--text); }
+  .steps code {
+    background: rgba(127,255,212,0.1); color: var(--accent);
+    padding: 1px 6px; border-radius: 4px; font-size: 0.8rem;
+  }
+
+  /* ── 背景色控制 ── */
+  .bg-control {
+    display: flex; align-items: center; gap: 12px;
+    font-size: 0.85rem; color: var(--muted);
+  }
+  .bg-control input[type=color] {
+    width: 36px; height: 28px; border: 1px solid var(--border);
+    border-radius: 6px; cursor: pointer; background: none; padding: 2px;
+  }
+  .bg-control label { cursor: pointer; }
+  .padding-control {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 0.85rem; color: var(--muted);
+  }
+  .padding-control input[type=range] { width: 100px; accent-color: var(--accent); }
+  .controls-row {
+    display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;
+    align-items: center;
+  }
+</style>
+</head>
+<body>
+
+<h1>🎨 PWA 圖示產生器</h1>
+<p class="subtitle">拖入 AClogo 圖片，自動產生符合規格的 4 張圖示 PNG</p>
+
+<!-- 拖曳上傳區 -->
+<div class="drop-zone" id="dropZone">
+  <input type="file" id="fileInput" accept="image/*">
+  <div class="drop-icon">📂</div>
+  <div class="drop-text">
+    <strong>拖曳圖片到這裡</strong>，或點擊選擇檔案<br>
+    建議使用 <strong>AClogo-removebg-preview.png</strong>（透明背景效果最佳）
+  </div>
+</div>
+
+<!-- 控制列（上傳後顯示） -->
+<div class="controls-row" id="controlsRow" style="display:none">
+  <div class="bg-control">
+    <label for="bgColor">圖示底色</label>
+    <input type="color" id="bgColor" value="#111111">
+  </div>
+  <div class="padding-control">
+    <label for="padRange">留白比例</label>
+    <input type="range" id="padRange" min="0" max="35" value="15">
+    <span id="padVal">15%</span>
+  </div>
+  <button class="dl-btn ghost" id="resetBtn">↩ 重新選圖</button>
+</div>
+
+<!-- 預覽 + 下載 -->
+<div class="preview-section" id="previewSection">
+  <div class="preview-grid">
+    <!-- 192 any -->
+    <div class="preview-card">
+      <canvas id="c192" width="96" height="96"></canvas>
+      <div class="card-label">
+        <strong>icon-192.png</strong>
+        192×192 · any<br>一般顯示用
+      </div>
+      <button class="dl-btn ghost" onclick="download('c192','icon-192.png',192)">⬇ 下載</button>
+    </div>
+    <!-- 192 maskable -->
+    <div class="preview-card maskable">
+      <canvas id="c192m" width="96" height="96"></canvas>
+      <div class="card-label">
+        <strong>icon-192-maskable.png</strong>
+        192×192 · maskable<br>Android 自適應圖示
+      </div>
+      <button class="dl-btn ghost" onclick="download('c192m','icon-192-maskable.png',192)">⬇ 下載</button>
+    </div>
+    <!-- 512 any -->
+    <div class="preview-card">
+      <canvas id="c512" width="96" height="96"></canvas>
+      <div class="card-label">
+        <strong>icon-512.png</strong>
+        512×512 · any<br>啟動畫面 / 商店用
+      </div>
+      <button class="dl-btn ghost" onclick="download('c512','icon-512.png',512)">⬇ 下載</button>
+    </div>
+    <!-- 512 maskable -->
+    <div class="preview-card maskable">
+      <canvas id="c512m" width="96" height="96"></canvas>
+      <div class="card-label">
+        <strong>icon-512-maskable.png</strong>
+        512×512 · maskable<br>Android 自適應（大）
+      </div>
+      <button class="dl-btn ghost" onclick="download('c512m','icon-512-maskable.png',512)">⬇ 下載</button>
+    </div>
+  </div>
+
+  <div class="dl-all-row">
+    <button class="dl-btn primary" onclick="downloadAll()">⬇ 一次下載全部 4 張</button>
+  </div>
+</div>
+
+<!-- 使用說明 -->
+<div class="steps">
+  <h3>📋 使用步驟</h3>
+  <ol>
+    <li>把 <strong>AClogo-removebg-preview.png</strong> 拖入上方框</li>
+    <li>調整底色（建議 <code>#111111</code>）與留白比例後確認預覽</li>
+    <li>點「一次下載全部 4 張」，得到 4 個 PNG 檔</li>
+    <li>把這 4 個 PNG 放進 GitHub repo <strong>根目錄</strong>（和 index.html 同層）</li>
+    <li>重新部署後安裝 PWA，桌面圖示就會變成你的 logo ✓</li>
+  </ol>
+  <br>
+  <p style="font-size:0.8rem;color:#444">
+    ⓘ <strong>any</strong> = 圖示直接顯示，適合所有平台<br>
+    ⓘ <strong>maskable</strong> = Android 自適應圖示，系統會依形狀裁切，logo 縮在安全區內（虛線框內）確保不被切掉
+  </p>
+</div>
+
+<script>
+let sourceImg = null;
+
+const dropZone   = document.getElementById('dropZone');
+const fileInput  = document.getElementById('fileInput');
+const preview    = document.getElementById('previewSection');
+const controlsRow = document.getElementById('controlsRow');
+const bgColor    = document.getElementById('bgColor');
+const padRange   = document.getElementById('padRange');
+const padVal     = document.getElementById('padVal');
+const resetBtn   = document.getElementById('resetBtn');
+
+// ── 拖曳事件 ──────────────────────────────
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault(); dropZone.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file?.type.startsWith('image/')) loadImage(file);
+});
+fileInput.addEventListener('change', () => { if (fileInput.files[0]) loadImage(fileInput.files[0]); });
+
+// ── 即時重繪 ──────────────────────────────
+bgColor.addEventListener('input', redraw);
+padRange.addEventListener('input', () => { padVal.textContent = padRange.value + '%'; redraw(); });
+resetBtn.addEventListener('click', () => {
+  sourceImg = null;
+  preview.classList.remove('visible');
+  controlsRow.style.display = 'none';
+  dropZone.style.display = 'block';
+  fileInput.value = '';
+});
+
+// ── 讀取圖片 ──────────────────────────────
+function loadImage(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      sourceImg = img;
+      dropZone.style.display = 'none';
+      controlsRow.style.display = 'flex';
+      preview.classList.add('visible');
+      redraw();
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── 繪製到 canvas（預覽尺寸 96px，下載時再放大） ──
+function drawIcon(canvasId, isMaskable) {
+  const cvs = document.getElementById(canvasId);
+  const ctx = cvs.getContext('2d');
+  const size = cvs.width; // 預覽用 96px
+  const pad  = isMaskable ? 0.25 : parseFloat(padRange.value) / 100; // maskable 固定 25% safe zone
+  const bg   = bgColor.value;
+
+  ctx.clearRect(0, 0, size, size);
+
+  // 背景
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, size, size);
+
+  // Logo（保持比例，置中縮放）
+  const drawSize = size * (1 - pad * 2);
+  const ratio    = Math.min(drawSize / sourceImg.width, drawSize / sourceImg.height);
+  const w = sourceImg.width  * ratio;
+  const h = sourceImg.height * ratio;
+  const x = (size - w) / 2;
+  const y = (size - h) / 2;
+  ctx.drawImage(sourceImg, x, y, w, h);
+}
+
+function redraw() {
+  if (!sourceImg) return;
+  drawIcon('c192',  false);
+  drawIcon('c192m', true);
+  drawIcon('c512',  false);
+  drawIcon('c512m', true);
+}
+
+// ── 下載（高解析度） ──────────────────────
+function download(canvasId, filename, realSize) {
+  const isMaskable = canvasId.includes('m');
+
+  // 產生真實尺寸的 canvas
+  const cvs = document.createElement('canvas');
+  cvs.width = cvs.height = realSize;
+  const ctx = cvs.getContext('2d');
+  const pad = isMaskable ? 0.25 : parseFloat(padRange.value) / 100;
+
+  ctx.fillStyle = bgColor.value;
+  ctx.fillRect(0, 0, realSize, realSize);
+
+  const drawSize = realSize * (1 - pad * 2);
+  const ratio = Math.min(drawSize / sourceImg.width, drawSize / sourceImg.height);
+  const w = sourceImg.width  * ratio;
+  const h = sourceImg.height * ratio;
+  const x = (realSize - w) / 2;
+  const y = (realSize - h) / 2;
+
+  // 使用高品質縮放
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(sourceImg, x, y, w, h);
+
+  const a = document.createElement('a');
+  a.href     = cvs.toDataURL('image/png');
+  a.download = filename;
+  a.click();
+}
+
+function downloadAll() {
+  const icons = [
+    { id: 'c192',  name: 'icon-192.png',          size: 192 },
+    { id: 'c192m', name: 'icon-192-maskable.png',  size: 192 },
+    { id: 'c512',  name: 'icon-512.png',           size: 512 },
+    { id: 'c512m', name: 'icon-512-maskable.png',  size: 512 },
+  ];
+  // 依序觸發，間隔 200ms 避免瀏覽器阻擋
+  icons.forEach((ic, i) => {
+    setTimeout(() => download(ic.id, ic.name, ic.size), i * 200);
+  });
+}
+</script>
+</body>
+</html>
