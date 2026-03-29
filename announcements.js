@@ -15,8 +15,8 @@ const AC_ANNOUNCE = (() => {
   // ════════════════════════════════
   //  ★ 請填入你的 GitHub 帳號與 repo 名稱
   // ════════════════════════════════
-  const REPO_OWNER = 'YOUR_GITHUB_USERNAME';   // e.g. 'thcca5th'
-  const REPO_NAME  = 'YOUR_REPO_NAME';          // e.g. 'ac-coding'
+  const REPO_OWNER = 'yitween';   // e.g. 'thcca5th'
+  const REPO_NAME  = 'AC';          // e.g. 'ac-coding'
   // ════════════════════════════════
 
   const API = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues?labels=announcement&state=open&per_page=5`;
