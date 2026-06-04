@@ -112,7 +112,78 @@
         .ibtn-blue:hover { background: #2563eb; box-shadow: 0 4px 14px rgba(29,78,216,0.35); }
         .ibtn-ghost { background: transparent; color: var(--accent); border: 1px solid rgba(127,255,212,0.3); }
         .ibtn-ghost:hover { background: rgba(127,255,212,0.08); }
-        #pwa-install-btn { display: none; } 
+        #pwa-install-btn { display: none; }
+
+        /* ════════════════════════════════════════
+           4. 分享此平台 & 5. 問卷調查 樣式
+        ════════════════════════════════════════ */
+        .share-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 20px; max-width: 640px; margin-top: 20px;
+        }
+        .share-card, .survey-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 16px; padding: 28px;
+            display: flex; flex-direction: column; gap: 16px;
+        }
+        .share-card:hover, .survey-card:hover {
+            border-color: var(--accent); box-shadow: 0 4px 20px rgba(127,255,212,0.07);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .share-card h3, .survey-card h3 {
+            font-size: 1rem; font-weight: 700; color: var(--text); margin: 0;
+        }
+        .share-card p, .survey-card p {
+            font-size: 0.9rem; color: var(--muted); line-height: 1.6; margin: 0;
+        }
+        .share-buttons {
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .share-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 16px; background: transparent; color: var(--accent);
+            border: 1px solid rgba(127,255,212,0.3); border-radius: 8px;
+            text-decoration: none; font-weight: 600; font-size: 0.87rem;
+            font-family: 'JetBrains Mono', monospace;
+            cursor: pointer; transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .share-btn:hover {
+            background: var(--accent); color: #111; border-color: var(--accent);
+            box-shadow: 0 4px 12px rgba(127,255,212,0.25); transform: translateY(-1px);
+        }
+        .share-btn:active { transform: translateY(0); }
+        .share-btn::before {
+            font-size: 1.1em; line-height: 1;
+        }
+        .facebook-btn::before { content: '📘'; }
+        .twitter-btn::before { content: '𝕏'; }
+        .line-btn::before { content: '💬'; }
+        .copy-btn::before { content: '🔗'; }
+
+        .survey-btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 12px 24px; background: rgba(32,200,150,0.8); color: #fff;
+            border: none; border-radius: 8px; text-decoration: none;
+            font-weight: 700; font-size: 0.9rem;
+            font-family: 'JetBrains Mono', monospace;
+            cursor: pointer; width: 100%; transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .survey-btn::before { content: '✍️'; font-size: 1.1em; }
+        .survey-btn:hover {
+            background: rgba(32,200,150,1); transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(32,200,150,0.3);
+        }
+        .survey-btn:active { transform: translateY(0); }
+
+        .survey-qr {
+            margin-top: 10px; padding: 10px; background: rgba(255,255,255,0.05);
+            border-radius: 8px; text-align: center;
+        }
+        .survey-qr p { font-size: 0.8rem; color: var(--muted); margin-bottom: 10px; }
+        .survey-qr img { max-width: 120px; border-radius: 6px; }
+
         @media (max-width: 768px) {
             .quiz-row { flex-direction: column; align-items: stretch; }
             .quiz-select, .go-btn { width: 100%; }
@@ -121,11 +192,14 @@
             .course-card img { width: 100%; max-width: 260px; margin: 0 auto; display: block; }
             .course-link { width: 100%; justify-content: center; }
             .install-grid { grid-template-columns: 1fr; }
+            .share-grid { grid-template-columns: 1fr; }
+            .share-card, .survey-card { padding: 20px; }
         }
         @media (max-width: 480px) {
             .quiz-picker { max-width: 100%; }
             .course-card { padding: 16px; border-radius: 12px; }
             .install-card { padding: 16px 14px; }
+            .share-card, .survey-card { padding: 16px; }
         }
     </style>
 </head>
@@ -152,25 +226,25 @@
                 <li><a href="#section1">1. 輔助題庫</a></li>
                 <li><a href="#section2">2. 線上課程</a></li>
                 <li><a href="#section3">3. 下載 App</a></li>
+                <li><a href="#section4">4. 分享此平台</a></li>
+                <li><a href="#section5">5. 問卷調查</a></li>
             </ul>
         </nav>
 
-        <div class="main-content">
-            <h1 class="page-title">其他</h1>
-            <hr class="page-divider">
+        <div class="content">
+
+            <!-- 公告區 -->
             <section id="section-announce">
                 <h2>0. 公告</h2>
-                <div class="ann-meta">
-                    <p>由管理員透過 GitHub Issues 發布，自動同步顯示於此。</p>
-                    <a class="ann-post-btn"
-                       href="https://github.com/yitween/AC/issues/new?labels=announcement&title=%5B%E5%85%AC%E5%91%8A%5D+&body=%23%23+%E5%85%AC%E5%91%8A%E5%85%A7%E5%AE%B9%0A%0A%EF%BC%88%E5%9C%A8%E6%AD%A4%E8%BC%B8%E5%85%A5%E5%85%A7%E5%AE%B9%EF%BC%89"
-                       target="_blank" rel="noopener" id="ann-post-link">
-                        ＋ 發布新公告
-                    </a>
-                </div>
-                <!-- announcements.js 動態插入公告卡片 -->
-                <div id="ac-announce"></div>
+                <p>由管理員透過 GitHub Issues 發布，自動同步顯示於此。</p>
+                <a class="ann-post-btn" href="https://github.com/yitween/AC/issues/new?labels=announcement&title=%5B%E5%85%AC%E5%91%8A%5D+&body=%23%23+%E5%85%AC%E5%91%8A%E5%85%A7%E5%AE%B9%0A%0A%EF%BC%88%E5%9C%A8%E6%AD%A4%E8%BC%B8%E5%85%A5%E5%85%A7%E5%AE%B9%EF%BC%89"
+                   target="_blank" rel="noopener">
+                    ＋ 發布新公告
+                </a>
+                <div id="announcement-container" style="margin-top: 20px;"></div>
             </section>
+
+            <!-- 題庫區 -->
             <section id="section1">
                 <h2>1. 輔助題庫</h2>
                 <p>選擇題目後點擊「前往題目」，將在新分頁開啟 ZeroJudge 對應題目。</p>
@@ -197,6 +271,8 @@
                     </div>
                 </div>
             </section>
+
+            <!-- 課程區 -->
             <section id="section2">
                 <h2>2. 線上課程</h2>
                 <div class="course-card">
@@ -209,6 +285,8 @@
                     </div>
                 </div>
             </section>
+
+            <!-- App 下載區 -->
             <section id="section3">
                 <h2>3. 下載 App</h2>
                 <p>本網站已支援 PWA（漸進式網頁應用程式），可安裝到任何裝置的主畫面，離線也能瀏覽學過的頁面。</p>
@@ -217,7 +295,7 @@
 
                     <!-- Android -->
                     <div class="install-card">
-                        <div class="install-icon"></div>
+                        <div class="install-icon">📱</div>
                         <h4>Android</h4>
                         <p>直接從瀏覽器安裝 PWA，或使用 PWA Builder 打包為 .apk 安裝檔。</p>
                         <button class="ibtn ibtn-green" id="pwa-install-btn">⬇ 安裝到裝置</button>
@@ -239,7 +317,7 @@
 
                     <!-- iOS -->
                     <div class="install-card">
-                        <div class="install-icon"></div>
+                        <div class="install-icon">🍎</div>
                         <h4>iPhone / iPad</h4>
                         <p>iOS 透過 Safari 的「加入主畫面」功能安裝，體驗近似原生 App。</p>
                         <div class="install-steps">
@@ -281,12 +359,73 @@
                 </div>
             </section>
 
+            <!-- 分享此平台 -->
+            <section id="section4">
+                <h2>4. 分享此平台</h2>
+                <p>歡迎分享 AC 程式設計學習平台給更多想學習程式的朋友！</p>
+
+                <div class="share-grid" style="margin-top: 20px;">
+                    <div class="share-card">
+                        <h3>社群分享</h3>
+                        <p>分享到你的 SNS，幫助更多人發現 AC！</p>
+                        <div class="share-buttons">
+                            <a class="share-btn facebook-btn" 
+                               href="https://www.facebook.com/sharer/sharer.php?u=https://yitween.github.io/AC/" 
+                               target="_blank" rel="noopener">
+                                分享到 Facebook
+                            </a>
+                            <a class="share-btn twitter-btn"
+                               href="https://twitter.com/intent/tweet?url=https://yitween.github.io/AC/&text=AC%20-%20%E8%87%AA%E7%94%B1%E5%AE%89%E5%85%A8%E7%9A%84%E7%A8%8B%E5%BC%8F%E8%A8%AD%E8%A8%88%E5%AD%B8%E7%BF%92%E5%B9%B3%E8%87%BA%20%23%E7%A8%8B%E5%BC%8F%E8%A8%AD%E8%A8%88"
+                               target="_blank" rel="noopener">
+                                分享到 Twitter
+                            </a>
+                            <a class="share-btn line-btn"
+                               href="https://line.me/R/msg/text/?https://yitween.github.io/AC/"
+                               target="_blank" rel="noopener">
+                                分享到 LINE
+                            </a>
+                            <button class="share-btn copy-btn" onclick="copyWebsiteLink()">
+                                複製網址
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 問卷調查 -->
+                    <div class="survey-card">
+                        <h3>您的意見很重要</h3>
+                        <p>只需 3-5 分鐘，幫助我們了解你的使用體驗並改進平台。</p>
+                        <a class="survey-btn" 
+                           href="https://docs.google.com/forms/d/e/1FAIpQLScWu-mMg1G2s3fGzLc2nsSLHdDFNWmnFgd6jsdkrGyzGLNyGg/viewform?usp=header" 
+                           target="_blank" rel="noopener">
+                            填寫問卷
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 問卷說明區 -->
+            <section id="section5">
+                <h2>5. 問卷調查</h2>
+                <p>感謝你使用 AC 程式設計學習平台！為了提升服務品質，我們很希望聽聽你的意見。</p>
+                <p>此問卷涵蓋以下項目：</p>
+                <ul style="margin: 15px 0; padding-left: 24px; color: var(--muted); font-size: 0.92rem; line-height: 1.8;">
+                    <li><strong>使用體驗：</strong>對各功能區塊的滿意度</li>
+                    <li><strong>內容需求：</strong>希望增加的課程和功能</li>
+                    <li><strong>學習成效：</strong>平台對你的幫助程度</li>
+                    <li><strong>改進建議：</strong>開放式意見和建議</li>
+                </ul>
+                <p style="margin-top: 20px; padding: 16px; background: rgba(127,255,212,0.08); border-left: 3px solid var(--accent); border-radius: 6px; font-size: 0.92rem;">
+                    <strong>重要提醒：</strong> 你的回應完全匿名且保密。我們只用於改進服務，絕不會與第三方分享。
+                </p>
+            </section>
+
         </div>
     </div>
 
     <script src="shared.js"></script>
     <script src="announcements.js"></script>
     <script>
+        // ── 題庫相關 ──
         function goToQuestion() {
             const url = document.getElementById('questions').value;
             if (url) window.open(url, '_blank', 'noopener');
@@ -294,6 +433,8 @@
         document.getElementById('questions').addEventListener('keydown', e => {
             if (e.key === 'Enter') goToQuestion();
         });
+
+        // ── PWA 安裝按鈕 ──
         let deferredPrompt = null;
         const installBtn = document.getElementById('pwa-install-btn');
 
@@ -307,19 +448,90 @@
             deferredPrompt.prompt();
             const { outcome } = await deferredPrompt.userChoice;
             if (outcome === 'accepted') {
-                installBtn.textContent = '✓ 已安裝';
+                installBtn.textContent = '已安裝';
                 installBtn.disabled = true;
             }
             deferredPrompt = null;
         });
         window.addEventListener('appinstalled', () => {
-            installBtn.textContent = '✓ 已安裝';
+            installBtn.textContent = '已安裝';
             installBtn.disabled = true;
         });
+
+        // ── Service Worker ──
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js')
                 .catch(err => console.warn('[SW]', err));
         }
+
+        // ── 分享與問卷功能 ──
+        function copyWebsiteLink() {
+            const url = 'https://yitween.github.io/AC/';
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url).then(() => {
+                    showNotification('連結已複製到剪貼簿！');
+                }).catch(() => {
+                    fallbackCopy(url);
+                });
+            } else {
+                fallbackCopy(url);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showNotification('連結已複製到剪貼簿！');
+            } catch (err) {
+                showNotification('複製失敗，請手動複製：' + text);
+            }
+            document.body.removeChild(textarea);
+        }
+
+        function showNotification(message) {
+            // 簡單的通知 - 如果需要更好的 UI，可以使用 toast 通知庫
+            alert(message);
+        }
+
+        // ── 分享追蹤（Google Analytics） ──
+        function trackShare(platform) {
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'share', {
+                    'method': platform,
+                    'content_title': 'AC Coding Platform'
+                });
+            }
+        }
+
+        // 為分享按鈕添加追蹤
+        document.querySelectorAll('.share-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                let platform = 'other';
+                if (this.classList.contains('facebook-btn')) platform = 'facebook';
+                else if (this.classList.contains('twitter-btn')) platform = 'twitter';
+                else if (this.classList.contains('line-btn')) platform = 'line';
+                else if (this.classList.contains('copy-btn')) platform = 'copy_link';
+                trackShare(platform);
+            });
+        });
+
+        // 問卷點擊追蹤
+        document.querySelectorAll('.survey-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (typeof gtag !== 'undefined') {
+                    gtag('event', 'view_item', {
+                        'content_type': 'survey',
+                        'item_id': 'user_satisfaction_survey'
+                    });
+                }
+            });
+        });
     </script>
 </body>
 </html>
